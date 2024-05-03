@@ -1,4 +1,3 @@
-import javax.swing.JPanel;
 import java.awt.Graphics;
 
 public class Player {
@@ -13,7 +12,9 @@ public class Player {
     public int attack;
     public int defense;
 
-    public Weapons[] weapons;
+    public Weapon[] weapons;
+    private int monsterCount;
+    private Monster[] monsters;
     private int speed;
 
     public Player(String name, int x, int y, int speed) {
@@ -21,8 +22,21 @@ public class Player {
         this.x = x;
         this.y = y;
         this.speed = speed;
-        this.weapons = new Weapons[1];
-        this.weapons[0] = new Weapons("assets/sword_rotated", 100, 300, 100, 100, 60);
+        this.weapons = new Weapon[1];
+        this.weapons[0] = new Weapon("assets/sword_rotated", 100, 300, 100, 100, 1);
+    }
+
+    public void setMonsters(Monster[] monsters) {
+        this.monsters = monsters;
+        for (Weapon weapon : weapons) {
+            weapon.setMonsters(monsters);
+        }
+    }
+    public void setMonsterCount(int monsterCount) {
+        this.monsterCount = monsterCount;
+        for (Weapon weapon : weapons) {
+            weapon.setMonsterCount(monsterCount);
+        }
     }
 
     public void setWidth(int width) { this.width = width; }
@@ -35,9 +49,23 @@ public class Player {
     public void moveRight() { x += speed; }
 
     public void update() {
-        for (Weapons weapon : weapons) {
+        for (Weapon weapon : weapons) {
             weapon.update(x, y);
         }
+    }
+
+    public void draw(Graphics g) {
+        // System.out.println("Drawing player at " + x + ", " + y);
+        int x = this.x + this.width / 2;
+        int y = this.y + this.height / 2;
+        int width = this.width;
+        int height = this.height;
+        Weapon[] weapons = this.weapons;
+        for (Weapon weapon : weapons) {
+            weapon.draw(g);
+        }
+        g.drawRect(x, y, width, height);
+        g.drawString(name, x, y - 5);
     }
 
 }

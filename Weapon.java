@@ -6,15 +6,18 @@ import javax.imageio.ImageIO;
 
 
 
-public class Weapons {
-    public float offsetX;
-    public float offsetY;
-
-    public BufferedImage image;
-    public float degree;
+public class Weapon {
 
     private int x;
     private int y;
+    private int offsetX;
+    private int offsetY;
+    private int playerX;
+    private int playerY;
+
+    private int attack;
+    private float degree;
+    private BufferedImage image;
 
     private BufferedImage originalImage;
     private float degreePerSecond;
@@ -23,13 +26,14 @@ public class Weapons {
     private int width;
     private int height;
 
-    
     private String imageName;
-    private int degreeIndex;
-    private BufferedImage[] images; // for animation
+    // private int degreeIndex;
+    // private BufferedImage[] images; // for animation
 
+    private Monster[] monsters;
+    private int monsterCount;
 
-    public Weapons(String imageName, int distance, float degreePerSecond, int width, int height, int FPS) {
+    public Weapon(String imageName, int distance, float degreePerSecond, int width, int height, int attack) {
         // this.originalImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
         Image img = null;
         try {
@@ -49,14 +53,21 @@ public class Weapons {
         this.image = originalImage;
         this.distance = distance;
         this.degree = 0;
-        // this.degreePerSecond = 1;
         this.degreePerSecond = degreePerSecond;
-        this.FPS = FPS;
-        this.images = new BufferedImage[360 / 3];
+        this.FPS = 60;
+        this.attack = attack;
+        // this.images = new BufferedImage[360 / 3];
+        playerX = 0;
+        playerY = 0;
         x = 0;
         y = 0;
         // loadAnimation();
+        monsterCount = 0;
         update();
+    }
+
+    public void setMonsters(Monster[] monsters) {
+        this.monsters = monsters;
     }
 
     public void loadAnimation() {
@@ -82,52 +93,51 @@ public class Weapons {
         originalImage.getGraphics().drawImage(image, 0, 0, width, height, null);
     }
 
+    public void setMonsterCount(int monsterCount) {
+        this.monsterCount = monsterCount;
+    }
+
+    public void collisionCheck() {
+        for (int i = 0; i < monsterCount; i++) {
+            if (monsters[i].x < x + width && monsters[i].x + monsters[i].width > x && monsters[i].y < y + height && monsters[i].y + monsters[i].height > y) {
+                monsters[i].damage(attack);
+            }
+        }
+    }
+
     public void update() {
         degree += degreePerSecond / FPS;
         if (degree >= 360) {
             degree -= 360;
         }
-        // System.out.println("Degree: " + degree);
-        offsetX = (float) (Math.cos(Math.toRadians(degree)) * distance);
-        offsetY = (float) (Math.sin(Math.toRadians(degree)) * distance);
+        offsetX = (int) (Math.cos(Math.toRadians(degree)) * distance);
+        offsetY = (int) (Math.sin(Math.toRadians(degree)) * distance);
+
+        x = playerX + offsetX;
+        y = playerY + offsetY;
+        // System.out.println("Weapon at " + x + ", " + y);
+        collisionCheck();
         
-        // paintComponent(originalImage.getGraphics());
-        degreeIndex = (360 - (int)(degree + 45) % 360) % 360;
-        // image = images[degreeIndex / 3];
     }
 
     public void update(int x, int y) {
-        this.x = x;
-        this.y = y;
+        this.playerX = x;
+        this.playerY = y;
         update();
     }
+    
 
-    public void paintComponent(Graphics g) {
-
+    public void draw(Graphics g) {
         // System.out.println("Painting weapon");
 
-        // g.drawImage(images[degreeIndex / 3], (int)offsetX + x, (int)offsetY + y, null);
-        // g.drawImage(image, (int)offsetX + x, (int)offsetY + y, null);
-        // g.drawImage(originalImage, (int)offsetX + x, (int)offsetY + y, null);
+        int loc_x = (int)offsetX + playerX;
+        int loc_y = (int)offsetY + playerY;
 
-        // image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        
-        // AffineTransform at = AffineTransform.getRotateInstance(Math.toRadians(degree), width / 2, height / 2);
-        int loc_x = (int)offsetX + x;
-        int loc_y = (int)offsetY + y;
         AffineTransform at = AffineTransform.getTranslateInstance(loc_x, loc_y);
-        // float temdegree = degree + 45;
-        float temdegree = degree;
-        if (temdegree >= 360) {
-            temdegree -= 360;
-        } else if (temdegree < 0) {
-            temdegree += 360;
-        }
-        at.rotate(Math.toRadians(temdegree), image.getWidth() / 2, image.getHeight() / 2);
-
-        // // Resize the image
+        at.rotate(Math.toRadians(degree), image.getWidth() / 2, image.getHeight() / 2);
 
         ((Graphics2D) g).drawImage(image, at, null);
+        // ((Graphics2D) g).drawRect(loc_x, loc_y, width+5, height+5);
 
     }
 }
