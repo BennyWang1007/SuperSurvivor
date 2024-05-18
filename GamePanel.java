@@ -1,11 +1,12 @@
 
 import javax.swing.JPanel;
-import java.awt.Graphics;
+import java.awt.*;
 
 
 public class GamePanel extends JPanel{
 
     private Player player;
+    private int currentMonsterId;
 
     private int monsterCount;
     private int maxMonsterCount;
@@ -14,18 +15,52 @@ public class GamePanel extends JPanel{
     private int panelHeight;
     private int panelWidth;
 
+    private int FPS = 60;
+    private boolean isPause = false;
+
     public GamePanel(Player player) {
         super();
         this.player = player;
+        currentMonsterId = 0;
         monsterCount = 0;
         maxMonsterCount = 100;
         monsters = new Monster[maxMonsterCount];
         player.setMonsters(monsters);
+    }
 
+    public GamePanel() {
+        super();
+        monsterCount = 0;
+        maxMonsterCount = 100;
+        monsters = new Monster[maxMonsterCount];
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+        player.setGamePanel(this);
+        player.setMonsters(monsters);
+    }
+
+    public void initGame() {
+        panelHeight = this.getHeight();
+        panelWidth = this.getWidth();
+        System.out.println("Panel size: " + panelWidth + ", " + panelHeight);
+        int randX = (int)(Math.random() * panelWidth);
+        int randY = (int)(Math.random() * panelHeight);
+        player.setPos(randX, randY);
+        player.setMonsters(monsters);
+        for (int i = 0; i < 5; i++) {
+            randX = (int)(Math.random() * panelWidth);
+            randY = (int)(Math.random() * panelHeight);
+            addMonster(new Monster("Monster", randX, randY, 1, player));
+        }
     }
 
     public void addMonster(Monster monster) {
         if (monsterCount < maxMonsterCount) {
+            currentMonsterId++;
+            // System.out.println("Adding monster with id " + currentMonsterId);
+            monster.setId(currentMonsterId);
             monsters[monsterCount] = monster;
             monsterCount++;
             player.setMonsterCount(monsterCount);
@@ -45,7 +80,15 @@ public class GamePanel extends JPanel{
         }
     }
 
+    public int getFPS() { return FPS; }
+    public int getMonsterCount() { return monsterCount; }
+    public Monster[] getMonsters() { return monsters; }
+    public void setFPS(int FPS) { this.FPS = FPS; }
+
     public void update() {
+        if (isPause) {
+            return;
+        }
         panelHeight = this.getHeight();
         panelWidth = this.getWidth();
 
@@ -54,7 +97,7 @@ public class GamePanel extends JPanel{
             weapon.update();
         }
         for (int i = 0; i < monsterCount; i++) {
-            monsters[i].update(player.x, player.y);
+            monsters[i].update();
         }
 
         for (int i = 0; i < monsterCount; i++) {
@@ -62,14 +105,33 @@ public class GamePanel extends JPanel{
                 // removeMonster(monsters[i]);
                 int randX = (int)(Math.random() * panelWidth);
                 int randY = (int)(Math.random() * panelHeight);
-                monsters[i] = new Monster("Monster", randX, randY, 1);
+                currentMonsterId++;
+                monsters[i] = new Monster("Monster", randX, randY, 1, player);
+                monsters[i].setId(currentMonsterId);
             }
         }
+    }
+
+    public void reversePause() {
+        isPause = !isPause;
+    }
+
+    public void setPause(boolean isPause) {
+        this.isPause = isPause;
     }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         // System.out.println("Painting player");
+
+        if (isPause) {
+            // print pause at the middle of screen with big font with red color
+            g.setColor(Color.RED);
+            g.setFont(new Font("Arial", Font.BOLD, 50));
+            g.drawString("PAUSE", panelWidth / 2 - 100, panelHeight / 2);
+            g.setColor(Color.BLACK);
+            // return;
+        }
         
         // draw : monster -> weapon -> player
         for (int i = 0; i < monsterCount; i++) {

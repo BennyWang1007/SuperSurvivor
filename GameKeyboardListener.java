@@ -1,16 +1,21 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class PlayerMoveListener implements KeyListener {
+public class GameKeyboardListener implements KeyListener {
 
     public Player player;
+    public GamePanel gamePanel;
+
+    private boolean isPause = false;
+    private boolean escPressed = false;
     private boolean upPressed = false;
     private boolean downPressed = false;
     private boolean leftPressed = false;
     private boolean rightPressed = false;
 
-    public PlayerMoveListener(Player player) {
+    public GameKeyboardListener(GamePanel gamePanel, Player player) {
         this.player = player;
+        this.gamePanel = gamePanel;
         // System.out.println("Key listener created");
         new Thread(() -> {
             while (true) {
@@ -42,6 +47,11 @@ public class PlayerMoveListener implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         // System.out.println("Key pressed");
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE && !escPressed) {
+            isPause = !isPause;
+            gamePanel.reversePause();
+            escPressed = true;
+        }
         if (e.getKeyCode() == KeyEvent.VK_W) {
             upPressed = true;
         }
@@ -60,6 +70,9 @@ public class PlayerMoveListener implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
         // System.out.println("Key released");
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            escPressed = false;
+        }
         if (e.getKeyCode() == KeyEvent.VK_W) {
             upPressed = false;
         }

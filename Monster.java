@@ -6,6 +6,9 @@ public class Monster {
     public int y;
     public int width;
     public int height;
+    public int id = 0;
+
+    private Player player;
 
     public int health;
     public int maxHealth;
@@ -13,7 +16,7 @@ public class Monster {
     public int defense;
     private int speed;
 
-    public Monster(String name, int x, int y, int speed) {
+    public Monster(String name, int x, int y, int speed, Player player) {
         this.name = name;
         this.x = x;
         this.y = y;
@@ -22,11 +25,13 @@ public class Monster {
         maxHealth = 100;
         width = 50;
         height = 50;
+        this.player = player;
     }
 
     public void setWidth(int width) { this.width = width; }
     public void setHeight(int height) { this.height = height; }
     public void setName(String name) { this.name = name; }
+    public void setId(int id) { this.id = id; }
 
     public void moveUp() { y -= speed; }
     public void moveDown() { y += speed; }
@@ -40,6 +45,9 @@ public class Monster {
 
     public void update() {
         // TODO
+        int playerX = player.x;
+        int playerY = player.y;
+        update(playerX, playerY);
     }
 
     public void updateRandom() {
@@ -84,7 +92,9 @@ public class Monster {
         int height = this.height;
         g.drawRect(x, y, width, height);
         g.fillRect(x, y, width, height);
-        g.drawString(name, x, y - 5);
+        // g.drawString(name, x, y - 5);
+        // use id instead of name
+        g.drawString(Integer.toString(id), x, y - 5);
 
         // draw health bar, red and green, obove the monster
         int healthBarWidth = width;
