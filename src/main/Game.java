@@ -8,10 +8,10 @@ public class Game {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int SCREEN_HEIGHT = screenSize.height;
         int SCREEN_WIDTH = SCREEN_HEIGHT * 16 / 9;
-//        int SCREEN_WIDTH = 1080;
-//        int SCREEN_HEIGHT = 720;
+        // int SCREEN_WIDTH = 1080;
+        // int SCREEN_HEIGHT = 720;
         int FPS = 60;
-        double TARGET_TIME = 1000000000 / FPS;
+        double TARGET_TIME = 1000000000.0 / FPS;
 
         JFrame frame = new JFrame("Game");
         frame.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -19,8 +19,6 @@ public class Game {
 
         GamePanel gamePanel = new GamePanel();
         Player player = new Player("PlayerName", 100, 100, 5, gamePanel);
-        player.setWidth(50);
-        player.setHeight(50);
         gamePanel.setPlayer(player);
         gamePanel.setFPS(FPS);
         frame.add(gamePanel);
@@ -48,8 +46,15 @@ public class Game {
                 start = System.nanoTime();
                 gamePanel.update();
                 gamePanel.repaint();
+                if (gamePanel.isGameOver()) {
+                    break;
+                }
             }
         }
+        // close the frame
+        frame.dispose();
+        return;
+
 
         // // test the limit fps 
         // long start = System.nanoTime();

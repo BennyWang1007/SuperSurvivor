@@ -2,35 +2,36 @@ package monsters;
 
 import java.awt.Graphics;
 
-import weapons.*;
+// import weapons.*;
 import main.*;
 
 public class Monster {
     public String name;
-    public int x;
-    public int y;
+    public int x; // center x
+    public int y; // center y
     public int width;
     public int height;
     public int id = 0;
 
     private Player player;
 
-    public int health;
-    public int maxHealth;
+    public int hp;
+    public int maxHp;
     public int attack;
     public int defense;
     private int speed;
 
-    public Monster(String name, int x, int y, int speed, Player player) {
+    public Monster(String name, int x, int y, int hp, int attack, int speed, Player player) {
         this.name = name;
         this.x = x;
         this.y = y;
+        this.hp = hp;
+        this.maxHp = hp;
+        this.attack = attack;
         this.speed = speed;
-        health = 100;
-        maxHealth = 100;
+        this.player = player;
         width = 50;
         height = 50;
-        this.player = player;
     }
 
     public void setWidth(int width) { this.width = width; }
@@ -50,20 +51,16 @@ public class Monster {
 
     public void update() {
         // TODO
-        int playerX = player.x;
-        int playerY = player.y;
-        update(playerX, playerY);
+        update(player.x, player.y);
     }
 
     public void updateRandom() {
         int dx = (int)(Math.random() * speed * 2) - speed;
         int dy = (int)(Math.random() * speed * 2) - speed;
-        
         move(dx, dy);
     }
 
     public void update(int x, int y) {
-
         // move towards player
         int dx, dy;
         if (this.x < x) { dx = speed; }
@@ -73,45 +70,37 @@ public class Monster {
         else if (this.y > y) { dy = -speed; }
         else { dy = 0; }
         move(dx, dy);
-
-        // move randomly
-        // updateRandom();
-        
     }
 
-    public boolean isDead() {
-        return health <= 0;
-    }
+    public boolean isDead() { return hp <= 0; }
 
     public boolean damage(int damage) {
         // System.out.println(name + " took " + damage + " damage");
-        health -= damage;
+        hp -= damage;
         return isDead();
     }
 
     public void draw(Graphics g) {
         // System.out.println("Drawing monster at " + x + ", " + y);
-//        int x = this.x + this.width / 2;
-//        int y = this.y + this.height / 2;
-        int x = this.x + this.width / 2 - player.x + player.getGamePanel().getWidth() / 2;
-        int y = this.y + this.height / 2 - player.y + player.getGamePanel().getHeight() / 2;
-        int width = this.width;
-        int height = this.height;
-        g.drawRect(x, y, width, height);
-        g.fillRect(x, y, width, height);
+        // int cx = x - width / 2;
+        // int cy = y - height / 2;
+        int cx = x - width / 2 - player.x + player.getGamePanel().getWidth() / 2;
+        int cy = y - height / 2 - player.y + player.getGamePanel().getHeight() / 2;
+        g.drawRect(cx, cy, width, height);
+        g.fillRect(cx, cy, width, height);
         // g.drawString(name, x, y - 5);
         // use id instead of name
-        g.drawString(Integer.toString(id), x, y - 5);
+        g.drawString(Integer.toString(id), cx, cy - 5);
 
         // draw health bar, red and green, above the monster
         int healthBarWidth = width;
         int healthBarHeight = 5;
-        int healthBarX = x;
-        int healthBarY = y - healthBarHeight - 15;
+        int healthBarX = cx;
+        int healthBarY = cy - healthBarHeight - 15;
         g.setColor(java.awt.Color.RED);
         g.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
         g.setColor(java.awt.Color.GREEN);
-        g.fillRect(healthBarX, healthBarY, healthBarWidth * health / maxHealth, healthBarHeight);
+        g.fillRect(healthBarX, healthBarY, healthBarWidth * hp / maxHp, healthBarHeight);
         g.setColor(java.awt.Color.BLACK);
 
     }

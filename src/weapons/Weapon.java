@@ -11,8 +11,8 @@ import monsters.*;
 
 public abstract class Weapon {
 
-    protected int x;
-    protected int y;
+    protected int x; // center x
+    protected int y; // center y
     protected int offsetX;
     protected int offsetY;
     protected int playerX;
@@ -20,18 +20,18 @@ public abstract class Weapon {
     protected int FPS;
     protected GamePanel gamePanel;
 
-    private int attack;
+    protected int attack;
     protected HashMap<Integer, Integer> attackCooldowns;
     
     protected BufferedImage image;
     // private BufferedImage[] images; // for animation
     private BufferedImage originalImage;
     
-    private int width;
-    private int height;
+    protected int width;
+    protected int height;
 
     protected Player owner;
-    protected Monster[] monsters; // maybe consider using a arraylist + hashmap to search by id
+    protected Monster[] monsters; // maybe consider using an arraylist + hashmap to search by id
     protected int monsterCount;
 
     public Weapon(int width, int height, int attack, Player owner) {
@@ -77,7 +77,8 @@ public abstract class Weapon {
         monsterCount = gamePanel.getMonsterCount();
         monsters = gamePanel.getMonsters();
         for (int i = 0; i < monsterCount; i++) {
-            if (monsters[i].x < x + width && monsters[i].x + monsters[i].width > x && monsters[i].y < y + height && monsters[i].y + monsters[i].height > y) {
+            if (monsters[i].x - monsters[i].width / 2 < x + width / 2 && monsters[i].x + monsters[i].width / 2 > x - width / 2 &&
+                monsters[i].y - monsters[i].height / 2 < y + height / 2 && monsters[i].y + monsters[i].height / 2 > y - height / 2) {
                 if (attackCooldowns.containsKey(monsters[i].id)) {
                     continue;
                 }

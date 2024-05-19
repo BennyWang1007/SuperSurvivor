@@ -28,7 +28,7 @@ public class GamePanel extends JPanel{
         monsterCount = 0;
         maxMonsterCount = 100;
         monsters = new Monster[maxMonsterCount];
-        player.setMonsters(monsters);
+        // player.setMonsters(monsters);
     }
 
     public GamePanel() {
@@ -41,7 +41,7 @@ public class GamePanel extends JPanel{
     public void setPlayer(Player player) {
         this.player = player;
         player.setGamePanel(this);
-        player.setMonsters(monsters);
+        // player.setMonsters(monsters);
     }
 
     public void initGame() {
@@ -51,11 +51,11 @@ public class GamePanel extends JPanel{
         int randX = (int)(Math.random() * panelWidth);
         int randY = (int)(Math.random() * panelHeight);
         player.setPos(randX, randY);
-        player.setMonsters(monsters);
+        // player.setMonsters(monsters);
         for (int i = 0; i < 5; i++) {
             randX = (int)(Math.random() * panelWidth);
             randY = (int)(Math.random() * panelHeight);
-            addMonster(new Monster("Monster", randX, randY, 1, player));
+            addMonster(new Monster("Monster", randX, randY, 100, 20, 1, player));
         }
     }
 
@@ -66,7 +66,7 @@ public class GamePanel extends JPanel{
             monster.setId(currentMonsterId);
             monsters[monsterCount] = monster;
             monsterCount++;
-            player.setMonsterCount(monsterCount);
+            // player.setMonsterCount(monsterCount);
         }
     }
 
@@ -77,7 +77,7 @@ public class GamePanel extends JPanel{
                     monsters[j] = monsters[j + 1];
                 }
                 monsterCount--;
-                player.setMonsterCount(monsterCount);
+                // player.setMonsterCount(monsterCount);
                 break;
             }
         }
@@ -109,10 +109,15 @@ public class GamePanel extends JPanel{
                 int randX = (int)(Math.random() * panelWidth);
                 int randY = (int)(Math.random() * panelHeight);
                 currentMonsterId++;
-                monsters[i] = new Monster("Monster", randX, randY, 1, player);
+                monsters[i] = new Monster("Monster", randX, randY, 100, 20, 1, player);
                 monsters[i].setId(currentMonsterId);
             }
         }
+    }
+
+    public boolean isGameOver() {
+        // TODO
+        return player.hp <= 0;
     }
 
     public void reversePause() {
