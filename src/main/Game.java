@@ -9,7 +9,7 @@ import java.awt.*;
 
 public class Game {
 
-    private static final int FPS = 1000000;
+    private static final int FPS = 240;
     public static void main(String[] args) {
         // Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         // int SCREEN_HEIGHT = screenSize.height;
