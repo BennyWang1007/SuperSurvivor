@@ -1,5 +1,9 @@
+package weapons;
+
 import java.awt.geom.AffineTransform;
 import java.awt.*;
+
+import main.*;
 
 public class SpinningSword extends Weapon{
     
@@ -12,7 +16,7 @@ public class SpinningSword extends Weapon{
         this.degreePerSecond = degreePerSecond;
         this.distance = distance;
         this.degree = 0;
-        readImage("assets/sword_900.png");
+        readImage("res/sword_900.png");
     }
 
     public void update() {
@@ -34,10 +38,12 @@ public class SpinningSword extends Weapon{
 
     public void draw(Graphics g) {
         // System.out.println("Painting weapon");
-        AffineTransform at = AffineTransform.getTranslateInstance(x, y);
+        int cx = x - playerX + owner.getGamePanel().getWidth() / 2;
+        int cy = y - playerY + owner.getGamePanel().getHeight() / 2;
+        AffineTransform at = AffineTransform.getTranslateInstance(cx, cy);
         at.rotate(Math.toRadians(degree), image.getWidth() / 2, image.getHeight() / 2);
         ((Graphics2D) g).drawImage(image, at, null);
-        // ((Graphics2D) g).drawRect(loc_x, loc_y, width+5, height+5);
+        ((Graphics2D) g).drawRect(cx, cy, image.getWidth()+5, image.getHeight()+5);
     }
 
     public void loadAnimation() {};

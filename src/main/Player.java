@@ -1,4 +1,9 @@
+package main;
+
 import java.awt.Graphics;
+
+import monsters.*;
+import weapons.*;
 
 public class Player {
     public String name;
@@ -68,8 +73,10 @@ public class Player {
 
     public void draw(Graphics g) {
         // System.out.println("Drawing player at " + x + ", " + y);
-        int x = this.x + this.width / 2;
-        int y = this.y + this.height / 2;
+//        int x = this.x + this.width / 2;
+//        int y = this.y + this.height / 2;
+        int x = gamePanel.getWidth() / 2;
+        int y = gamePanel.getHeight() / 2;
         int width = this.width;
         int height = this.height;
         Weapon[] weapons = this.weapons;

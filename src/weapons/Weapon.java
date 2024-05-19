@@ -1,8 +1,13 @@
+package weapons;
+
 import java.awt.image.BufferedImage;
 import java.awt.*;
 import java.io.File;
 import java.util.*;
 import javax.imageio.ImageIO;
+
+import main.*;
+import monsters.*;
 
 public abstract class Weapon {
 

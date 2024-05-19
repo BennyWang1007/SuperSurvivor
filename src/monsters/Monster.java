@@ -1,4 +1,9 @@
+package monsters;
+
 import java.awt.Graphics;
+
+import weapons.*;
+import main.*;
 
 public class Monster {
     public String name;
@@ -86,8 +91,10 @@ public class Monster {
 
     public void draw(Graphics g) {
         // System.out.println("Drawing monster at " + x + ", " + y);
-        int x = this.x + this.width / 2;
-        int y = this.y + this.height / 2;
+//        int x = this.x + this.width / 2;
+//        int y = this.y + this.height / 2;
+        int x = this.x + this.width / 2 - player.x + player.getGamePanel().getWidth() / 2;
+        int y = this.y + this.height / 2 - player.y + player.getGamePanel().getHeight() / 2;
         int width = this.width;
         int height = this.height;
         g.drawRect(x, y, width, height);
@@ -96,7 +103,7 @@ public class Monster {
         // use id instead of name
         g.drawString(Integer.toString(id), x, y - 5);
 
-        // draw health bar, red and green, obove the monster
+        // draw health bar, red and green, above the monster
         int healthBarWidth = width;
         int healthBarHeight = 5;
         int healthBarX = x;

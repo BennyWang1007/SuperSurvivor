@@ -1,7 +1,10 @@
+package main;
 
 import javax.swing.JPanel;
 import java.awt.*;
 
+import monsters.*;
+import weapons.*;
 
 public class GamePanel extends JPanel{
 

@@ -1,10 +1,15 @@
+package main;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class Game {
     public static void main(String[] args) {
-        int SCREEN_WIDTH = 1080;
-        int SCREEN_HEIGHT = 720;
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int SCREEN_HEIGHT = screenSize.height;
+        int SCREEN_WIDTH = SCREEN_HEIGHT * 16 / 9;
+//        int SCREEN_WIDTH = 1080;
+//        int SCREEN_HEIGHT = 720;
         int FPS = 60;
         double TARGET_TIME = 1000000000 / FPS;
 
