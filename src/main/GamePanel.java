@@ -2,6 +2,7 @@ package main;
 
 import javax.swing.JPanel;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 import monsters.*;
 import weapons.*;
@@ -21,6 +22,10 @@ public class GamePanel extends JPanel{
     private int FPS = 60;
     private boolean isPause = false;
 
+    private Image backgroundImage;
+    private int mapWidth;
+    private int mapHeight;
+
     public GamePanel(Player player) {
         super();
         this.player = player;
@@ -36,6 +41,21 @@ public class GamePanel extends JPanel{
         monsterCount = 0;
         maxMonsterCount = 100;
         monsters = new Monster[maxMonsterCount];
+        mapWidth = 3000;
+        mapHeight = 3000;
+        setBackgroundImage("res/backgnd.png");
+    }
+
+    public void setBackgroundImage(String imageName) {
+        Image img = null;
+        try {
+            img = Toolkit.getDefaultToolkit().getImage(imageName);
+        } catch (Exception e) {
+            System.out.println("Error loading image: " + imageName);
+        }
+        // scale the image to map size
+        backgroundImage = img.getScaledInstance(mapWidth, mapHeight, Image.SCALE_DEFAULT);
+        // backgroundImage = img;
     }
 
     public void setPlayer(Player player) {
@@ -131,6 +151,11 @@ public class GamePanel extends JPanel{
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         // System.out.println("Painting player");
+
+        // find the part of the image to draw
+        int sx = (int)(mapWidth / 2 + player.x - panelWidth / 2), ex = (int)(mapWidth / 2 + player.x + panelWidth / 2);
+        int sy = (int)(mapHeight / 2 + player.y - panelHeight / 2), ey = (int)(mapHeight / 2 + player.y + panelHeight / 2);
+        g.drawImage(backgroundImage, 0, 0, panelWidth, panelHeight, sx, sy, ex, ey, this);
 
         if (isPause) {
             // print pause at the middle of screen with big font with red color
