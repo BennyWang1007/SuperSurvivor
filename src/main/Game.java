@@ -1,27 +1,33 @@
 package main;
 
 import javax.swing.*;
+
+import entity.Player;
+import listeners.GameKeyboardListener;
+
 import java.awt.*;
 
 public class Game {
+
+    private static final int FPS = 1000000;
     public static void main(String[] args) {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int SCREEN_HEIGHT = screenSize.height;
-        int SCREEN_WIDTH = SCREEN_HEIGHT * 16 / 9;
-        // int SCREEN_WIDTH = 1080;
-        // int SCREEN_HEIGHT = 720;
-        int FPS = 60;
+        // Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        // int SCREEN_HEIGHT = screenSize.height;
+        // int SCREEN_WIDTH = SCREEN_HEIGHT * 16 / 9;
+        int SCREEN_WIDTH = 1080;
+        int SCREEN_HEIGHT = 720;
         double TARGET_TIME = 1000000000.0 / FPS;
 
+        // create the frame
         JFrame frame = new JFrame("Game");
         frame.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        GamePanel gamePanel = new GamePanel();
+        GamePanel gamePanel = new GamePanel(FPS);
         Player player = new Player("PlayerName", 100, 100, 5, gamePanel);
         gamePanel.setPlayer(player);
-        gamePanel.setFPS(FPS);
         frame.add(gamePanel);
+
 
         // JMenu menu = new JMenu("File");
         // JMenuItem menuItem = new JMenuItem("Set Name");
@@ -33,8 +39,9 @@ public class Game {
         // JMenuBar menuBar = new JMenuBar();
         // menuBar.add(menu);
         // frame.setJMenuBar(menuBar);
-
-        frame.addKeyListener(new GameKeyboardListener(gamePanel, player));
+        
+        GameKeyboardListener kbListener = new GameKeyboardListener(gamePanel, player);
+        frame.addKeyListener(kbListener);
         frame.setVisible(true);
         
         gamePanel.initGame();
@@ -44,6 +51,7 @@ public class Game {
             long elapsed = System.nanoTime() - start;
             if (elapsed > TARGET_TIME) {
                 start = System.nanoTime();
+                kbListener.update();
                 gamePanel.update();
                 gamePanel.repaint();
                 if (gamePanel.isGameOver()) {
@@ -53,7 +61,6 @@ public class Game {
         }
         // close the frame
         frame.dispose();
-        return;
 
 
         // // test the limit fps 

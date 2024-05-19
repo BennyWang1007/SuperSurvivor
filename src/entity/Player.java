@@ -1,16 +1,17 @@
-package main;
+package entity;
 
 import java.awt.Graphics;
 
-import monsters.*;
+import entity.enemy.Enemy;
+import main.GamePanel;
 import weapons.*;
 
-public class Player {
+public class Player extends Entity{
     public String name;
-    public int x;
-    public int y;
-    public int width;
-    public int height;
+    // public int x;
+    // public int y;
+    // public int width;
+    // public int height;
 
     public int hp;
     public int maxHp;
@@ -18,30 +19,30 @@ public class Player {
     public int defense;
 
     public int damageCooldown;
+    private int curMaxDamage;
 
     public Weapon[] weapons;
-    private int speed;
+    private float speed;
     private int FPS;
 
     private GamePanel gamePanel;
+    private final int renderMode;
 
     public Player(String name, int x, int y, int speed, GamePanel gamePanel) {
+        super(x, y, 50, 50);
+        this.gamePanel = gamePanel;
+        this.renderMode = gamePanel.renderMode;
+        this.FPS = gamePanel.getFPS();
         this.name = name;
-        this.x = x;
-        this.y = y;
-        this.width = 50;
-        this.height = 50;
-        this.speed = speed;
+        this.speed = (float)speed * 60 / FPS;
         this.attack = 20;
         this.hp = 100;
         this.maxHp = 100;
         this.defense = 0;
         this.damageCooldown = 0;
-        this.gamePanel = gamePanel;
-        this.FPS = gamePanel.getFPS();
         this.weapons = new Weapon[1];
         this.weapons[0] = (Weapon)(new SpinningSword(100, 100, attack, 300, 100, this));
-        // this.weapons[0].setGamePanel(gamePanel);
+        System.out.println("Player created at " + x + ", " + y + " with speed " + this.speed + ", FPS " + FPS);
     }
 
     public void setGamePanel(GamePanel gamePanel) {
@@ -50,18 +51,6 @@ public class Player {
             weapon.setGamePanel(gamePanel);
         }
     }
-
-    // public void setMonsters(Monster[] monsters) {
-    //     // for (Weapon weapon : weapons) {
-    //     //     weapon.setMonsters(monsters);
-    //     // }
-    // }
-    // public void setMonsterCount(int monsterCount) {
-    //     // this.monsterCount = monsterCount;
-    //     // for (Weapon weapon : weapons) {
-    //     //     weapon.setMonsterCount(monsterCount);
-    //     // }
-    // }
 
     public GamePanel getGamePanel() { return gamePanel; }
 
@@ -76,40 +65,55 @@ public class Player {
     public void moveRight() { x += speed; }
 
     public void update() {
+        System.out.print("\rPlayer at " + x + ", " + y);
         damageCooldown--;
         for (Weapon weapon : weapons) {
             weapon.update();
         }
         if (damageCooldown > 0) return;
-        int monsterCount = gamePanel.getMonsterCount();
-        Monster[] monsters = gamePanel.getMonsters();
-        int maxDamage = 0;
-        for (int i = 0; i < monsterCount; i++) {
-            if (monsters[i].x - monsters[i].width / 2 < x + width / 2 && monsters[i].x + monsters[i].width / 2 > x - width / 2 &&
-                monsters[i].y - monsters[i].height / 2 < y + height / 2 && monsters[i].y + monsters[i].height / 2 > y - height / 2) {
-                maxDamage = Math.max(maxDamage, monsters[i].attack);
+        if (renderMode == 1) {
+            curMaxDamage = 0;
+            int monsterCount = gamePanel.getMonsterCount();
+            Enemy[] monsters = gamePanel.getMonsters();
+            for (int i = 0; i < monsterCount; i++) {
+                if (monsters[i].x - monsters[i].width / 2 < x + width / 2 && monsters[i].x + monsters[i].width / 2 > x - width / 2 &&
+                    monsters[i].y - monsters[i].height / 2 < y + height / 2 && monsters[i].y + monsters[i].height / 2 > y - height / 2) {
+                    // curMaxDamage = Math.max(curMaxDamage, monsters[i].attack);
+                    colideWith(monsters[i]);
+                }
             }
         }
-        if (maxDamage != 0) {
-            damage(maxDamage);
-            damageCooldown = FPS / 2;
-        }
+        takeDamage();
+    }
+
+    public void colideWith(Enemy enemy) {
+        if (damageCooldown > 0) return;
+        curMaxDamage = Math.max(curMaxDamage, enemy.attack);
+    }
+
+    public void takeDamage() {
+        if (curMaxDamage == 0) return;
+        damage(curMaxDamage);
+        damageCooldown = FPS / 2;
+        if (renderMode == 0) curMaxDamage = 0;
     }
 
     public void damage(int damage) {
-        if (damage < 0) return;
+        if (damage <= 0) return;
         hp -= damage - defense;
         if (hp < 0) {
             hp = 0;
         }
     }
 
+    /**
+     * Draw the weapons and then the player
+     * @param g the Graphics object
+     */
     public void draw(Graphics g) {
         // System.out.println("Drawing player at " + x + ", " + y);
-        // int cx = this.x - width / 2;
-        // int cy = this.y - height / 2;
-        int cx = gamePanel.getWidth() / 2 - width / 2;
-        int cy = gamePanel.getHeight() / 2 - height / 2;
+        int cx = (gamePanel.getWidth() - width) / 2;
+        int cy = (gamePanel.getHeight() - height) / 2;
         Weapon[] weapons = this.weapons;
         for (Weapon weapon : weapons) {
             weapon.draw(g);
@@ -117,6 +121,7 @@ public class Player {
         g.drawRect(cx, cy, width, height);
         g.drawString(name, cx, cy - 5);
         
+        // Draw health bar
         int healthBarWidth = width;
         int healthBarHeight = 5;
         int healthBarX = cx;

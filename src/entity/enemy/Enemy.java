@@ -1,37 +1,31 @@
-package monsters;
+package entity.enemy;
 
 import java.awt.Graphics;
 
-// import weapons.*;
-import main.*;
+import entity.*;
 
-public class Monster {
+public class Enemy extends Entity {
     public String name;
-    public int x; // center x
-    public int y; // center y
-    public int width;
-    public int height;
     public int id = 0;
 
     private Player player;
+    private int FPS;
 
     public int hp;
     public int maxHp;
     public int attack;
     public int defense;
-    private int speed;
+    public float speed;
 
-    public Monster(String name, int x, int y, int hp, int attack, int speed, Player player) {
+    public Enemy(String name, int x, int y, int hp, int attack, int speed, Player player) {
+        super(x, y, 50, 50);
         this.name = name;
-        this.x = x;
-        this.y = y;
         this.hp = hp;
         this.maxHp = hp;
         this.attack = attack;
-        this.speed = speed;
+        this.speed = speed * 60;
         this.player = player;
-        width = 50;
-        height = 50;
+        this.FPS = player.getGamePanel().getFPS();
     }
 
     public void setWidth(int width) { this.width = width; }
@@ -44,7 +38,7 @@ public class Monster {
     public void moveLeft() { x -= speed; }
     public void moveRight() { x += speed; }
 
-    public void move(int dx, int dy) {
+    public void move(float dx, float dy) {
         x += dx;
         y += dy;
     }
@@ -55,20 +49,22 @@ public class Monster {
     }
 
     public void updateRandom() {
-        int dx = (int)(Math.random() * speed * 2) - speed;
-        int dy = (int)(Math.random() * speed * 2) - speed;
+        float dx = (float)(Math.random() * speed * 2 - speed) / FPS;
+        float dy = (float)(Math.random() * speed * 2 - speed) / FPS;
         move(dx, dy);
     }
 
-    public void update(int x, int y) {
+    public void update(float x, float y) {
         // move towards player
-        int dx, dy;
+        float dx, dy;
         if (this.x < x) { dx = speed; }
         else if (this.x > x) { dx = -speed; }
         else { dx = 0; }
         if (this.y < y) { dy = speed; }
         else if (this.y > y) { dy = -speed; }
         else { dy = 0; }
+        dx /= FPS;
+        dy /= FPS;
         move(dx, dy);
     }
 
@@ -84,8 +80,8 @@ public class Monster {
         // System.out.println("Drawing monster at " + x + ", " + y);
         // int cx = x - width / 2;
         // int cy = y - height / 2;
-        int cx = x - width / 2 - player.x + player.getGamePanel().getWidth() / 2;
-        int cy = y - height / 2 - player.y + player.getGamePanel().getHeight() / 2;
+        int cx = (int)Math.round(x - width / 2.0 - player.x + player.getGamePanel().getWidth() / 2.0);
+        int cy = (int)Math.round(y - height / 2.0 - player.y + player.getGamePanel().getHeight() / 2.0);
         g.drawRect(cx, cy, width, height);
         g.fillRect(cx, cy, width, height);
         // g.drawString(name, x, y - 5);

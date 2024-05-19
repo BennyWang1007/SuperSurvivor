@@ -6,13 +6,17 @@ import java.io.File;
 import java.util.*;
 import javax.imageio.ImageIO;
 
+import entity.*;
+import entity.enemy.Enemy;
 import main.*;
-import monsters.*;
 
-public abstract class Weapon {
+public abstract class Weapon extends Entity{
 
-    protected int x; // center x
-    protected int y; // center y
+    // protected int x; // center x
+    // protected int y; // center y
+    // protected int width;
+    // protected int height;
+
     protected int offsetX;
     protected int offsetY;
     protected int playerX;
@@ -27,22 +31,23 @@ public abstract class Weapon {
     // private BufferedImage[] images; // for animation
     private BufferedImage originalImage;
     
-    protected int width;
-    protected int height;
 
     protected Player owner;
-    protected Monster[] monsters; // maybe consider using an arraylist + hashmap to search by id
+    protected Enemy[] monsters; // maybe consider using an arraylist + hashmap to search by id
     protected int monsterCount;
 
+    protected float cooldownTime; // in seconds
+
     public Weapon(int width, int height, int attack, Player owner) {
-        this.width = width;
-        this.height = height;
+        super(0, 0, width, height);
+        // x = 0;
+        // y = 0;
+        // this.width = width;
+        // this.height = height;
         this.attack = attack;
         this.owner = owner;
         playerX = 0;
         playerY = 0;
-        x = 0;
-        y = 0;
         // loadAnimation();
         monsterCount = 0;
         attackCooldowns = new HashMap<Integer, Integer>();
@@ -79,25 +84,21 @@ public abstract class Weapon {
         for (int i = 0; i < monsterCount; i++) {
             if (monsters[i].x - monsters[i].width / 2 < x + width / 2 && monsters[i].x + monsters[i].width / 2 > x - width / 2 &&
                 monsters[i].y - monsters[i].height / 2 < y + height / 2 && monsters[i].y + monsters[i].height / 2 > y - height / 2) {
-                if (attackCooldowns.containsKey(monsters[i].id)) {
-                    continue;
-                }
-                attackCooldowns.put(monsters[i].id, FPS);
-                monsters[i].damage(attack);
-            }
-        }
-        // remove cooldowns <= 0
-        Iterator<Integer> iterator = attackCooldowns.keySet().iterator();
-        while (iterator.hasNext()) {
-            int id = iterator.next();
-            attackCooldowns.put(id, attackCooldowns.get(id) - 1);
-            if (attackCooldowns.get(id) <= 0) {
-                iterator.remove();
+                attackOn(monsters[i]);
             }
         }
     }
 
+    public void colideWith(Enemy enemy) {
+        if (attackCooldowns.containsKey(enemy.id)) {
+            return;
+        }
+        attackCooldowns.put(enemy.id, FPS);
+        enemy.damage(attack);
+    }
+
     public abstract void update();
+    public abstract void attackOn(Enemy enemy);
     public abstract void draw(Graphics g);
     public abstract void loadAnimation();
 }
