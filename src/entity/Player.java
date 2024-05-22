@@ -22,6 +22,8 @@ public class Player extends Entity{
     private int curMaxDamage;
 
     public Weapon[] weapons;
+    public int weaponCount;
+
     private float speed;
     private int FPS;
 
@@ -40,15 +42,17 @@ public class Player extends Entity{
         this.maxHp = 100;
         this.defense = 0;
         this.damageCooldown = 0;
-        this.weapons = new Weapon[1];
+        this.weapons = new Weapon[20];
         this.weapons[0] = (Weapon)(new SpinningSword(100, 100, attack, 300, 100, this));
+        this.weapons[1] = (Weapon)(new Bow(10, 10, attack, 600, 1, this));
+        this.weaponCount = 2;
         System.out.println("Player created at " + x + ", " + y + " with speed " + this.speed + ", FPS " + FPS);
     }
 
     public void setGamePanel(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
-        for (Weapon weapon : weapons) {
-            weapon.setGamePanel(gamePanel);
+        for (int i = 0; i < weaponCount; i++) {
+            weapons[i].setGamePanel(gamePanel);
         }
     }
 
@@ -65,10 +69,10 @@ public class Player extends Entity{
     public void moveRight() { x += speed; }
 
     public void update() {
-        System.out.print("\rPlayer at " + x + ", " + y);
+        // System.out.println("\rPlayer at " + x + ", " + y);
         damageCooldown--;
-        for (Weapon weapon : weapons) {
-            weapon.update();
+        for (int i = 0; i < weaponCount; i++) {
+            weapons[i].update();
         }
         if (damageCooldown > 0) return;
         if (renderMode == 1) {
@@ -115,9 +119,10 @@ public class Player extends Entity{
         int cx = (gamePanel.getWidth() - width) / 2;
         int cy = (gamePanel.getHeight() - height) / 2;
         Weapon[] weapons = this.weapons;
-        for (Weapon weapon : weapons) {
-            weapon.draw(g);
+        for (int i = 0; i < weaponCount; i++) {
+            weapons[i].draw(g);
         }
+        g.setColor(java.awt.Color.BLUE);
         g.drawRect(cx, cy, width, height);
         g.drawString(name, cx, cy - 5);
         
@@ -130,7 +135,6 @@ public class Player extends Entity{
         g.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
         g.setColor(java.awt.Color.GREEN);
         g.fillRect(healthBarX, healthBarY, healthBarWidth * hp / maxHp, healthBarHeight);
-        g.setColor(java.awt.Color.BLACK);
     }
 
 }

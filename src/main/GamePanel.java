@@ -3,6 +3,7 @@ package main;
 import javax.swing.JPanel;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 import api.*;
 import entity.*;
@@ -39,7 +40,7 @@ public class GamePanel extends JPanel{
     private final EventDispatcher eventDispatcher;
 
     // for testing
-    public final int renderMode = 0; // 0: event, 1: hierarchy
+    public final int renderMode = 1; // 0: event, 1: hierarchy
 
     public GamePanel() {
         super();
@@ -73,7 +74,6 @@ public class GamePanel extends JPanel{
         }
         // scale the image to map size
         backgroundImage = img.getScaledInstance(mapWidth, mapHeight, Image.SCALE_DEFAULT);
-        // backgroundImage = img;
     }
 
     public void setPlayer(Player player) {
@@ -156,8 +156,9 @@ public class GamePanel extends JPanel{
         };
 
         player.update();
-        for (Weapon weapon : player.weapons) {
-            weapon.update();
+
+        for (int i = 0; i < player.weaponCount; i++) {
+            player.weapons[i].update();
         }
         for (int i = 0; i < monsterCount; i++) {
             monsters[i].update();
@@ -192,17 +193,25 @@ public class GamePanel extends JPanel{
         super.paintComponent(g);
         // System.out.println("Painting player");
 
-        // find the part of the image to draw
+        // find the part of the background to draw
         int sx = (int)(mapWidth / 2 + player.x - panelWidth / 2), ex = (int)(mapWidth / 2 + player.x + panelWidth / 2);
         int sy = (int)(mapHeight / 2 + player.y - panelHeight / 2), ey = (int)(mapHeight / 2 + player.y + panelHeight / 2);
-        g.drawImage(backgroundImage, 0, 0, panelWidth, panelHeight, sx, sy, ex, ey, this);
+        // g.drawImage(backgroundImage, 0, 0, panelWidth, panelHeight, sx, sy, ex, ey, this);
+
+        // draw the background with opacity 0.5
+        BufferedImage bimg = new BufferedImage(panelWidth, panelHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D bg = bimg.createGraphics();
+        bg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+        bg.drawImage(backgroundImage, 0, 0, panelWidth, panelHeight, sx, sy, ex, ey, this);
+        bg.dispose();
+        g.drawImage(bimg, 0, 0, this);
 
         if (isPause) {
             // print pause at the middle of screen with big font with red color
             g.setColor(Color.RED);
             g.setFont(new Font("Arial", Font.BOLD, 50));
             g.drawString("PAUSE", panelWidth / 2 - 100, panelHeight / 2);
-            g.setColor(Color.BLACK);
+            g.setFont(new Font("Arial", Font.PLAIN, 12));
             // return;
         }
         
@@ -233,9 +242,9 @@ public class GamePanel extends JPanel{
             if (isCollided(player, monsters[i])) {
                 eventDispatcher.dispatchEvent(new EnemyHitPlayerEvent(player, monsters[i]));
             }
-            for (Weapon weapon : player.weapons) {
-                if (isCollided(weapon, monsters[i])) {
-                    eventDispatcher.dispatchEvent(new WeaponHitEnemyEvent(weapon, monsters[i]));
+            for (int j = 0; j < player.weaponCount; j++) {
+                if (isCollided(player.weapons[i], monsters[i])) {
+                    eventDispatcher.dispatchEvent(new WeaponHitEnemyEvent(player.weapons[i], monsters[i]));
                 }
             }
         }

@@ -69,6 +69,9 @@ public class SpinningSword extends Weapon{
         AffineTransform at = AffineTransform.getTranslateInstance(cx, cy);
         at.rotate(Math.toRadians(degree), image.getWidth() / 2, image.getHeight() / 2);
         ((Graphics2D) g).drawImage(image, at, null);
+
+        // draw hitbox
+        g.setColor(Color.RED);
         ((Graphics2D) g).drawRect(cx, cy, width, height);
     }
 

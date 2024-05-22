@@ -71,9 +71,13 @@ public class Enemy extends Entity {
     public boolean isDead() { return hp <= 0; }
 
     public boolean damage(int damage) {
-        // System.out.println(name + " took " + damage + " damage");
+        // System.out.println(id + " took " + damage + " damage");
         hp -= damage;
         return isDead();
+    }
+
+    public boolean equals(Enemy enemy) {
+        return id == enemy.id;
     }
 
     public void draw(Graphics g) {
@@ -82,6 +86,7 @@ public class Enemy extends Entity {
         // int cy = y - height / 2;
         int cx = (int)Math.round(x - width / 2.0 - player.x + player.getGamePanel().getWidth() / 2.0);
         int cy = (int)Math.round(y - height / 2.0 - player.y + player.getGamePanel().getHeight() / 2.0);
+        g.setColor(java.awt.Color.BLACK);
         g.drawRect(cx, cy, width, height);
         g.fillRect(cx, cy, width, height);
         // g.drawString(name, x, y - 5);
@@ -99,6 +104,9 @@ public class Enemy extends Entity {
         g.fillRect(healthBarX, healthBarY, healthBarWidth * hp / maxHp, healthBarHeight);
         g.setColor(java.awt.Color.BLACK);
 
+        // draw hitbox
+        g.setColor(java.awt.Color.RED);
+        g.drawRect(cx, cy, width, height);
     }
 
 }
