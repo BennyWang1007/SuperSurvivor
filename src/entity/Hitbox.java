@@ -1,10 +1,14 @@
 package entity;
 
 public class Hitbox {
-    public final int startX;
-    public final int startY;
-    public final int endX;
-    public final int endY;
+    public int startX;
+    public int startY;
+    public int endX;
+    public int endY;
+
+    public Hitbox() {
+        this(0, 0, 0, 0);
+    }
 
     public Hitbox(int startX, int startY, int endX, int endY) {
         this.startX = startX;

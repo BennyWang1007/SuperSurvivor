@@ -3,7 +3,7 @@ package listeners;
 import api.*;
 import weapons.SpinningSword;
 import weapons.Weapon;
-import entity.enemy.Enemy;
+import entity.monster.Monster;
 import event.*;
 
 public class PlayerAttackListener implements EventListener {
@@ -13,11 +13,8 @@ public class PlayerAttackListener implements EventListener {
     @EventHandler
     public void onPlayerAttack(WeaponHitEnemyEvent event) {
         Weapon weapon = event.getWeapon();
-        Enemy enemy = event.getEnemy();
-        if (weapon instanceof SpinningSword) {
-            SpinningSword spinningSword = (SpinningSword) weapon;
-            spinningSword.attackOn(enemy);
-        }
+        Monster enemy = event.getEnemy();
+        weapon.attackOn(enemy);
     }
 
 }

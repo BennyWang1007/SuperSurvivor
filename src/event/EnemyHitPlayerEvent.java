@@ -1,18 +1,18 @@
 package event;
 
 import entity.*;
-import entity.enemy.Enemy;
+import entity.monster.Monster;
 
 public class EnemyHitPlayerEvent extends Event {
     private final Player player;
-    private final Enemy enemy;
+    private final Monster enemy;
 
-    public EnemyHitPlayerEvent(Player player, Enemy enemy) {
+    public EnemyHitPlayerEvent(Player player, Monster enemy) {
         super("EnemyHitPlayerEvent");
         this.player = player;
         this.enemy = enemy;
     }
 
     public Player getPlayer() { return player; }
-    public Enemy getEnemy() { return enemy; }
+    public Monster getEnemy() { return enemy; }
 }
