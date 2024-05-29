@@ -14,9 +14,12 @@ public class GamePanel extends JPanel{
     private final Game game;
     private Player player;
     private Set<Monster> monsters;
+    private Set<ExpOrb> exps;
     private Image backgroundImage;
     private int mapWidth = 3000;
     private int mapHeight = 3000;
+
+    private static final boolean DEBUG = true;
 
     public GamePanel(Game game) {
         super();
@@ -44,12 +47,12 @@ public class GamePanel extends JPanel{
         backgroundImage = img.getScaledInstance(mapWidth, mapHeight, Image.SCALE_DEFAULT);
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    public void setMonsters(Set<Monster> monsters) {
-        this.monsters = monsters;
+    public void setPlayer(Player player) { this.player = player; }
+    public void setMonsters(Set<Monster> monsters) { this.monsters = monsters; }
+    public void setExpOrbs(Set<ExpOrb> exps) { this.exps = exps; }
+    public void setMapSize(int width, int height) {
+        mapWidth = width;
+        mapHeight = height;
     }
 
     public void paintComponent(Graphics g) {
@@ -57,11 +60,19 @@ public class GamePanel extends JPanel{
         // drawBackground(g);
         // draw : monster -> weapon -> player
         drawMonsters(g);
+        drawExp(g);
         drawPlayer(g);
         drawFPS(g);
 
         if (game.isPause()) {
             drawPauseView(g);
+        }
+
+        if (DEBUG) {
+            // draw the position of player
+            g.setColor(Color.RED);
+            g.drawString("Player: " + (int)player.x + ", " + (int)player.y, 0, 30);
+            g.drawString("Exp: " + player.exp + "/" + player.expTable[player.level] + ", Level: " + player.level, 0, 50);
         }
     }
 
@@ -94,6 +105,10 @@ public class GamePanel extends JPanel{
 
     private void drawMonsters(Graphics g) {
         monsters.forEach(monster -> monster.draw(g));
+    }
+
+    private void drawExp(Graphics g) {
+        exps.forEach(exp -> exp.draw(g));
     }
 
     private void drawPlayer(Graphics g) {

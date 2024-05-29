@@ -15,15 +15,17 @@ public class Monster extends Entity {
     public int maxHp;
     public int attack;
     public int defense;
-    public float speed;
+    public float speed; // pixels per second
+    public int exp;
 
-    public Monster(Game game, String name, int x, int y, int hp, int attack, int speed, Player player) {
+    public Monster(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
         super(game, x, y, 50, 50);
         this.name = name;
         this.hp = hp;
         this.maxHp = hp;
         this.attack = attack;
         this.speed = speed * 60;
+        this.exp = exp;
         this.player = player;
     }
 
