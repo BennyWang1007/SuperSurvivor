@@ -4,10 +4,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 import entity.Player;
+import main.Game;
+import main.GameState;
 
 public class GameKeyboardListener implements KeyListener {
 
-    public Player player;
+    private final Game game;
+    private final Player player;
 
     private boolean isPause = false;
     private boolean escPressed = false;
@@ -16,12 +19,9 @@ public class GameKeyboardListener implements KeyListener {
     private boolean leftPressed = false;
     private boolean rightPressed = false;
 
-    public GameKeyboardListener(Player player) {
+    public GameKeyboardListener(Game game, Player player) {
+        this.game = game;
         this.player = player;
-    }
-
-    public boolean isPause() {
-        return isPause;
     }
 
     @Override
@@ -31,8 +31,13 @@ public class GameKeyboardListener implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        if (game.getGameState() ==  GameState.TITLE_SCREEN) {
+            return;
+        }
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE && !escPressed) {
             isPause = !isPause;
+            if (isPause) game.pause();
+            else game.resume();
             escPressed = true;
         }
         if (e.getKeyCode() == KeyEvent.VK_W) {
@@ -51,6 +56,9 @@ public class GameKeyboardListener implements KeyListener {
 
     @Override
     public void keyReleased(KeyEvent e) {
+        if (game.getGameState() ==  GameState.TITLE_SCREEN) {
+            return;
+        }
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             escPressed = false;
         }
