@@ -34,8 +34,8 @@ public class Game {
     // Map
     private int mapWidth = 2000;
     private int mapHeight = 2000;
-    private int mapCenterX;
-    private int mapCenterY;
+    public int mapCenterX;
+    public int mapCenterY;
 
     // Listener
     private final GameKeyboardListener keyboardListener;

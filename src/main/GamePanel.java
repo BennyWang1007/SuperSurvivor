@@ -57,31 +57,37 @@ public class GamePanel extends JPanel{
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // drawBackground(g);
+        drawBackground(g);
         // draw : monster -> weapon -> player
         drawMonsters(g);
         drawExp(g);
         drawPlayer(g);
+        drawDamageReceived(g);
+        if (DEBUG) {
+            // draw a rectangle as background of debug info
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, 260, 100);
+            // draw the position of player
+            g.setColor(Color.WHITE);
+            g.setFont(getFont().deriveFont(20.0f));
+            g.drawString("Player: " + (int)player.x + ", " + (int)player.y, 10, 35);
+            g.drawString("Exp: " + player.exp + "/" + player.expTable[player.level] + ", Level: " + player.level, 10, 55);
+            g.setFont(getFont().deriveFont(12.0f));
+        }
         drawFPS(g);
 
         if (game.isPause()) {
             drawPauseView(g);
         }
 
-        if (DEBUG) {
-            // draw the position of player
-            g.setColor(Color.RED);
-            g.drawString("Player: " + (int)player.x + ", " + (int)player.y, 0, 30);
-            g.drawString("Exp: " + player.exp + "/" + player.expTable[player.level] + ", Level: " + player.level, 0, 50);
-        }
     }
 
     private void drawBackground(Graphics g) {
         int panelWidth = getWidth();
         int panelHeight = getHeight();
         // find the part of the background to draw
-        int sx = (int)(mapWidth / 2 + player.x - panelWidth / 2), ex = (int)(mapWidth / 2 + player.x + panelWidth / 2);
-        int sy = (int)(mapHeight / 2 + player.y - panelHeight / 2), ey = (int)(mapHeight / 2 + player.y + panelHeight / 2);
+        int sx = (int)(game.mapCenterX - panelWidth / 2), ex = (int)(game.mapCenterX + panelWidth / 2);
+        int sy = (int)(game.mapCenterY - panelHeight / 2), ey = (int)(game.mapCenterY + panelHeight / 2);
         // g.drawImage(backgroundImage, 0, 0, panelWidth, panelHeight, sx, sy, ex, ey, this);
 
         // draw the background with opacity 0.5
@@ -98,9 +104,9 @@ public class GamePanel extends JPanel{
         int panelHeight = getHeight();
         // print pause at the middle of screen with big font with red color
         g.setColor(Color.RED);
-        g.setFont(new Font("Arial", Font.BOLD, 50));
+        g.setFont(getFont().deriveFont(50.0f));
         g.drawString("PAUSE", panelWidth / 2 - 100, panelHeight / 2);
-        g.setFont(new Font("Arial", Font.PLAIN, 12));
+        g.setFont(getFont().deriveFont(12.0f));
     }
 
     private void drawMonsters(Graphics g) {
@@ -111,13 +117,18 @@ public class GamePanel extends JPanel{
         exps.forEach(exp -> exp.draw(g));
     }
 
+    private void drawDamageReceived(Graphics g) {
+        monsters.forEach(monster -> monster.drawDamageReceived(g));
+    }
+
     private void drawPlayer(Graphics g) {
         player.draw(g);
     }
 
     private void drawFPS(Graphics g) {
         String str = String.format("FPS: %d", game.getMeasuredFPS());
-        g.drawString(str, 0, 10);
+        g.setColor(Color.GREEN);
+        g.drawString(str, 10, 15);
     }
 
     
