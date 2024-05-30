@@ -12,6 +12,7 @@ import event.EnemyHitPlayerEvent;
 import event.EventDispatcher;
 import event.WeaponHitEnemyEvent;
 import listeners.GameKeyboardListener;
+import listeners.GameMouseListener;
 import listeners.PlayerAttackListener;
 import listeners.PlayerHurtListener;
 import weapons.Weapon;
@@ -30,6 +31,7 @@ public class Game {
     // Window frame / panel
     private final JFrame gameFrame;
     private final GamePanel gamePanel;
+    private GameState gameState;
 
     // Map
     private int mapWidth = 2000;
@@ -39,6 +41,7 @@ public class Game {
 
     // Listener
     private final GameKeyboardListener keyboardListener;
+    private final GameMouseListener mouseListener;
 
     // Player
     private Player player;
@@ -71,15 +74,22 @@ public class Game {
         gameFrame = new JFrame("Game");
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setResizable(false);
-        gamePanel = new GamePanel(this);
-        gamePanel.setMapSize(mapWidth, mapHeight);
+        
+        // mouse listener
+        mouseListener = new GameMouseListener();
+        gameFrame.addMouseListener(mouseListener);
+        gameFrame.addMouseMotionListener(mouseListener);
+
+        // game panel
+        gamePanel = new GamePanel(this, mouseListener);
+        gameFrame.add(gamePanel);
+        gameState = GameState.TITLE_SCREEN;
 
         // player
         // NOTE: original one will always be 0, 0.
         // player = new Player(this, "PlayerName", gamePanel.getWidth()/2, gamePanel.getHeight()/2, 250);
         player = new Player(this, "PlayerName", mapWidth/2, mapHeight/2, 250);
         gamePanel.setPlayer(player);
-        gameFrame.add(gamePanel);
 
         // monster
         monsters = new HashSet<>();
@@ -91,7 +101,7 @@ public class Game {
         gamePanel.setExpOrbs(exps);
 
         // keyboard listener
-        keyboardListener = new GameKeyboardListener(player);
+        keyboardListener = new GameKeyboardListener(this, player);
         gameFrame.addKeyListener(keyboardListener);
 
         eventDispatcher = new EventDispatcher();
@@ -111,10 +121,6 @@ public class Game {
 
     public int getMeasuredFPS() {
         return measuredFPS;
-    }
-
-    public boolean isPause() {
-        return keyboardListener.isPause();
     }
 
     public boolean isOver() {
@@ -167,6 +173,23 @@ public class Game {
         return x >= 0 && x <= mapWidth && y >= 0 && y <= mapHeight;
     }
 
+    public void pause() {
+        gameState = GameState.PAUSE;
+    }
+
+    public void resume() {
+        gameState = GameState.MAIN_GAME;
+    }
+
+    public void quit() {
+        // TODO: Quit Game
+        System.exit(0);
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
+
     private void registerEventListener(EventListener listener) {
         try {
             eventDispatcher.registerEventListener(listener);
@@ -217,9 +240,8 @@ public class Game {
     }
 
     private void processUpdate() {
-        if (isPause()){
-            return;
-        }
+        if (gameState == GameState.TITLE_SCREEN) return;
+        if (gameState == GameState.PAUSE) return;
         keyboardListener.update();
         player.update();
         exps.forEach(ExpOrb::update);
