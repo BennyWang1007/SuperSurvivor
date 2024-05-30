@@ -38,7 +38,7 @@ public class GamePanel extends JPanel{
 
     private void setupFont() {
         try {
-            InputStream is = new FileInputStream("res/font/Cubic_11_1.100_R.ttf");
+            InputStream is = getClass().getResourceAsStream("/font/Cubic_11_1.100_R.ttf");
             cubicFont = Font.createFont(Font.TRUETYPE_FONT, is);
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();
