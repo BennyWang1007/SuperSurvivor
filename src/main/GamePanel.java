@@ -4,10 +4,14 @@ import javax.swing.JPanel;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Set;
 
 import entity.*;
 import entity.monster.Monster;
+import listeners.GameMouseListener;
 
 public class GamePanel extends JPanel{
 
@@ -18,11 +22,27 @@ public class GamePanel extends JPanel{
     private int mapWidth = 3000;
     private int mapHeight = 3000;
 
-    public GamePanel(Game game) {
+    private final GameMouseListener mouseListener;
+    private final TitleScreen titleScreen;
+    private Font cubicFont;
+
+    public GamePanel(Game game, GameMouseListener mouseListener) {
         super();
         this.game = game;
+        this.mouseListener = mouseListener;
+        this.titleScreen = new TitleScreen(game, this, mouseListener);
+        setupFont();
         setupScreenSize(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
         setBackgroundImage("res/backgnd.png");
+    }
+
+    private void setupFont() {
+        try {
+            InputStream is = getClass().getResourceAsStream("/font/Cubic_11_1.100_R.ttf");
+            cubicFont = Font.createFont(Font.TRUETYPE_FONT, is);
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupScreenSize(int width, int height) {
@@ -54,15 +74,25 @@ public class GamePanel extends JPanel{
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // drawBackground(g);
-        // draw : monster -> weapon -> player
-        drawMonsters(g);
-        drawPlayer(g);
-        drawFPS(g);
+        g.setFont(cubicFont);
+        g.setFont(g.getFont().deriveFont(12f));
 
-        if (game.isPause()) {
-            drawPauseView(g);
+        GameState gameState = game.getGameState();
+
+        if (gameState == GameState.TITLE_SCREEN) {
+            titleScreen.draw(g);
+        } else if (gameState == GameState.MAIN_GAME || gameState == GameState.PAUSE) {
+            // drawBackground(g);
+            // draw : monster -> weapon -> player
+            drawMonsters(g);
+            drawPlayer(g);
+            drawFPS(g);
+            if (gameState == GameState.PAUSE) {
+                drawPauseView(g);
+            }
         }
+
+        g.dispose();
     }
 
     private void drawBackground(Graphics g) {
@@ -101,9 +131,9 @@ public class GamePanel extends JPanel{
     }
 
     private void drawFPS(Graphics g) {
+        g.setColor(Color.BLACK);
         String str = String.format("FPS: %d", game.getMeasuredFPS());
         g.drawString(str, 0, 10);
     }
-
     
 }

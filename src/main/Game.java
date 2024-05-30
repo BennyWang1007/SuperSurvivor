@@ -11,6 +11,7 @@ import event.EnemyHitPlayerEvent;
 import event.EventDispatcher;
 import event.WeaponHitEnemyEvent;
 import listeners.GameKeyboardListener;
+import listeners.GameMouseListener;
 import listeners.PlayerAttackListener;
 import listeners.PlayerHurtListener;
 import weapons.Weapon;
@@ -29,9 +30,11 @@ public class Game {
     // Window frame / panel
     private final JFrame gameFrame;
     private final GamePanel gamePanel;
+    private GameState gameState;
 
     // Listener
     private final GameKeyboardListener keyboardListener;
+    private final GameMouseListener mouseListener;
 
     // Player
     private Player player;
@@ -61,12 +64,20 @@ public class Game {
         gameFrame = new JFrame("Game");
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setResizable(false);
-        gamePanel = new GamePanel(this);
+
+        // mouse listener
+        mouseListener = new GameMouseListener();
+        gameFrame.addMouseListener(mouseListener);
+        gameFrame.addMouseMotionListener(mouseListener);
+
+        // game panel
+        gamePanel = new GamePanel(this, mouseListener);
+        gameFrame.add(gamePanel);
+        gameState = GameState.TITLE_SCREEN;
 
         // player
         player = new Player(this, "PlayerName", gamePanel.getWidth()/2, gamePanel.getHeight()/2, 250);
         gamePanel.setPlayer(player);
-        gameFrame.add(gamePanel);
 
         // monster
         monsters = new HashSet<>();
@@ -74,7 +85,7 @@ public class Game {
         monsterSpawner = new MonsterSpawner(this, player, monsters);
 
         // keyboard listener
-        keyboardListener = new GameKeyboardListener(player);
+        keyboardListener = new GameKeyboardListener(this, player);
         gameFrame.addKeyListener(keyboardListener);
 
         eventDispatcher = new EventDispatcher();
@@ -96,10 +107,6 @@ public class Game {
         return measuredFPS;
     }
 
-    public boolean isPause() {
-        return keyboardListener.isPause();
-    }
-
     public boolean isOver() {
         return player.hp <= 0;
     }
@@ -110,6 +117,23 @@ public class Game {
 
     public int translateToScreenY(float worldY) {
         return (int) (worldY - player.y + gamePanel.getHeight()/2);
+    }
+
+    public void pause() {
+        gameState = GameState.PAUSE;
+    }
+
+    public void resume() {
+        gameState = GameState.MAIN_GAME;
+    }
+
+    public void quit() {
+        // TODO: Quit Game
+        System.exit(0);
+    }
+
+    public GameState getGameState() {
+        return gameState;
     }
 
     private void registerEventListener(EventListener listener) {
@@ -162,9 +186,8 @@ public class Game {
     }
 
     private void processUpdate() {
-        if (isPause()){
-            return;
-        }
+        if (gameState == GameState.TITLE_SCREEN) return;
+        if (gameState == GameState.PAUSE) return;
         keyboardListener.update();
         player.update();
         player.getWeapons().forEach(Weapon::update);
