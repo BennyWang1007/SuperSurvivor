@@ -21,9 +21,9 @@ public class MonsterSpawner {
         this.monsters = monsters;
     }
 
-    public void spawnMonster(int id) {
+    public void spawnMonster(int id, int exp) {
         int[] pos = getSpawnPositionRandomly();
-        Monster monster = new Monster(game, "Monster", pos[0], pos[1], 100, 20, 1, player);
+        Monster monster = new Monster(game, "Monster", pos[0], pos[1], 100, 20, 1, exp, player);
         monster.setId(id);
         monsters.add(monster);
     }

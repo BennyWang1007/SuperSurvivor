@@ -16,4 +16,12 @@ public class Hitbox {
         this.endX = endX;
         this.endY = endY;
     }
+
+    public boolean isCollideWith(Hitbox other) {
+        if (startX < other.startX && endX < other.startX) return false;
+        if (other.startX < startX && other.endX < startX) return false;
+        if (startY < other.startY && endY < other.startY) return false;
+        if (other.startY < startY && other.endY < startY) return false;
+        return true;
+    }
 }

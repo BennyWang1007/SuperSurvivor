@@ -15,6 +15,10 @@ public class Player extends Entity{
     public int attack;
     public int defense;
     private float speed;
+    public int exp;
+    public int level;
+    public int levelUp;
+    public int[] expTable = {0, 100, 200, 400, 800, 1600, 3200, 6400};
 
     public int damageCooldown;
     private int curMaxDamage;
@@ -29,16 +33,26 @@ public class Player extends Entity{
         this.hp = 500;
         this.maxHp = 500;
         this.defense = 0;
+        this.exp = 0;
+        this.level = 1;
+        this.levelUp = 0;
         this.damageCooldown = 0;
         this.weapons = new HashSet<>();
         weapons.add(new SpinningSword(game, 100, 100, attack, 300, 100, this));
         System.out.println("Player created at " + x + ", " + y + " with speed " + this.speed + ", FPS " + Game.FPS);
     }
 
-    public void moveUp() { y -= speed * Game.DELTA_TIME; }
-    public void moveDown() { y += speed * Game.DELTA_TIME; }
-    public void moveLeft() { x -= speed * Game.DELTA_TIME; }
-    public void moveRight() { x += speed * Game.DELTA_TIME; }
+    public void moveUp() { move(x, (float)(y - speed * Game.DELTA_TIME)); }
+    public void moveDown() { move(x, (float)(y + speed * Game.DELTA_TIME)); }
+    public void moveLeft() { move((float)(x - speed * Game.DELTA_TIME), y); }
+    public void moveRight() { move((float)(x + speed * Game.DELTA_TIME), y); }
+
+    public void move(float x, float y) {
+        if (game.isValidatePosition(x, y)) {
+            this.x = x;
+            this.y = y;
+        }
+    }
 
     public void update() {
         // System.out.println("\rPlayer at " + x + ", " + y);
@@ -48,9 +62,7 @@ public class Player extends Entity{
         takeDamage();
     }
 
-    public Set<Weapon> getWeapons() {
-        return weapons;
-    }
+    public Set<Weapon> getWeapons() { return weapons; }
 
     public void collideWith(Monster enemy) {
         if (damageCooldown > 0) return;
@@ -69,6 +81,15 @@ public class Player extends Entity{
         hp -= damage - defense;
         if (hp < 0) {
             hp = 0;
+        }
+    }
+
+    public void addExp(int exp) {
+        this.exp += exp;
+        while (level < expTable.length && this.exp >= expTable[level]) {
+            this.exp -= expTable[level];
+            level++;
+            levelUp++;
         }
     }
 
