@@ -105,7 +105,7 @@ public class GamePanel extends JPanel{
             }
             drawFPS(g);
 
-            if (game.isPause()) {
+            if (gameState == GameState.PAUSE) {
                 drawPauseView(g);
             }
         }
