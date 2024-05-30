@@ -127,6 +127,11 @@ public class Game {
         gameState = GameState.MAIN_GAME;
     }
 
+    public void quit() {
+        // TODO: Quit Game
+        System.exit(0);
+    }
+
     public GameState getGameState() {
         return gameState;
     }
