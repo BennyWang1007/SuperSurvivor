@@ -16,7 +16,7 @@ public abstract class Weapon extends Entity{
     protected HashMap<Integer, Integer> attackCooldowns;
     protected BufferedImage image;
     // private BufferedImage[] images; // for animation
-    private BufferedImage originalImage;
+    protected BufferedImage originalImage;
     protected float cooldownTime; // in seconds
 
     public Weapon(Game game, int width, int height, int attack, Player player) {
@@ -25,7 +25,6 @@ public abstract class Weapon extends Entity{
         this.player = player;
         // loadAnimation();
         attackCooldowns = new HashMap<>();
-        update();
     }
 
     protected void readImage(String imageName) {
@@ -46,7 +45,7 @@ public abstract class Weapon extends Entity{
     }
 
     public abstract void update();
-    public abstract void attackOn(Monster enemy);
+    public abstract void attackOn(Monster monster);
     public abstract void draw(Graphics g);
     public abstract void loadAnimation();
 }

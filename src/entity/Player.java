@@ -39,7 +39,7 @@ public class Player extends Entity{
         this.damageCooldown = 0;
         this.weapons = new HashSet<>();
         weapons.add(new SpinningSword(game, 100, 100, attack, 300, 100, this));
-        System.out.println("Player created at " + x + ", " + y + " with speed " + this.speed + ", FPS " + Game.FPS);
+        weapons.add(new Bow(game, 100, 100, attack * 3, 150, 1, this));
     }
 
     public void moveUp() { move(x, (float)(y - speed * Game.DELTA_TIME)); }
@@ -48,7 +48,7 @@ public class Player extends Entity{
     public void moveRight() { move((float)(x + speed * Game.DELTA_TIME), y); }
 
     public void move(float x, float y) {
-        if (game.isValidatePosition(x, y)) {
+        if (game.isValidPosition(x, y)) {
             this.x = x;
             this.y = y;
         }

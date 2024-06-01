@@ -15,7 +15,7 @@ import listeners.GameKeyboardListener;
 import listeners.GameMouseListener;
 import listeners.PlayerAttackListener;
 import listeners.PlayerHurtListener;
-import weapons.Weapon;
+import weapons.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,6 +27,8 @@ public class Game {
     public static final int SCREEN_WIDTH = 1080;
     public static final int SCREEN_HEIGHT = 720;
     private static final double NANO_TIME_PER_FRAME = 1000000000.0 / FPS;
+
+    private static final boolean skipTitleScreen = true;
 
     // Window frame / panel
     private final JFrame gameFrame;
@@ -84,6 +86,7 @@ public class Game {
         gamePanel = new GamePanel(this, mouseListener);
         gameFrame.add(gamePanel);
         gameState = GameState.TITLE_SCREEN;
+        if (skipTitleScreen) { gameState = GameState.MAIN_GAME; }
 
         // player
         // NOTE: original one will always be 0, 0.
@@ -121,6 +124,10 @@ public class Game {
 
     public int getMeasuredFPS() {
         return measuredFPS;
+    }
+
+    public Set<Monster> getMonsters() {
+        return monsters;
     }
 
     public boolean isOver() {
@@ -168,9 +175,14 @@ public class Game {
         return Math.min(Math.max(y, 0), mapHeight);
     }
 
-    public boolean isValidatePosition(float x, float y) {
+    public boolean isValidPosition(float x, float y) {
         // TODO: check if the position is valid
         return x >= 0 && x <= mapWidth && y >= 0 && y <= mapHeight;
+    }
+
+    public boolean isInScreen(float x, float y) {
+        return x >= mapCenterX - gamePanel.getWidth() / 2 && x <= mapCenterX + gamePanel.getWidth() / 2
+                && y >= mapCenterY - gamePanel.getHeight() / 2 && y <= mapCenterY + gamePanel.getHeight() / 2;
     }
 
     public void pause() {
@@ -315,6 +327,11 @@ public class Game {
         player.hp = player.maxHp;
         player.attack += 5;
         player.defense += 2;
+        // for testing
+        if (true) {
+            Weapon weapon = new Bow(this, 100, 100, player.attack * 3, 150, 1, player);
+            player.getWeapons().add(weapon);
+        }
     }
 
     
