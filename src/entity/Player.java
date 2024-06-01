@@ -38,8 +38,6 @@ public class Player extends Entity{
         this.levelUp = 0;
         this.damageCooldown = 0;
         this.weapons = new HashSet<>();
-        weapons.add(new SpinningSword(game, 100, 100, attack, 300, 100, this));
-        weapons.add(new Bow(game, 100, 100, attack * 3, 150, 1, this));
     }
 
     public void moveUp() { move(x, (float)(y - speed * Game.DELTA_TIME)); }
@@ -64,9 +62,9 @@ public class Player extends Entity{
 
     public Set<Weapon> getWeapons() { return weapons; }
 
-    public void collideWith(Monster enemy) {
+    public void collideWith(Monster monster) {
         if (damageCooldown > 0) return;
-        curMaxDamage = Math.max(curMaxDamage, enemy.attack);
+        curMaxDamage = Math.max(curMaxDamage, monster.attack);
     }
 
     private void takeDamage() {

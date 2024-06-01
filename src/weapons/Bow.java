@@ -53,7 +53,7 @@ public class Bow extends Weapon {
     }
 
     @Override
-    public void attackOn(Monster enemy) {
+    public void attackOn(Monster monster) {
         // Do nothing
     }
 

@@ -99,6 +99,12 @@ public class Game {
         gamePanel.setMonsters(monsters);
         monsterSpawner = new MonsterSpawner(this, player, monsters);
 
+        // weapons
+        // player.getWeapons().add(new SpinningSword(this, 100, 100, player.attack, 300, 100, player));
+        // player.getWeapons().add(new Bow(this, 100, 100, player.attack * 3, 150, 1, player));
+        int radius = 150;
+        player.getWeapons().add(new Aura(this, radius * 2, radius * 2, player.attack / 2, radius, player));
+
         // exp orbs
         exps = new HashSet<>();
         gamePanel.setExpOrbs(exps);
@@ -258,8 +264,8 @@ public class Game {
         player.update();
         exps.forEach(ExpOrb::update);
         while (player.levelUp > 0) {
-            player.levelUp--;
             levelUp();
+            player.levelUp--;
         }
         player.getWeapons().forEach(Weapon::update);
         monsters.forEach(Monster::update);
@@ -327,10 +333,21 @@ public class Game {
         player.hp = player.maxHp;
         player.attack += 5;
         player.defense += 2;
+        System.out.println("player.level: " + player.level + " player.levelUp: " + player.levelUp);
         // for testing
-        if (true) {
+        int originalLevel = player.level - player.levelUp;
+        if (originalLevel == 1) {
             Weapon weapon = new Bow(this, 100, 100, player.attack * 3, 150, 1, player);
             player.getWeapons().add(weapon);
+        } else if (originalLevel == 2) {
+            Weapon weapon = new SpinningSword(this, 100, 100, player.attack, 300, 100, player);
+            player.getWeapons().add(weapon);
+        } else {
+            for(Weapon weapon : player.getWeapons()) {
+                if(weapon instanceof Aura) {
+                    ((Aura) weapon).increaseRadius(50);
+                }
+            }
         }
     }
 
