@@ -2,7 +2,6 @@ package weapons;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.util.Iterator;
 
 import entity.Player;
 import entity.monster.Monster;
@@ -34,17 +33,7 @@ public class SpinningSword extends Weapon{
         decreaseCooldowns();
     }
 
-    public void decreaseCooldowns() {
-        // remove cooldowns <= 0
-        Iterator<Integer> iterator = attackCooldowns.keySet().iterator();
-        while (iterator.hasNext()) {
-            int id = iterator.next();
-            attackCooldowns.put(id, attackCooldowns.get(id) - 1);
-            if (attackCooldowns.get(id) <= 0) {
-                iterator.remove();
-            }
-        }
-    }
+    
 
     public void attackOn(Monster monster) {
         if (attackCooldowns.containsKey(monster.id)) {

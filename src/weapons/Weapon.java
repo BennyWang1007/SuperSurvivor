@@ -15,8 +15,8 @@ public abstract class Weapon extends Entity{
     protected int attack;
     protected HashMap<Integer, Integer> attackCooldowns;
     protected BufferedImage image;
-    // private BufferedImage[] images; // for animation
-    private BufferedImage originalImage;
+    protected BufferedImage[] images; // for animation
+    protected BufferedImage originalImage;
     protected float cooldownTime; // in seconds
 
     public Weapon(Game game, int width, int height, int attack, Player player) {
@@ -25,7 +25,6 @@ public abstract class Weapon extends Entity{
         this.player = player;
         // loadAnimation();
         attackCooldowns = new HashMap<>();
-        update();
     }
 
     protected void readImage(String imageName) {
@@ -41,12 +40,26 @@ public abstract class Weapon extends Entity{
     }
 
     public void setSize(int width, int height) {
+        this.width = width;
+        this.height = height;
         originalImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         originalImage.getGraphics().drawImage(image, 0, 0, width, height, null);
     }
 
+    public void decreaseCooldowns() {
+        // cooldowns-- and remove cooldowns <= 0
+        Iterator<Integer> iterator = attackCooldowns.keySet().iterator();
+        while (iterator.hasNext()) {
+            int id = iterator.next();
+            attackCooldowns.put(id, attackCooldowns.get(id) - 1);
+            if (attackCooldowns.get(id) <= 0) {
+                iterator.remove();
+            }
+        }
+    }
+
     public abstract void update();
-    public abstract void attackOn(Monster enemy);
+    public abstract void attackOn(Monster monster);
     public abstract void draw(Graphics g);
     public abstract void loadAnimation();
 }
