@@ -19,9 +19,8 @@ public class GamePanel extends JPanel{
     private Player player;
     private Set<Monster> monsters;
     private Set<ExpOrb> exps;
-    private Image backgroundImage;
-    private int mapWidth = 3000;
-    private int mapHeight = 3000;
+
+    private final TileManager tileManager;
 
     private final GameMouseListener mouseListener;
     private final TitleScreen titleScreen;
@@ -33,10 +32,10 @@ public class GamePanel extends JPanel{
         super();
         this.game = game;
         this.mouseListener = mouseListener;
+        this.tileManager = new TileManager(game, this, player);
         this.titleScreen = new TitleScreen(game, this, mouseListener);
         setupFont();
-        setupScreenSize(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);
-        setBackgroundImage("res/backgnd.png");
+        setupScreenSize(game.screenWidth, game.screenHeight);
     }
 
     private void setupFont() {
@@ -56,24 +55,9 @@ public class GamePanel extends JPanel{
         setDoubleBuffered(true);
     }
 
-    private void setBackgroundImage(String imageName) {
-        Image img = null;
-        try {
-            img = Toolkit.getDefaultToolkit().getImage(imageName);
-        } catch (Exception e) {
-            System.out.println("Error loading image: " + imageName);
-        }
-        // scale the image to map size
-        backgroundImage = img.getScaledInstance(mapWidth, mapHeight, Image.SCALE_DEFAULT);
-    }
-
     public void setPlayer(Player player) { this.player = player; }
     public void setMonsters(Set<Monster> monsters) { this.monsters = monsters; }
     public void setExpOrbs(Set<ExpOrb> exps) { this.exps = exps; }
-    public void setMapSize(int width, int height) {
-        mapWidth = width;
-        mapHeight = height;
-    }
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -86,7 +70,7 @@ public class GamePanel extends JPanel{
         if (gameState == GameState.TITLE_SCREEN) {
             titleScreen.draw(g);
         } else if (gameState == GameState.MAIN_GAME || gameState == GameState.PAUSE) {
-            // drawBackground(g);
+            drawBackground(g);
             // draw : monster -> weapon -> player
             drawMonsters(g);
             drawExp(g);
@@ -114,20 +98,7 @@ public class GamePanel extends JPanel{
     }
 
     private void drawBackground(Graphics g) {
-        int panelWidth = getWidth();
-        int panelHeight = getHeight();
-        // find the part of the background to draw
-        int sx = (int)(game.mapCenterX - panelWidth / 2), ex = (int)(game.mapCenterX + panelWidth / 2);
-        int sy = (int)(game.mapCenterY - panelHeight / 2), ey = (int)(game.mapCenterY + panelHeight / 2);
-        // g.drawImage(backgroundImage, 0, 0, panelWidth, panelHeight, sx, sy, ex, ey, this);
-
-        // draw the background with opacity 0.5
-        BufferedImage bimg = new BufferedImage(panelWidth, panelHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D bg = bimg.createGraphics();
-        bg.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-        bg.drawImage(backgroundImage, 0, 0, panelWidth, panelHeight, sx, sy, ex, ey, this);
-        bg.dispose();
-        g.drawImage(bimg, 0, 0, this);
+        tileManager.draw(g);
     }
 
     private void drawPauseView(Graphics g) {

@@ -18,8 +18,6 @@ public class Game {
 
     public static final int FPS = 60;
     public static final double DELTA_TIME = 1. / FPS;
-    public static final int SCREEN_WIDTH = 1080;
-    public static final int SCREEN_HEIGHT = 720;
     private static final double NANO_TIME_PER_FRAME = 1000000000.0 / FPS;
 
     private static final boolean skipTitleScreen = false;
@@ -29,11 +27,22 @@ public class Game {
     private final GamePanel gamePanel;
     private GameState gameState;
 
+    // Screen
+    private final int originalTileSize = 16;
+    private final int scale = 3;
+    public final int tileSize = originalTileSize * scale;
+    public final int maxScreenRow = 24;
+    public final int maxScreenCol = 15;
+    public int screenCenterX;
+    public int screenCenterY;
+    public final int screenWidth = maxScreenRow * tileSize;
+    public final int screenHeight = maxScreenCol * tileSize;
+
     // Map
-    private int mapWidth = 2000;
-    private int mapHeight = 2000;
-    public int mapCenterX;
-    public int mapCenterY;
+    public final int maxWorldRow = 100;
+    public final int maxWorldCol = 100;
+    public final int worldWidth = maxWorldRow * tileSize;
+    public final int worldHeight = maxWorldCol * tileSize;
 
     // Listener
     private final GameKeyboardListener keyboardListener;
@@ -73,21 +82,14 @@ public class Game {
         gameFrame.addMouseListener(mouseListener);
         gameFrame.addMouseMotionListener(mouseListener);
 
-        // game panel
-        gamePanel = new GamePanel(this, mouseListener);
-        gameFrame.add(gamePanel);
-        gameState = GameState.TITLE_SCREEN;
-        if (skipTitleScreen) { gameState = GameState.MAIN_GAME; }
-
         // player
         // NOTE: original one will always be 0, 0.
         // player = new Player(this, "PlayerName", gamePanel.getWidth()/2, gamePanel.getHeight()/2, 250);
-        player = new Player(this, "PlayerName", mapWidth/2, mapHeight/2, 250);
-        gamePanel.setPlayer(player);
+        player = new Player(this, "PlayerName", worldWidth /2, worldHeight /2, 250);
+
 
         // monster
         monsters = new HashSet<>();
-        gamePanel.setMonsters(monsters);
         monsterSpawner = new MonsterSpawner(this, player, monsters);
 
         // weapons
@@ -98,7 +100,15 @@ public class Game {
 
         // exp orbs
         exps = new HashSet<>();
+
+        // game panel
+        gamePanel = new GamePanel(this, mouseListener);
+        gamePanel.setPlayer(player);
+        gamePanel.setMonsters(monsters);
         gamePanel.setExpOrbs(exps);
+        gameFrame.add(gamePanel);
+        gameState = GameState.TITLE_SCREEN;
+        if (skipTitleScreen) { gameState = GameState.MAIN_GAME; }
 
         // keyboard listener
         keyboardListener = new GameKeyboardListener(this, player);
@@ -128,15 +138,15 @@ public class Game {
     }
 
     public void calculateCenter() {
-        mapCenterX = getCenterX();
-        mapCenterY = getCenterY();
+        screenCenterX = getCenterX();
+        screenCenterY = getCenterY();
     }
 
     public int getCenterX() {
         if (player.x < gamePanel.getWidth() / 2) {
             return gamePanel.getWidth() / 2;
-        } else if (player.x > mapWidth - gamePanel.getWidth() / 2) {
-            return mapWidth - gamePanel.getWidth() / 2;
+        } else if (player.x > worldWidth - gamePanel.getWidth() / 2) {
+            return worldWidth - gamePanel.getWidth() / 2;
         } else {
             return (int) player.x;
         }
@@ -145,37 +155,37 @@ public class Game {
     public int getCenterY() {
         if (player.y < gamePanel.getHeight() / 2) {
             return gamePanel.getHeight() / 2;
-        } else if (player.y > mapHeight - gamePanel.getHeight() / 2) {
-            return mapHeight - gamePanel.getHeight() / 2;
+        } else if (player.y > worldHeight - gamePanel.getHeight() / 2) {
+            return worldHeight - gamePanel.getHeight() / 2;
         } else {
             return (int) player.y;
         }
     }
 
     public int translateToScreenX(float worldX) {
-        return (int) (worldX - mapCenterX + gamePanel.getWidth()/2);
+        return (int) (worldX - screenCenterX + gamePanel.getWidth()/2);
     }
 
     public int translateToScreenY(float worldY) {
-        return (int) (worldY - mapCenterY + gamePanel.getHeight()/2);
+        return (int) (worldY - screenCenterY + gamePanel.getHeight()/2);
     }
 
     public float validatePositionX(float x) {
-        return Math.min(Math.max(x, 0), mapWidth);
+        return Math.min(Math.max(x, 0), worldWidth);
     }
 
     public float validatePositionY(float y) {
-        return Math.min(Math.max(y, 0), mapHeight);
+        return Math.min(Math.max(y, 0), worldHeight);
     }
 
     public boolean isValidPosition(float x, float y) {
         // TODO: check if the position is valid
-        return x >= 0 && x <= mapWidth && y >= 0 && y <= mapHeight;
+        return x >= 0 && x <= worldWidth && y >= 0 && y <= worldHeight;
     }
 
     public boolean isInScreen(float x, float y) {
-        return x >= mapCenterX - gamePanel.getWidth() / 2 && x <= mapCenterX + gamePanel.getWidth() / 2
-                && y >= mapCenterY - gamePanel.getHeight() / 2 && y <= mapCenterY + gamePanel.getHeight() / 2;
+        return x >= screenCenterX - gamePanel.getWidth() / 2 && x <= screenCenterX + gamePanel.getWidth() / 2
+                && y >= screenCenterY - gamePanel.getHeight() / 2 && y <= screenCenterY + gamePanel.getHeight() / 2;
     }
 
     public void pause() {
