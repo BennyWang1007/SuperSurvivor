@@ -2,19 +2,13 @@ package main;
 
 import javax.swing.*;
 
-import api.EventListener;
 import entity.Entity;
 import entity.ExpOrb;
 import entity.Hitbox;
 import entity.Player;
 import entity.monster.Monster;
-import event.EnemyHitPlayerEvent;
-import event.EventDispatcher;
-import event.WeaponHitEnemyEvent;
 import listeners.GameKeyboardListener;
 import listeners.GameMouseListener;
-import listeners.PlayerAttackListener;
-import listeners.PlayerHurtListener;
 import weapons.*;
 
 import java.util.HashSet;
@@ -22,13 +16,13 @@ import java.util.Set;
 
 public class Game {
 
-    public static final int FPS = 120;
+    public static final int FPS = 60;
     public static final double DELTA_TIME = 1. / FPS;
     public static final int SCREEN_WIDTH = 1080;
     public static final int SCREEN_HEIGHT = 720;
     private static final double NANO_TIME_PER_FRAME = 1000000000.0 / FPS;
 
-    private static final boolean skipTitleScreen = true;
+    private static final boolean skipTitleScreen = false;
 
     // Window frame / panel
     private final JFrame gameFrame;
@@ -59,9 +53,6 @@ public class Game {
 
     // ExpOrbs
     private Set<ExpOrb> exps;
-
-    // Event
-    private final EventDispatcher eventDispatcher;
 
     // measured FPS & UPS
     private int measuredFPS = 0;
@@ -112,10 +103,6 @@ public class Game {
         // keyboard listener
         keyboardListener = new GameKeyboardListener(this, player);
         gameFrame.addKeyListener(keyboardListener);
-
-        eventDispatcher = new EventDispatcher();
-        registerEventListener(new PlayerHurtListener());
-        registerEventListener(new PlayerAttackListener());
 
         gameFrame.pack();
         gameFrame.setLocationRelativeTo(null);
@@ -208,15 +195,6 @@ public class Game {
         return gameState;
     }
 
-    private void registerEventListener(EventListener listener) {
-        try {
-            eventDispatcher.registerEventListener(listener);
-        } catch (Exception e) {
-            System.out.println("Error Message: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
     private void startGameLoop() {
         // For actual game update
         long previousTime = System.nanoTime();
@@ -263,11 +241,6 @@ public class Game {
         keyboardListener.update();
         player.update();
         exps.forEach(ExpOrb::update);
-        while (player.levelUp > 0) {
-            levelUp();
-            player.levelUp--;
-        }
-        player.getWeapons().forEach(Weapon::update);
         monsters.forEach(Monster::update);
         processCollision();
         monsters.forEach(monster -> {
@@ -289,13 +262,13 @@ public class Game {
         monsters.forEach(monster -> {
             // monster hit player
             if (isCollided(player, monster)) {
-                eventDispatcher.dispatchEvent(new EnemyHitPlayerEvent(player, monster));
+                player.collideWith(monster);
             }
 
             // player's weapon hit monster
             player.getWeapons().forEach(weapon -> {
                 if (isCollided(weapon, monster)) {
-                    eventDispatcher.dispatchEvent(new WeaponHitEnemyEvent(weapon, monster));
+                    weapon.attackOn(monster);
                 }
             });
         });
@@ -324,30 +297,6 @@ public class Game {
         if (monsters.size() < maxMonsterCount) {
             currentMonsterId++;
             monsterSpawner.spawnMonster(currentMonsterId, exp);
-        }
-    }
-
-    public void levelUp() {
-        // TODO: level up player
-        player.maxHp += 10;
-        player.hp = player.maxHp;
-        player.attack += 5;
-        player.defense += 2;
-        System.out.println("player.level: " + player.level + " player.levelUp: " + player.levelUp);
-        // for testing
-        int originalLevel = player.level - player.levelUp;
-        if (originalLevel == 1) {
-            Weapon weapon = new Bow(this, 100, 100, player.attack * 3, 150, 1, player);
-            player.getWeapons().add(weapon);
-        } else if (originalLevel == 2) {
-            Weapon weapon = new SpinningSword(this, 100, 100, player.attack, 300, 100, player);
-            player.getWeapons().add(weapon);
-        } else {
-            for(Weapon weapon : player.getWeapons()) {
-                if(weapon instanceof Aura) {
-                    ((Aura) weapon).increaseRadius(50);
-                }
-            }
         }
     }
 

@@ -68,5 +68,10 @@ public class Bow extends Weapon {
     public void loadAnimation() {
         // TODO
     }
-    
+
+    @Override
+    public void levelUp() {
+
+    }
+
 }

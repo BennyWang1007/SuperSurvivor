@@ -18,7 +18,7 @@ public class SpinningSword extends Weapon{
         this.degreePerSecond = degreePerSecond;
         this.distance = distance;
         this.degree = 0;
-        readImage("res/sword_900.png");
+        readImage("/sword_900.png");
         cooldownTime = 0.5f;
     }
 
@@ -60,4 +60,9 @@ public class SpinningSword extends Weapon{
     }
 
     public void loadAnimation() {}
+
+    @Override
+    public void levelUp() {
+
+    }
 }

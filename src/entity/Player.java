@@ -17,7 +17,7 @@ public class Player extends Entity{
     private float speed;
     public int exp;
     public int level;
-    public int levelUp;
+    public final int maxLevel = 7;
     public int[] expTable = {0, 100, 200, 400, 800, 1600, 3200, 6400};
 
     public int damageCooldown;
@@ -35,7 +35,6 @@ public class Player extends Entity{
         this.defense = 0;
         this.exp = 0;
         this.level = 1;
-        this.levelUp = 0;
         this.damageCooldown = 0;
         this.weapons = new HashSet<>();
     }
@@ -58,6 +57,10 @@ public class Player extends Entity{
         weapons.forEach(Weapon::update);
         if (damageCooldown > 0) return;
         takeDamage();
+        if (level < maxLevel && exp >= expTable[level]) {
+            exp -= expTable[level];
+            levelUp();
+        }
     }
 
     public Set<Weapon> getWeapons() { return weapons; }
@@ -82,13 +85,32 @@ public class Player extends Entity{
         }
     }
 
+    private void levelUp() {
+        // TODO: level up player
+        level++;
+        maxHp += 10;
+        hp = maxHp;
+        attack += 5;
+        defense += 2;
+        System.out.println("player.level: " + level);
+        // for testing
+        if (level == 2) {
+            Weapon weapon = new Bow(game, 100, 100, attack * 3, 150, 1, this);
+            weapons.add(weapon);
+        } else if (level == 3) {
+            Weapon weapon = new SpinningSword(game, 100, 100, attack, 300, 100, this);
+            weapons.add(weapon);
+        } else {
+            for(Weapon weapon : weapons) {
+                if(weapon instanceof Aura) {
+                    weapon.levelUp();
+                }
+            }
+        }
+    }
+
     public void addExp(int exp) {
         this.exp += exp;
-        while (level < expTable.length && this.exp >= expTable[level]) {
-            this.exp -= expTable[level];
-            level++;
-            levelUp++;
-        }
     }
 
     /**

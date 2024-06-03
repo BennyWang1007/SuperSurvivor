@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import entity.Player;
 import entity.monster.Monster;
 import main.Game;
+import utils.ImageTools;
 
 public class Arrow extends Weapon {
 
@@ -17,18 +18,14 @@ public class Arrow extends Weapon {
 
     public Arrow(Game game, float x, float y, int width, int height, int attack, float degree, float speed, Player player) {
         super(game, width, height, attack, player);
-        readImage("res/Arrow.png");
+        readImage("/Arrow2.png");
         this.degree = degree;
         this.speed = speed;
         this.x = x;
         this.y = y;
         
         // rotate image
-        AffineTransform at = AffineTransform.getRotateInstance(Math.toRadians(degree), image.getWidth() / 2, image.getHeight() / 2);
-        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = (Graphics2D) image.getGraphics();
-        g.drawImage(originalImage, at, null);
-        g.dispose();
+        image = ImageTools.rotateImage(originalImage, degree);
     }
 
     @Override
@@ -72,5 +69,10 @@ public class Arrow extends Weapon {
     public void loadAnimation() {
         // TODO
     }
-    
+
+    @Override
+    public void levelUp() {
+
+    }
+
 }

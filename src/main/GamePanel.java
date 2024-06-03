@@ -86,7 +86,7 @@ public class GamePanel extends JPanel{
         if (gameState == GameState.TITLE_SCREEN) {
             titleScreen.draw(g);
         } else if (gameState == GameState.MAIN_GAME || gameState == GameState.PAUSE) {
-            drawBackground(g);
+            // drawBackground(g);
             // draw : monster -> weapon -> player
             drawMonsters(g);
             drawExp(g);

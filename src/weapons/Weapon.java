@@ -2,22 +2,23 @@ package weapons;
 
 import java.awt.image.BufferedImage;
 import java.awt.*;
-import java.io.File;
 import java.util.*;
-import javax.imageio.ImageIO;
 
 import entity.*;
 import entity.monster.Monster;
 import main.Game;
+import utils.ImageTools;
 
 public abstract class Weapon extends Entity{
     protected Player player;
     protected int attack;
     protected HashMap<Integer, Integer> attackCooldowns;
     protected BufferedImage image;
-    protected BufferedImage[] images; // for animation
+    protected BufferedImage[][] animationImages; // for animation
     protected BufferedImage originalImage;
     protected float cooldownTime; // in seconds
+    protected int level = 1;
+    protected final int maxLevel = 5;
 
     public Weapon(Game game, int width, int height, int attack, Player player) {
         super(game, 0, 0, width, height);
@@ -28,22 +29,14 @@ public abstract class Weapon extends Entity{
     }
 
     protected void readImage(String imageName) {
-        Image img = null;
-        try {
-            img = ImageIO.read(new File(imageName));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        this.originalImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        originalImage.getGraphics().drawImage(img, 0, 0, width, height, null);
+        originalImage = ImageTools.scaleImage(ImageTools.readImage(imageName), width, height);
         image = originalImage;
     }
 
     public void setSize(int width, int height) {
         this.width = width;
         this.height = height;
-        originalImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        originalImage.getGraphics().drawImage(image, 0, 0, width, height, null);
+        originalImage = ImageTools.scaleImage(image, width, height);
     }
 
     public void decreaseCooldowns() {
@@ -60,6 +53,7 @@ public abstract class Weapon extends Entity{
 
     public abstract void update();
     public abstract void attackOn(Monster monster);
+    public abstract void levelUp();
     public abstract void draw(Graphics g);
     public abstract void loadAnimation();
 }
