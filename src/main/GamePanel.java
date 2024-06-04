@@ -1,10 +1,7 @@
 package main;
 
-import javax.swing.JPanel;
-
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
+import java.awt.image.BufferStrategy;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
@@ -13,7 +10,7 @@ import entity.*;
 import entity.monster.Monster;
 import listeners.GameMouseListener;
 
-public class GamePanel extends JPanel{
+public class GamePanel extends Canvas {
 
     private final Game game;
     private Player player;
@@ -52,15 +49,19 @@ public class GamePanel extends JPanel{
         setMinimumSize(screenSize);
         setPreferredSize(screenSize);
         setMaximumSize(screenSize);
-        setDoubleBuffered(true);
     }
 
     public void setPlayer(Player player) { this.player = player; }
     public void setMonsters(Set<Monster> monsters) { this.monsters = monsters; }
     public void setExpOrbs(Set<ExpOrb> exps) { this.exps = exps; }
 
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    public void render() {
+        BufferStrategy bs = getBufferStrategy();
+        if (bs == null){
+            createBufferStrategy(4);
+            return;
+        }
+        Graphics g = bs.getDrawGraphics();
 
         g.setFont(cubicFont);
         g.setFont(g.getFont().deriveFont(12f));
@@ -93,8 +94,8 @@ public class GamePanel extends JPanel{
                 drawPauseView(g);
             }
         }
-
         g.dispose();
+        bs.show();
     }
 
     private void drawBackground(Graphics g) {

@@ -18,8 +18,6 @@ public class TitleScreen {
     private Color textColor = Color.BLACK;
     private Color borderColor = Color.BLACK;
     private Color backColor = normalBackColor;
-    private Color shadowColor = Color.DARK_GRAY;
-    private boolean shadow = false;
 
     // For start game animation
     private final int secondsToStartGame = 2;
@@ -89,18 +87,14 @@ public class TitleScreen {
         if (!startGame) {
             if (isClicked(rect)) {
                 backColor = clickBackColor;
-                shadow = true;
                 onClick.run();
             } else if (isHover(rect)) {
                 backColor = hoverBackColor;
-                shadow = false;
             } else {
                 backColor = normalBackColor;
-                shadow = false;
             }
         } else {
             backColor = normalBackColor;
-            shadow = false;
         }
         drawTextBounds(g, rect);
         g.setColor(textColor);
@@ -112,11 +106,7 @@ public class TitleScreen {
         int width = (int) rect.getWidth();
         int height = (int) rect.getHeight();
         int x = (int) rect.getX();
-        int y = (int) rect.getY() - height/2;
-        if (shadow) {
-            g.setColor(shadowColor);
-            g.fillRect(x+4, y+4, width, height);
-        }
+        int y = (int) rect.getY();
         g.setColor(backColor);
         g.fillRect(x, y, width, height);
         g.setColor(borderColor);
@@ -131,7 +121,7 @@ public class TitleScreen {
         int width = (int) rect.getWidth() + 2*horzPadding;
         int height = (int) rect.getHeight();
         x = x - horzPadding;
-        y = (int) (y - rect.getHeight()*23/100.);
+        y = (int) (y - rect.getHeight()*73/100.);
         rect.setRect(x, y, width, height);
         return rect;
     }

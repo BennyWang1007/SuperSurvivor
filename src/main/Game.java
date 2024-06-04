@@ -79,8 +79,6 @@ public class Game {
         
         // mouse listener
         mouseListener = new GameMouseListener();
-        gameFrame.addMouseListener(mouseListener);
-        gameFrame.addMouseMotionListener(mouseListener);
 
         // player
         // NOTE: original one will always be 0, 0.
@@ -101,18 +99,20 @@ public class Game {
         // exp orbs
         exps = new HashSet<>();
 
+        // keyboard listener
+        keyboardListener = new GameKeyboardListener(this, player);
+
         // game panel
         gamePanel = new GamePanel(this, mouseListener);
         gamePanel.setPlayer(player);
         gamePanel.setMonsters(monsters);
         gamePanel.setExpOrbs(exps);
+        gamePanel.addMouseListener(mouseListener);
+        gamePanel.addMouseMotionListener(mouseListener);
+        gamePanel.addKeyListener(keyboardListener);
         gameFrame.add(gamePanel);
         gameState = GameState.TITLE_SCREEN;
         if (skipTitleScreen) { gameState = GameState.MAIN_GAME; }
-
-        // keyboard listener
-        keyboardListener = new GameKeyboardListener(this, player);
-        gameFrame.addKeyListener(keyboardListener);
 
         gameFrame.pack();
         gameFrame.setLocationRelativeTo(null);
@@ -265,7 +265,7 @@ public class Game {
     }
 
     private void processFrame() {
-        gamePanel.repaint();
+        gamePanel.render();
     }
 
     private void processCollision() {
