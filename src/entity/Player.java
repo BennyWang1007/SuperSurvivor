@@ -1,8 +1,7 @@
 package entity;
 
-import java.awt.Graphics;
-import java.util.HashSet;
-import java.util.Set;
+import java.awt.*;
+import java.util.*;
 
 import entity.monster.Monster;
 import main.Game;
@@ -14,11 +13,12 @@ public class Player extends Entity{
     public int maxHp;
     public int attack;
     public int defense;
-    private float speed;
+    public float speed;
     public int exp;
     public int level;
-    public final int maxLevel = 7;
-    public int[] expTable = {0, 100, 200, 400, 800, 1600, 3200, 6400};
+    public final int maxLevel = 39;
+    // public int[] expTable = {0, 100, 200, 400, 800, 1600, 3200, 6400};
+    public int[] expTable = {0, 100, 100, 100, 100, 100, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 520, 540, 560, 580, 600, 620, 640, 660, 680, 700, 720, 740, 760, 780, 800};
 
     public int damageCooldown;
     private int curMaxDamage;
@@ -65,6 +65,33 @@ public class Player extends Entity{
 
     public Set<Weapon> getWeapons() { return weapons; }
 
+    public <T extends Weapon> T getWeapon(Class<T> weaponType) {
+        for (Weapon weapon : weapons) {
+            if (weaponType.isInstance(weapon)) {
+                return weaponType.cast(weapon);
+            }
+        }
+        return null;
+    }
+
+    public Aura getAura() { return getWeapon(Aura.class); }
+    public SpinningSword getSpinningSword() { return getWeapon(SpinningSword.class); }
+    public Bow getBow() { return getWeapon(Bow.class); }
+
+    public ArrayList<SpinningSword> getSwords() {
+        ArrayList<SpinningSword> swords = new ArrayList<>();
+        for (Weapon weapon : weapons) {
+            if (weapon instanceof SpinningSword) {
+                swords.add((SpinningSword) weapon);
+            }
+        }
+        return swords;
+    }
+
+    public void addBow() { weapons.add(new Bow(game, 100, 100, attack * 5, 360, 1, this)); }
+    public void addSpinningSword() { weapons.add(new SpinningSword(game, 100, 100, attack, 300, 100, this)); }
+    public void addAura() { weapons.add(new Aura(game, 200, 200, attack / 2, 100, this)); }
+
     public void collideWith(Monster monster) {
         if (damageCooldown > 0) return;
         curMaxDamage = Math.max(curMaxDamage, monster.attack);
@@ -92,21 +119,7 @@ public class Player extends Entity{
         hp = maxHp;
         attack += 5;
         defense += 2;
-        System.out.println("player.level: " + level);
-        // for testing
-        if (level == 2) {
-            Weapon weapon = new Bow(game, 100, 100, attack * 3, 150, 1, this);
-            weapons.add(weapon);
-        } else if (level == 3) {
-            Weapon weapon = new SpinningSword(game, 100, 100, attack, 300, 100, this);
-            weapons.add(weapon);
-        } else {
-            for(Weapon weapon : weapons) {
-                if(weapon instanceof Aura) {
-                    weapon.levelUp();
-                }
-            }
-        }
+        game.levelUp();
     }
 
     public void addExp(int exp) {
@@ -123,6 +136,8 @@ public class Player extends Entity{
         int screenY = game.translateToScreenY(y);
         int drawX = (screenX - width/2);
         int drawY = (screenY - height/2);
+        g.setFont(g.getFont().deriveFont(12f));
+        ((Graphics2D) g).setStroke(new BasicStroke(2));
         weapons.forEach(weapon -> weapon.draw(g));
         g.setColor(java.awt.Color.BLUE);
         g.drawRect(drawX, drawY, width, height);

@@ -39,6 +39,8 @@ public abstract class Weapon extends Entity{
         originalImage = ImageTools.scaleImage(image, width, height);
     }
 
+    public int getLevel() { return level; }
+
     public void decreaseCooldowns() {
         // cooldowns-- and remove cooldowns <= 0
         Iterator<Integer> iterator = attackCooldowns.keySet().iterator();

@@ -55,12 +55,14 @@ public class Monster extends Entity {
     public void update(float x, float y) {
         // move towards player
         float dx, dy;
-        if (this.x < x) { dx = speed; }
-        else if (this.x > x) { dx = -speed; }
-        else { dx = 0; }
-        if (this.y < y) { dy = speed; }
-        else if (this.y > y) { dy = -speed; }
-        else { dy = 0; }
+        float distance = (float)Math.hypot(x - this.x, y - this.y);
+        if (distance < 1) {
+            dx = 0;
+            dy = 0;
+        } else {
+            dx = speed * (x - this.x) / distance;
+            dy = speed * (y - this.y) / distance;
+        }
         dx /= Game.FPS;
         dy /= Game.FPS;
         move(dx, dy);
@@ -80,6 +82,7 @@ public class Monster extends Entity {
         int cx = (int)Math.round(screenX - width/2.0);
         int cy = (int)Math.round(screenY - height/2.0);
         g.setColor(java.awt.Color.BLACK);
+        g.setFont(g.getFont().deriveFont(12f));
         g.drawRect(cx, cy, width, height);
         g.fillRect(cx, cy, width, height);
         // use id instead of name

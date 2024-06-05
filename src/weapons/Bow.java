@@ -7,6 +7,7 @@ import java.util.HashSet;
 import entity.Player;
 import entity.monster.Monster;
 import main.Game;
+import listeners.GameMouseListener;
 
 public class Bow extends Weapon {
 
@@ -30,26 +31,35 @@ public class Bow extends Weapon {
         }
         arrows.removeIf(arrow -> arrow.toDelete);
 
-        if (shotCooldown > 0 || arrows.size() > 5) {
+        if (shotCooldown > 0 || arrows.size() > 20) {
             shotCooldown--;
             return;
         }
-        // find nearest monster
-        Monster nearestMonster = null;
-        double minDistance = Double.MAX_VALUE;
-        Set<Monster> monsters = game.getMonsters();
-        for (Monster monster : monsters) {
-            double distance = Math.hypot(monster.x - player.x, monster.y - player.y);
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearestMonster = monster;
-            }
-        }
-        if (nearestMonster != null) {
-            float degree = (float) Math.toDegrees(Math.atan2(nearestMonster.y - player.y, nearestMonster.x - player.x));
-            arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, degree, speed / Game.FPS, player));
-            shotCooldown = (int) (shotInterval * Game.FPS);
-        }
+
+        // shoot towards mouse
+        GameMouseListener mouseListener = game.getMouseListener();
+        int centerX = game.translateToScreenX(player.x);
+        int centerY = game.translateToScreenY(player.y);
+        float degree = (float) Math.toDegrees(Math.atan2(mouseListener.mouseY - centerY, mouseListener.mouseX - centerX));
+        arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, degree, speed / Game.FPS, player));
+        shotCooldown = (int) (shotInterval * Game.FPS);
+
+        // // find nearest monster
+        // Monster nearestMonster = null;
+        // double minDistance = Double.MAX_VALUE;
+        // Set<Monster> monsters = game.getMonsters();
+        // for (Monster monster : monsters) {
+        //     double distance = Math.hypot(monster.x - player.x, monster.y - player.y);
+        //     if (distance < minDistance) {
+        //         minDistance = distance;
+        //         nearestMonster = monster;
+        //     }
+        // }
+        // if (nearestMonster != null) {
+        //     float degree = (float) Math.toDegrees(Math.atan2(nearestMonster.y - player.y, nearestMonster.x - player.x));
+        //     arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, degree, speed / Game.FPS, player));
+        //     shotCooldown = (int) (shotInterval * Game.FPS);
+        // }
     }
 
     @Override
@@ -71,7 +81,8 @@ public class Bow extends Weapon {
 
     @Override
     public void levelUp() {
-
+        level++;
+        shotInterval *= 0.6;
     }
 
 }

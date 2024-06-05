@@ -81,20 +81,12 @@ public class Game {
         mouseListener = new GameMouseListener();
 
         // player
-        // NOTE: original one will always be 0, 0.
-        // player = new Player(this, "PlayerName", gamePanel.getWidth()/2, gamePanel.getHeight()/2, 250);
-        player = new Player(this, "PlayerName", worldWidth /2, worldHeight /2, 250);
-
+        player = new Player(this, "PlayerName", worldWidth/2, worldHeight/2, 250);
+        player.addBow();
 
         // monster
         monsters = new HashSet<>();
         monsterSpawner = new MonsterSpawner(this, player, monsters);
-
-        // weapons
-        // player.getWeapons().add(new SpinningSword(this, 100, 100, player.attack, 300, 100, player));
-        // player.getWeapons().add(new Bow(this, 100, 100, player.attack * 3, 150, 1, player));
-        int radius = 150;
-        player.getWeapons().add(new Aura(this, radius * 2, radius * 2, player.attack / 2, radius, player));
 
         // exp orbs
         exps = new HashSet<>();
@@ -118,6 +110,7 @@ public class Game {
         gameFrame.setLocationRelativeTo(null);
         gameFrame.setVisible(true);
 
+        gamePanel.initLevelUpChoices();
         // game loop
         startGameLoop();
 
@@ -196,6 +189,10 @@ public class Game {
         gameState = GameState.MAIN_GAME;
     }
 
+    public void levelUp() {
+        gameState = GameState.LEVEL_UP;
+    }
+
     public void quit() {
         // TODO: Quit Game
         System.exit(0);
@@ -203,6 +200,10 @@ public class Game {
 
     public GameState getGameState() {
         return gameState;
+    }
+
+    public GameMouseListener getMouseListener() {
+        return mouseListener;
     }
 
     private void startGameLoop() {
@@ -248,6 +249,7 @@ public class Game {
     private void processUpdate() {
         if (gameState == GameState.TITLE_SCREEN) return;
         if (gameState == GameState.PAUSE) return;
+        if (gameState == GameState.LEVEL_UP) return;
         keyboardListener.update();
         player.update();
         exps.forEach(ExpOrb::update);

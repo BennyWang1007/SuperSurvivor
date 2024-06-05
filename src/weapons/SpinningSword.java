@@ -2,6 +2,7 @@ package weapons;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
 
 import entity.Player;
 import entity.monster.Monster;
@@ -63,6 +64,13 @@ public class SpinningSword extends Weapon{
 
     @Override
     public void levelUp() {
-
+        level++;
+        player.addSpinningSword();
+        // set every degree of spinning sword
+        degree = 0;
+        ArrayList<SpinningSword> swords = player.getSwords();
+        for (int i = 0; i < swords.size(); i++) {
+            swords.get(i).degree = 360 / swords.size() * i;
+        }
     }
 }

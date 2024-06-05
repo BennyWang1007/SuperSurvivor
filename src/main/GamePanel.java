@@ -4,11 +4,14 @@ import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Set;
 
 import entity.*;
 import entity.monster.Monster;
 import listeners.GameMouseListener;
+import weapons.*;
 
 public class GamePanel extends Canvas {
 
@@ -16,6 +19,9 @@ public class GamePanel extends Canvas {
     private Player player;
     private Set<Monster> monsters;
     private Set<ExpOrb> exps;
+
+    private ArrayList<LevelUpChoice> levelUpChoices;
+    private LevelUpChoice[] curLevelUpChoices = new LevelUpChoice[3];
 
     private final TileManager tileManager;
 
@@ -51,6 +57,29 @@ public class GamePanel extends Canvas {
         setMaximumSize(screenSize);
     }
 
+     public void initLevelUpChoices() {
+        levelUpChoices = new ArrayList<>();
+        levelUpChoices.add(new LevelUpChoice("Spinning Sword", LevelUpChoice.ADD_WEAPON, new SpinningSword(game, 100, 100, player.attack, 300, 100, player), player));
+        levelUpChoices.add(new LevelUpChoice("Aura", LevelUpChoice.ADD_WEAPON, new Aura(game, 150, 150, player.attack, 300, player), player));
+        levelUpChoices.add(new LevelUpChoice("Bow Lv.2", LevelUpChoice.UPGRADE_WEAPON, player.getBow(), player));
+
+        levelUpChoices.add(new LevelUpChoice("Atk + 20", LevelUpChoice.UPGRADE_PLAYER, LevelUpChoice.UPGRADE_ATK, 20, player));
+        levelUpChoices.add(new LevelUpChoice("Def + 10", LevelUpChoice.UPGRADE_PLAYER, LevelUpChoice.UPGRADE_DEF, 10, player));
+        levelUpChoices.add(new LevelUpChoice("Hp + 50", LevelUpChoice.UPGRADE_PLAYER, LevelUpChoice.UPGRADE_HP, 50, player));
+        levelUpChoices.add(new LevelUpChoice("Speed + 5", LevelUpChoice.UPGRADE_PLAYER, LevelUpChoice.UPGRADE_SPD, 5, player));
+
+        randomCurLevelUpChoices();
+    }
+
+    // randomly choose 3 choices from levelUpChoices to curLevelUpChoices
+    private void randomCurLevelUpChoices() {
+        System.out.println("Random curLevelUpChoices from size " + levelUpChoices.size());
+        Collections.shuffle(levelUpChoices);
+        for (int i = 0; i < 3; i++) {
+            curLevelUpChoices[i] = levelUpChoices.get(i);
+        }
+    }
+
     public void setPlayer(Player player) { this.player = player; }
     public void setMonsters(Set<Monster> monsters) { this.monsters = monsters; }
     public void setExpOrbs(Set<ExpOrb> exps) { this.exps = exps; }
@@ -70,7 +99,7 @@ public class GamePanel extends Canvas {
 
         if (gameState == GameState.TITLE_SCREEN) {
             titleScreen.draw(g);
-        } else if (gameState == GameState.MAIN_GAME || gameState == GameState.PAUSE) {
+        } else if (gameState != GameState.TITLE_SCREEN) {
             drawBackground(g);
             // draw : monster -> weapon -> player
             drawMonsters(g);
@@ -80,18 +109,29 @@ public class GamePanel extends Canvas {
             if (DEBUG) {
                 // draw a rectangle as background of debug info
                 g.setColor(Color.BLACK);
-                g.fillRect(0, 0, 260, 100);
-                // draw the position of player
+                g.fillRect(0, 0, 260, 100 + 20 * player.getWeapons().size());
+                // info
                 g.setColor(Color.WHITE);
                 g.setFont(getFont().deriveFont(20.0f));
                 g.drawString("Player: " + (int)player.x + ", " + (int)player.y, 10, 35);
                 g.drawString("Exp: " + player.exp + "/" + player.expTable[player.level] + ", Level: " + player.level, 10, 55);
+                if (player.getWeapons().size() > 0) {
+                    g.drawString("Weapons: ", 10, 95);
+                    int i = 0;
+                    for (Weapon weapon : player.getWeapons()) {
+                        g.drawString(weapon.getClass().getSimpleName() + ": " + weapon.getLevel(), 10, 115 + 20 * i);
+                        i++;
+                    }
+                }
                 g.setFont(getFont().deriveFont(12.0f));
             }
             drawFPS(g);
 
             if (gameState == GameState.PAUSE) {
                 drawPauseView(g);
+            }
+            if (gameState == GameState.LEVEL_UP) {
+                drawUpdateScreen(g);
             }
         }
         g.dispose();
@@ -112,11 +152,72 @@ public class GamePanel extends Canvas {
         g.setFont(getFont().deriveFont(12.0f));
     }
 
+    private void drawUpdateScreen(Graphics g) {
+
+        // draw a white rectangle as background with opacity 0.5
+        g.setColor(new Color(255, 255, 255, 128));
+        g.fillRect(0, 0, getWidth(), getHeight());
+
+        int panelWidth = getWidth();
+        int panelHeight = getHeight();
+
+        int boxWidth = 200;
+        int boxHeight = 200;
+        int margin = 20;
+
+        int boxX[] = {panelWidth / 2 - boxWidth / 2 * 3 - margin, panelWidth / 2 - boxWidth / 2, panelWidth / 2 + boxWidth / 2 + margin};
+        int boxY = panelHeight / 2 - boxHeight / 2;
+
+        g.setColor(Color.BLACK);
+        ((Graphics2D) g).setStroke(new BasicStroke(3));
+
+        g.setFont(getFont().deriveFont(20.0f));
+        g.drawString("Choose one upgrade", panelWidth / 2 - "Choose one upgrade".length() * 5, boxY - 20);
+        for (int i = 0; i < 3; i++) {
+            g.setColor(Color.WHITE);
+            g.fillRoundRect(boxX[i], boxY, boxWidth, boxHeight, 10, 10);
+            g.setColor(Color.BLACK);
+            g.drawRoundRect(boxX[i], boxY, boxWidth, boxHeight, 10, 10);
+            g.drawString(curLevelUpChoices[i].getName(), boxX[i] + boxWidth / 2 - curLevelUpChoices[i].getName().length() * 5, boxY + boxHeight / 2);
+        }
+        
+        if (mouseListener.mouseClicked) {
+            for (int i = 0; i < 3; i++) {
+                if (mouseListener.mouseX > boxX[i] && mouseListener.mouseX < boxX[i] + boxWidth &&
+                    mouseListener.mouseY > boxY && mouseListener.mouseY < panelHeight / 2 + boxHeight / 2) {
+                    curLevelUpChoices[i].apply();
+                    LevelUpChoice nextChoice = curLevelUpChoices[i].nextUpgrade();
+                    if (nextChoice == null) {
+                        levelUpChoices.remove(curLevelUpChoices[i]);
+                    } else {
+                        levelUpChoices.set(levelUpChoices.indexOf(curLevelUpChoices[i]), nextChoice);
+                    }
+                    randomCurLevelUpChoices();
+                    game.resume();
+                }
+            }
+        }
+    }
+
     private void drawMonsters(Graphics g) {
         monsters.forEach(monster -> monster.draw(g));
     }
 
     private void drawExp(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.setFont(getFont().deriveFont(20.0f));
+        g.drawString("Level: " + player.level, 10, 75);
+        int x = 350, y = 100, h = 50, arc = 10;
+        int w = getWidth() - 2 * x;
+        // draw the background of the exp bar
+        g.setColor(Color.GREEN);
+        int expWidth = Math.min((int) (w * (float) player.exp / player.expTable[player.level]), w);
+        g.fillRoundRect(x, y, expWidth, h, arc, arc);
+        // draw the edge of the exp bar
+        g.setColor(Color.BLUE);
+        ((Graphics2D) g).setStroke(new BasicStroke(3));
+
+        g.drawRoundRect(x, y, w, h, arc, arc);
         exps.forEach(exp -> exp.draw(g));
     }
 
@@ -135,4 +236,78 @@ public class GamePanel extends Canvas {
         g.drawString(str, 10, 15);
     }
     
+}
+
+class LevelUpChoice {
+    private String name;
+    private final Player player;
+    public final int type; // 1: Add weapon, 2: Upgrade weapon, 3. Upgrade player ability
+    private Weapon weapon;
+    private int abilityType;
+    private int abilityValue;
+
+    public static final int ADD_WEAPON = 1;
+    public static final int UPGRADE_WEAPON = 2;
+    public static final int UPGRADE_PLAYER = 3;
+
+    public static final int UPGRADE_ATK = 1;
+    public static final int UPGRADE_DEF = 2;
+    public static final int UPGRADE_HP = 3;
+    public static final int UPGRADE_SPD = 4;
+
+    public LevelUpChoice(String name, int type, Weapon weapon, Player player) {
+        this.name = name;
+        this.type = type;
+        this.weapon = weapon;
+        this.player = player;
+    }
+
+    public LevelUpChoice(String name, int type, int abilityType, int abilityValue, Player player) {
+        this.name = name;
+        this.type = type;
+        this.abilityType = abilityType;
+        this.abilityValue = abilityValue;
+        this.player = player;
+    }
+
+    public String getName() { return name; }
+    public Weapon getWeapon() { return weapon; }
+
+    public void apply() {
+        if (type == ADD_WEAPON) {
+            System.out.println("Add Weapon " + name);
+            player.getWeapons().add(weapon);
+        } else if (type == UPGRADE_WEAPON) {
+            System.out.println("Upgrade Weapon " + name);
+            weapon.levelUp();
+        } else if (type == UPGRADE_PLAYER) {
+            if (abilityValue == UPGRADE_ATK) {
+                player.attack += abilityValue;
+            } else if (abilityValue == UPGRADE_DEF) {
+                player.defense += abilityValue;
+            } else if (abilityValue == UPGRADE_HP) {
+                player.maxHp += abilityValue;
+                player.hp = player.maxHp;
+            } else if (abilityValue == UPGRADE_SPD) {
+                player.speed += abilityValue;
+            }
+        }
+    }
+
+    public LevelUpChoice nextUpgrade() {
+        if (type == ADD_WEAPON) {
+            System.out.println("Gen Upgrade " + name);
+            return new LevelUpChoice(name + " Lv.2", UPGRADE_WEAPON, weapon, player);
+        } else if (type == UPGRADE_WEAPON) {
+            if (weapon.getLevel() == 5) return null;
+            // add the last character of the name by 1
+            name = name.substring(0, name.length() - 1) + (char)(name.charAt(name.length() - 1) + 1);
+            System.out.println("Next Upgrade " + name);
+            return this;
+        } else if (type == UPGRADE_PLAYER) {
+            return this;
+        }
+
+        return null;
+    }
 }
