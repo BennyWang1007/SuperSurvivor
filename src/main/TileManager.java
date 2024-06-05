@@ -47,7 +47,7 @@ public class TileManager {
                 collisionstatus = true;
             }
             setup(i, fileName, collisionstatus);
-            System.out.println("setup: " + i + " | " + fileName);
+            // System.out.println("setup: " + i + " | " + fileName);
         }
     }
 

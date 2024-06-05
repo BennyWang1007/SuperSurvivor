@@ -73,7 +73,7 @@ public class GamePanel extends Canvas {
 
     // randomly choose 3 choices from levelUpChoices to curLevelUpChoices
     private void randomCurLevelUpChoices() {
-        System.out.println("Random curLevelUpChoices from size " + levelUpChoices.size());
+        // System.out.println("Random curLevelUpChoices from size " + levelUpChoices.size());
         Collections.shuffle(levelUpChoices);
         for (int i = 0; i < 3; i++) {
             curLevelUpChoices[i] = levelUpChoices.get(i);
@@ -275,10 +275,8 @@ class LevelUpChoice {
 
     public void apply() {
         if (type == ADD_WEAPON) {
-            System.out.println("Add Weapon " + name);
             player.getWeapons().add(weapon);
         } else if (type == UPGRADE_WEAPON) {
-            System.out.println("Upgrade Weapon " + name);
             weapon.levelUp();
         } else if (type == UPGRADE_PLAYER) {
             if (abilityValue == UPGRADE_ATK) {
@@ -296,13 +294,11 @@ class LevelUpChoice {
 
     public LevelUpChoice nextUpgrade() {
         if (type == ADD_WEAPON) {
-            System.out.println("Gen Upgrade " + name);
             return new LevelUpChoice(name + " Lv.2", UPGRADE_WEAPON, weapon, player);
         } else if (type == UPGRADE_WEAPON) {
             if (weapon.getLevel() == 5) return null;
             // add the last character of the name by 1
             name = name.substring(0, name.length() - 1) + (char)(name.charAt(name.length() - 1) + 1);
-            System.out.println("Next Upgrade " + name);
             return this;
         } else if (type == UPGRADE_PLAYER) {
             return this;
