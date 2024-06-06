@@ -97,6 +97,10 @@ public class Player extends Entity{
         curMaxDamage = Math.max(curMaxDamage, monster.attack);
     }
 
+    public void collideWith(Projectile projectile) {
+        hp -= projectile.attack - defense;
+    }
+
     private void takeDamage() {
         if (curMaxDamage == 0) return;
         damage(curMaxDamage);

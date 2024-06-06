@@ -11,7 +11,7 @@ import utils.ImageTools;
 
 public abstract class Weapon extends Entity{
     protected Player player;
-    protected int attack;
+    public int attack;
     protected HashMap<Integer, Integer> attackCooldowns;
     protected BufferedImage image;
     protected BufferedImage[][] animationImages; // for animation

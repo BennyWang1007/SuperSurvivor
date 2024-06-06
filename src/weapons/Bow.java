@@ -41,7 +41,7 @@ public class Bow extends Weapon {
         int centerX = game.translateToScreenX(player.x);
         int centerY = game.translateToScreenY(player.y);
         float degree = (float) Math.toDegrees(Math.atan2(mouseListener.mouseY - centerY, mouseListener.mouseX - centerX));
-        arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, degree, speed / Game.FPS, player));
+        arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, speed / Game.FPS, degree, player));
         shotCooldown = (int) (shotInterval * Game.FPS);
 
         // // find nearest monster

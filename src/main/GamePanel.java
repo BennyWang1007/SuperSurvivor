@@ -19,6 +19,7 @@ public class GamePanel extends Canvas {
     private Player player;
     private Set<Monster> monsters;
     private Set<ExpOrb> exps;
+    private Set<Projectile> projectiles;
 
     private ArrayList<LevelUpChoice> levelUpChoices;
     private LevelUpChoice[] curLevelUpChoices = new LevelUpChoice[3];
@@ -83,6 +84,7 @@ public class GamePanel extends Canvas {
     public void setPlayer(Player player) { this.player = player; }
     public void setMonsters(Set<Monster> monsters) { this.monsters = monsters; }
     public void setExpOrbs(Set<ExpOrb> exps) { this.exps = exps; }
+    public void setProjectiles(Set<Projectile> projectiles) { this.projectiles = projectiles; }
 
     public void render() {
         BufferStrategy bs = getBufferStrategy();
@@ -104,6 +106,7 @@ public class GamePanel extends Canvas {
             // draw : monster -> weapon -> player
             drawMonsters(g);
             drawExp(g);
+            drawProjectiles(g);
             drawPlayer(g);
             drawDamageReceived(g);
             if (DEBUG) {
@@ -201,6 +204,10 @@ public class GamePanel extends Canvas {
 
     private void drawMonsters(Graphics g) {
         monsters.forEach(monster -> monster.draw(g));
+    }
+
+    private void drawProjectiles(Graphics g) {
+        projectiles.forEach(projectile -> projectile.draw(g));
     }
 
     private void drawExp(Graphics g) {
