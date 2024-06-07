@@ -11,8 +11,7 @@ public class Arrow extends Projectile {
 
     public Arrow(Game game, float x, float y, int width, int height, int attack, float speed, float degree, Player player) {
         super(game, x, y, width, height, attack, speed, degree);
-        // readImage("/Arrow2.png");
-        originalImage = ImageTools.scaleImage(ImageTools.readImage("/Arrow2.png"), width, height);
+        originalImage = ImageTools.scaleImage(ImageTools.readImage("/Arrow.png"), width, height);
         image = ImageTools.rotateImage(originalImage, degree);
     }
 
