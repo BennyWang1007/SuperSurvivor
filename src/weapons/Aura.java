@@ -17,11 +17,10 @@ public class Aura extends Weapon {
     private final float deltaRadius = 20;
     // private float degreeOfTransparency = 0.0f; // cos(degree) = transparency
 
-    public Aura(Game game, int width, int height, int attack, float radius, Player player) {
-        super(game, width, height, attack, player);
+    public Aura(Game game, int width, int height, float attackMul, float radius, Player player) {
+        super(game, width, height, attackMul, player);
         readImage("/Aura.png");
         this.radius = radius;
-        this.level = 1;
         monsters = game.getMonsters();
         loadAnimation();
     }

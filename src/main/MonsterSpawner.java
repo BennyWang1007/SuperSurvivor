@@ -1,7 +1,10 @@
 package main;
 
 import entity.Player;
+import entity.monster.KnifeGoblin;
 import entity.monster.Monster;
+import entity.monster.Roller;
+import entity.monster.StoneThrower;
 
 import java.util.Random;
 import java.util.Set;
@@ -23,7 +26,15 @@ public class MonsterSpawner {
 
     public void spawnMonster(int id, int exp) {
         int[] pos = getSpawnPositionRandomly();
-        Monster monster = new Monster(game, "Monster", pos[0], pos[1], 100, 20, 1, exp, player);
+        Monster monster;
+        float rand = random.nextFloat();
+        if (rand < 0.5) {
+            monster = new KnifeGoblin(game, "Monster", pos[0], pos[1], 100, 20, 60, exp, player);
+        } else if (rand < 0.9) {
+            monster = new StoneThrower(game, "Monster", pos[0], pos[1], 100, 20, 60, exp, player);
+        } else {
+            monster = new Roller(game, "Monster", pos[0], pos[1], 100, 20, 240, exp, player);
+        }
         monster.setId(id);
         monsters.add(monster);
     }

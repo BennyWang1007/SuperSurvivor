@@ -88,13 +88,17 @@ public class Player extends Entity{
         return swords;
     }
 
-    public void addBow() { weapons.add(new Bow(game, 100, 100, attack * 5, 360, 1, this)); }
-    public void addSpinningSword() { weapons.add(new SpinningSword(game, 100, 100, attack, 300, 100, this)); }
-    public void addAura() { weapons.add(new Aura(game, 200, 200, attack / 2, 100, this)); }
+    public void addBow() { weapons.add(new Bow(game, 100, 100, 5, 360, 1, this)); }
+    public void addSpinningSword() { weapons.add(new SpinningSword(game, 100, 100, 1, 300, 100, this)); }
+    public void addAura() { weapons.add(new Aura(game, 200, 200, 0.5f, 100, this)); }
 
     public void collideWith(Monster monster) {
         if (damageCooldown > 0) return;
         curMaxDamage = Math.max(curMaxDamage, monster.attack);
+    }
+
+    public void collideWith(Projectile projectile) {
+        hp -= projectile.attack - defense;
     }
 
     private void takeDamage() {
@@ -112,12 +116,24 @@ public class Player extends Entity{
         }
     }
 
+    public void setAttack(int attack) {
+        this.attack = attack;
+        for (Weapon weapon : weapons) {
+            weapon.setAttack(this.attack);
+        }
+    }
+    public void addAttack(int attack) {
+        this.attack += attack;
+        for (Weapon weapon : weapons) {
+            weapon.setAttack(this.attack);
+        }
+    }
+
     private void levelUp() {
-        // TODO: level up player
         level++;
         maxHp += 10;
         hp = maxHp;
-        attack += 5;
+        addAttack(5);
         defense += 2;
         game.levelUp();
     }

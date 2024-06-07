@@ -14,8 +14,8 @@ public class SpinningSword extends Weapon{
     private float distance;
     private float degree;
 
-    public SpinningSword(Game game, int width, int height, int attack, float degreePerSecond, float distance, Player owner){
-        super(game, width, height, attack, owner);
+    public SpinningSword(Game game, int width, int height, float attackMul, float degreePerSecond, float distance, Player owner){
+        super(game, width, height, attackMul, owner);
         this.degreePerSecond = degreePerSecond;
         this.distance = distance;
         this.degree = 0;

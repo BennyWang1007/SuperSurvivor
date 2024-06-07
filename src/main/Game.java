@@ -20,7 +20,7 @@ public class Game {
     public static final double DELTA_TIME = 1. / FPS;
     private static final double NANO_TIME_PER_FRAME = 1000000000.0 / FPS;
 
-    private static final boolean skipTitleScreen = false;
+    private static final boolean skipTitleScreen = true;
 
     // Window frame / panel
     private final JFrame gameFrame;
@@ -63,6 +63,9 @@ public class Game {
     // ExpOrbs
     private Set<ExpOrb> exps;
 
+    // Projectiles
+    private Set<Projectile> projectiles;
+
     // measured FPS & UPS
     private int measuredFPS = 0;
 
@@ -88,6 +91,9 @@ public class Game {
         monsters = new HashSet<>();
         monsterSpawner = new MonsterSpawner(this, player, monsters);
 
+        // projectiles
+        projectiles = new HashSet<>();
+
         // exp orbs
         exps = new HashSet<>();
 
@@ -99,6 +105,7 @@ public class Game {
         gamePanel.setPlayer(player);
         gamePanel.setMonsters(monsters);
         gamePanel.setExpOrbs(exps);
+        gamePanel.setProjectiles(projectiles);
         gamePanel.addMouseListener(mouseListener);
         gamePanel.addMouseMotionListener(mouseListener);
         gamePanel.addKeyListener(keyboardListener);
@@ -254,6 +261,7 @@ public class Game {
         player.update();
         exps.forEach(ExpOrb::update);
         monsters.forEach(Monster::update);
+        projectiles.forEach(Projectile::update);
         processCollision();
         monsters.forEach(monster -> {
             if (monster.isDead()) {
@@ -261,6 +269,7 @@ public class Game {
             }
         });
         monsters.removeIf(Monster::isDead);
+        projectiles.removeIf(proj -> proj.toDelete);
         exps.removeIf(exp -> exp.isCollected);
         processMonsterSpawn();
         calculateCenter();
@@ -319,6 +328,10 @@ public class Game {
 
     public void removeExpOrb(ExpOrb expOrb) {
         exps.remove(expOrb);
+    }
+
+    public void addProjectile(Projectile projectile) {
+        projectiles.add(projectile);
     }
 
 }

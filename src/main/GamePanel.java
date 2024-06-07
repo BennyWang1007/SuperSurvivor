@@ -19,6 +19,7 @@ public class GamePanel extends Canvas {
     private Player player;
     private Set<Monster> monsters;
     private Set<ExpOrb> exps;
+    private Set<Projectile> projectiles;
 
     private ArrayList<LevelUpChoice> levelUpChoices;
     private LevelUpChoice[] curLevelUpChoices = new LevelUpChoice[3];
@@ -60,7 +61,7 @@ public class GamePanel extends Canvas {
      public void initLevelUpChoices() {
         levelUpChoices = new ArrayList<>();
         levelUpChoices.add(new LevelUpChoice("Spinning Sword", LevelUpChoice.ADD_WEAPON, new SpinningSword(game, 100, 100, player.attack, 300, 100, player), player));
-        levelUpChoices.add(new LevelUpChoice("Aura", LevelUpChoice.ADD_WEAPON, new Aura(game, 150, 150, player.attack, 75, player), player));
+        levelUpChoices.add(new LevelUpChoice("Aura", LevelUpChoice.ADD_WEAPON, new Aura(game, 150, 150, 0.5f, 75, player), player));
         levelUpChoices.add(new LevelUpChoice("Bow Lv.2", LevelUpChoice.UPGRADE_WEAPON, player.getBow(), player));
 
         levelUpChoices.add(new LevelUpChoice("Atk + 20", LevelUpChoice.UPGRADE_PLAYER, LevelUpChoice.UPGRADE_ATK, 20, player));
@@ -83,6 +84,7 @@ public class GamePanel extends Canvas {
     public void setPlayer(Player player) { this.player = player; }
     public void setMonsters(Set<Monster> monsters) { this.monsters = monsters; }
     public void setExpOrbs(Set<ExpOrb> exps) { this.exps = exps; }
+    public void setProjectiles(Set<Projectile> projectiles) { this.projectiles = projectiles; }
 
     public void render() {
         BufferStrategy bs = getBufferStrategy();
@@ -104,22 +106,24 @@ public class GamePanel extends Canvas {
             // draw : monster -> weapon -> player
             drawMonsters(g);
             drawExp(g);
+            drawProjectiles(g);
             drawPlayer(g);
             drawDamageReceived(g);
             if (DEBUG) {
                 // draw a rectangle as background of debug info
                 g.setColor(Color.BLACK);
-                g.fillRect(0, 0, 260, 100 + 20 * player.getWeapons().size());
+                g.fillRect(0, 0, 310, 100 + 20 * player.getWeapons().size());
                 // info
                 g.setColor(Color.WHITE);
                 g.setFont(getFont().deriveFont(20.0f));
-                g.drawString("Player: " + (int)player.x + ", " + (int)player.y, 10, 35);
-                g.drawString("Exp: " + player.exp + "/" + player.expTable[player.level] + ", Level: " + player.level, 10, 55);
+                g.drawString("Player: (" + (int)player.x + ", " + (int)player.y + "), atk: " + player.attack, 10, 35);
+                g.drawString("def: " + player.defense + ", hp: " + player.hp + " / " + player.maxHp + ", spd: " + player.speed, 10, 55);
+                g.drawString("Exp: " + player.exp + "/" + player.expTable[player.level] + ", Level: " + player.level, 10, 75);
                 if (player.getWeapons().size() > 0) {
                     g.drawString("Weapons: ", 10, 95);
                     int i = 0;
                     for (Weapon weapon : player.getWeapons()) {
-                        g.drawString(weapon.getClass().getSimpleName() + ": " + weapon.getLevel(), 10, 115 + 20 * i);
+                        g.drawString(weapon.getClass().getSimpleName() + " lv: " + weapon.getLevel() + "atk " + weapon.attack, 10, 115 + 20 * i);
                         i++;
                     }
                 }
@@ -203,6 +207,10 @@ public class GamePanel extends Canvas {
         monsters.forEach(monster -> monster.draw(g));
     }
 
+    private void drawProjectiles(Graphics g) {
+        projectiles.forEach(projectile -> projectile.draw(g));
+    }
+
     private void drawExp(Graphics g) {
         g.setColor(Color.BLACK);
         g.setFont(getFont().deriveFont(20.0f));
@@ -276,17 +284,18 @@ class LevelUpChoice {
     public void apply() {
         if (type == ADD_WEAPON) {
             player.getWeapons().add(weapon);
+            weapon.setAttack(player.attack);
         } else if (type == UPGRADE_WEAPON) {
             weapon.levelUp();
         } else if (type == UPGRADE_PLAYER) {
-            if (abilityValue == UPGRADE_ATK) {
-                player.attack += abilityValue;
-            } else if (abilityValue == UPGRADE_DEF) {
+            if (abilityType == UPGRADE_ATK) {
+                player.addAttack(abilityValue);
+            } else if (abilityType == UPGRADE_DEF) {
                 player.defense += abilityValue;
-            } else if (abilityValue == UPGRADE_HP) {
+            } else if (abilityType == UPGRADE_HP) {
                 player.maxHp += abilityValue;
                 player.hp = player.maxHp;
-            } else if (abilityValue == UPGRADE_SPD) {
+            } else if (abilityType == UPGRADE_SPD) {
                 player.speed += abilityValue;
             }
         }

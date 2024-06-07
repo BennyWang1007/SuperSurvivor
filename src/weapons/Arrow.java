@@ -1,37 +1,24 @@
 package weapons;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-
 
 import entity.Player;
 import entity.monster.Monster;
 import main.Game;
 import utils.ImageTools;
 
-public class Arrow extends Weapon {
+public class Arrow extends Projectile {
 
-    private float degree;
-    private float speed; // in pixels per update
-    public boolean toDelete = false;
-
-    public Arrow(Game game, float x, float y, int width, int height, int attack, float degree, float speed, Player player) {
-        super(game, width, height, attack, player);
-        readImage("/Arrow.png");
-        this.degree = degree;
-        this.speed = speed;
-        this.x = x;
-        this.y = y;
-        
-        // rotate image
+    public Arrow(Game game, float x, float y, int width, int height, int attack, float speed, float degree, Player player) {
+        super(game, x, y, width, height, attack, speed, degree);
+        // readImage("/Arrow2.png");
+        originalImage = ImageTools.scaleImage(ImageTools.readImage("/Arrow2.png"), width, height);
         image = ImageTools.rotateImage(originalImage, degree);
     }
 
     @Override
     public void update() {
-        x += Math.cos(Math.toRadians(degree)) * speed;
-        y += Math.sin(Math.toRadians(degree)) * speed;
+        move();
         for (Monster monster : game.getMonsters()) {
             if (monster.getHitBox().isCollideWith(getHitBox())) {
                 attackOn(monster);
@@ -50,6 +37,11 @@ public class Arrow extends Weapon {
     }
 
     @Override
+    public void attackOn(Player player) {
+        throw new UnsupportedOperationException("Should not attack on player!");
+    }
+
+    @Override
     public void draw(Graphics g) {
         int screenX = game.translateToScreenX(x);
         int screenY = game.translateToScreenY(y);
@@ -64,15 +56,4 @@ public class Arrow extends Weapon {
 //        ((Graphics2D) g).drawRect(cx, cy, width, height);
 
     }
-
-    @Override
-    public void loadAnimation() {
-        // TODO
-    }
-
-    @Override
-    public void levelUp() {
-
-    }
-
 }
