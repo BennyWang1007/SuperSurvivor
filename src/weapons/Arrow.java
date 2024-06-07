@@ -18,7 +18,7 @@ public class Arrow extends Weapon {
 
     public Arrow(Game game, float x, float y, int width, int height, int attack, float degree, float speed, Player player) {
         super(game, width, height, attack, player);
-        readImage("/Arrow2.png");
+        readImage("/Arrow.png");
         this.degree = degree;
         this.speed = speed;
         this.x = x;
@@ -60,8 +60,8 @@ public class Arrow extends Weapon {
         g.drawImage(image, cx, cy, null);
 
         // draw hitbox
-        g.setColor(Color.RED);
-        ((Graphics2D) g).drawRect(cx, cy, width, height);
+//        g.setColor(Color.RED);
+//        ((Graphics2D) g).drawRect(cx, cy, width, height);
 
     }
 

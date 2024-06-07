@@ -31,18 +31,18 @@ public class Game {
     private final int originalTileSize = 16;
     private final int scale = 3;
     public final int tileSize = originalTileSize * scale;
-    public final int maxScreenRow = 24;
-    public final int maxScreenCol = 15;
+    public final int maxScreenCol = 24;
+    public final int maxScreenRow = 15;
     public int screenCenterX;
     public int screenCenterY;
-    public final int screenWidth = maxScreenRow * tileSize;
-    public final int screenHeight = maxScreenCol * tileSize;
+    public final int screenWidth = maxScreenCol * tileSize;
+    public final int screenHeight = maxScreenRow * tileSize;
 
     // Map
     public final int maxWorldRow = 100;
     public final int maxWorldCol = 100;
-    public final int worldWidth = maxWorldRow * tileSize;
-    public final int worldHeight = maxWorldCol * tileSize;
+    public final int worldWidth = maxWorldCol * tileSize;
+    public final int worldHeight = maxWorldRow * tileSize;
 
     // Listener
     private final GameKeyboardListener keyboardListener;

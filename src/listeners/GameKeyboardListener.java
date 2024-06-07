@@ -31,9 +31,8 @@ public class GameKeyboardListener implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (game.getGameState() ==  GameState.TITLE_SCREEN) {
-            return;
-        }
+        if (game.getGameState() ==  GameState.TITLE_SCREEN) return;
+        if (game.getGameState() == GameState.LEVEL_UP) return;
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE && !escPressed) {
             isPause = !isPause;
             if (isPause) game.pause();

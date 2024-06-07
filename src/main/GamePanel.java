@@ -60,7 +60,7 @@ public class GamePanel extends Canvas {
      public void initLevelUpChoices() {
         levelUpChoices = new ArrayList<>();
         levelUpChoices.add(new LevelUpChoice("Spinning Sword", LevelUpChoice.ADD_WEAPON, new SpinningSword(game, 100, 100, player.attack, 300, 100, player), player));
-        levelUpChoices.add(new LevelUpChoice("Aura", LevelUpChoice.ADD_WEAPON, new Aura(game, 150, 150, player.attack, 300, player), player));
+        levelUpChoices.add(new LevelUpChoice("Aura", LevelUpChoice.ADD_WEAPON, new Aura(game, 150, 150, player.attack, 75, player), player));
         levelUpChoices.add(new LevelUpChoice("Bow Lv.2", LevelUpChoice.UPGRADE_WEAPON, player.getBow(), player));
 
         levelUpChoices.add(new LevelUpChoice("Atk + 20", LevelUpChoice.UPGRADE_PLAYER, LevelUpChoice.UPGRADE_ATK, 20, player));

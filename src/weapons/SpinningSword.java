@@ -19,7 +19,7 @@ public class SpinningSword extends Weapon{
         this.degreePerSecond = degreePerSecond;
         this.distance = distance;
         this.degree = 0;
-        readImage("/sword_900.png");
+        readImage("/Sword.png");
         cooldownTime = 0.5f;
     }
 
@@ -56,8 +56,8 @@ public class SpinningSword extends Weapon{
         ((Graphics2D) g).drawImage(image, at, null);
 
         // draw hitbox
-        g.setColor(Color.RED);
-        ((Graphics2D) g).drawRect(cx, cy, width, height);
+//        g.setColor(Color.RED);
+//        ((Graphics2D) g).drawRect(cx, cy, width, height);
     }
 
     public void loadAnimation() {}
