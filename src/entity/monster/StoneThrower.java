@@ -22,8 +22,8 @@ public class StoneThrower extends Monster {
             return ;
         };
         
-        dx *= speed / distance / Game.FPS;
-        dy *= speed / distance / Game.FPS;
+        dx *= speedPerFrame / distance;
+        dy *= speedPerFrame / distance;
         
         x += dx;
         y += dy;
@@ -62,6 +62,8 @@ public class StoneThrower extends Monster {
         g.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
         g.setColor(java.awt.Color.GREEN);
         g.fillRect(healthBarX, healthBarY, healthBarWidth * hp / maxHp, healthBarHeight);
+
+        drawDamageReceived(g);
 
         // // draw hitbox
         // g.setColor(java.awt.Color.RED);

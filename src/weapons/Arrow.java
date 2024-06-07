@@ -1,9 +1,6 @@
 package weapons;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-
 
 import entity.Player;
 import entity.monster.Monster;

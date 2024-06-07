@@ -22,6 +22,7 @@ public abstract class Monster extends Entity {
     protected int maxHp;
     protected int defense;
     protected float speed; // pixels per second
+    protected float speedPerFrame;
 
     public int attack;
     public int exp;
@@ -29,13 +30,14 @@ public abstract class Monster extends Entity {
     protected Player player;
     protected ArrayList<DamageReceive> damageReceived = new ArrayList<DamageReceive>();
 
-    public Monster(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
+    public Monster(Game game, String name, int x, int y, int hp, int attack, float speed, int exp, Player player) {
         super(game, x, y, 50, 50);
         this.name = name;
         this.hp = hp;
         this.maxHp = hp;
         this.attack = attack;
-        this.speed = speed * 60;
+        this.speed = speed;
+        this.speedPerFrame = speed / Game.FPS;
         this.exp = exp;
         this.player = player;
     }

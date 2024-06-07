@@ -12,6 +12,7 @@ import utils.ImageTools;
 public abstract class Weapon extends Entity{
     protected Player player;
     public int attack;
+    protected float attackMul;
     protected HashMap<Integer, Integer> attackCooldowns;
     protected BufferedImage image;
     protected BufferedImage[][] animationImages; // for animation
@@ -20,10 +21,11 @@ public abstract class Weapon extends Entity{
     protected int level = 1;
     protected final int maxLevel = 5;
 
-    public Weapon(Game game, int width, int height, int attack, Player player) {
+    public Weapon(Game game, int width, int height, float attackMul, Player player) {
         super(game, 0, 0, width, height);
-        this.attack = attack;
         this.player = player;
+        this.attackMul = attackMul;
+        this.attack = (int)(player.attack * attackMul);
         // loadAnimation();
         attackCooldowns = new HashMap<>();
     }
@@ -40,6 +42,7 @@ public abstract class Weapon extends Entity{
     }
 
     public int getLevel() { return level; }
+    public void setAttack(int attack) { this.attack = (int)(attack * attackMul); }
 
     public void decreaseCooldowns() {
         // cooldowns-- and remove cooldowns <= 0

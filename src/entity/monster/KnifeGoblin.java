@@ -17,16 +17,10 @@ public class KnifeGoblin extends Monster {
         float dx = player.x - this.x;
         float dy = player.y - this.y;
         float distance = (float)Math.hypot(dx, dy);
-        if (distance < 1) {
-            dx = 0;
-            dy = 0;
-        } else {
-            dx *= speed / distance;
-            dy *= speed / distance;
-        }
-        dx /= Game.FPS;
-        dy /= Game.FPS;
-        
+        if (distance < 1) return;
+
+        dx *= speedPerFrame / distance;
+        dy *= speedPerFrame / distance;
         x += dx;
         y += dy;
     }
@@ -55,8 +49,10 @@ public class KnifeGoblin extends Monster {
         g.fillRect(healthBarX, healthBarY, healthBarWidth * hp / maxHp, healthBarHeight);
         g.setColor(java.awt.Color.BLACK);
 
-        // draw hitbox
-        g.setColor(java.awt.Color.RED);
-        g.drawRect(cx, cy, width, height);
+        drawDamageReceived(g);
+
+        // // draw hitbox
+        // g.setColor(java.awt.Color.RED);
+        // g.drawRect(cx, cy, width, height);
     }
 }

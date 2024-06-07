@@ -16,8 +16,8 @@ public class Bow extends Weapon {
     private int shotCooldown = 0;
     private Set<Arrow> arrows = new HashSet<Arrow>();
 
-    public Bow(Game game, int width, int height, int attack, float speed, float shotInterval, Player player) {
-        super(game, width, height, attack, player);
+    public Bow(Game game, int width, int height, float attackMul, float speed, float shotInterval, Player player) {
+        super(game, width, height, attackMul, player);
         this.speed = speed;
         this.shotInterval = shotInterval;
         // readImage("res/bow.png");
