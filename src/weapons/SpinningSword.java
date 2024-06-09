@@ -2,10 +2,12 @@ package weapons;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 
 import entity.Player;
 import entity.monster.Monster;
 import main.Game;
+import utils.ImageTools;
 
 public class SpinningSword extends Weapon{
     
@@ -90,5 +92,10 @@ public class SpinningSword extends Weapon{
         for (int i = 0; i < level - 1; i++) {
             childSwords[i].degree = 360 / (level - 1) * i;
         }
+    }
+
+    @Override
+    protected BufferedImage loadIconImage() {
+        return ImageTools.rotateImage(ImageTools.readImage("/weapons/Sword.png"), -45);
     }
 }

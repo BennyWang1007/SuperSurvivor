@@ -1,12 +1,14 @@
 package weapons;
 
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.Set;
 import java.util.HashSet;
 
 import entity.Player;
 import entity.monster.Monster;
 import main.Game;
+import utils.ImageTools;
 import listeners.GameMouseListener;
 
 public class Bow extends Weapon {
@@ -90,6 +92,12 @@ public class Bow extends Weapon {
     @Override
     public void loadAnimation() {
         // TODO
+    }
+
+    @Override
+    protected BufferedImage loadIconImage() {
+        BufferedImage img = ImageTools.readImage("/weapons/Bow.png");
+        return ImageTools.rotateImage(img, -45);
     }
 
     @Override

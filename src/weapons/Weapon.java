@@ -15,6 +15,7 @@ public abstract class Weapon extends Entity{
     protected float attackMul;
     protected HashMap<Integer, Integer> attackCooldowns;
     protected BufferedImage image;
+    public final BufferedImage iconImage = loadIconImage();
     protected BufferedImage[][] animationImages; // for animation
     protected BufferedImage originalImage;
     protected float cooldownTime; // in seconds
@@ -61,4 +62,5 @@ public abstract class Weapon extends Entity{
     public abstract void levelUp();
     public abstract void draw(Graphics g);
     public abstract void loadAnimation();
+    protected abstract BufferedImage loadIconImage();
 }

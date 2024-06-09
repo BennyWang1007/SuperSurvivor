@@ -91,4 +91,9 @@ public class Aura extends Weapon {
         height = (int) radius * 2;
     }
 
+    @Override
+    protected BufferedImage loadIconImage() {
+        return ImageTools.readImage("/weapons/Aura.png");
+    }
+
 }
