@@ -3,6 +3,7 @@ package entity.monster;
 import java.awt.Graphics;
 
 import entity.Player;
+import entity.DropItem;
 import main.Game;
 
 public class StoneThrower extends Monster {
@@ -10,6 +11,10 @@ public class StoneThrower extends Monster {
     private float shootRange = 500;
     public StoneThrower(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
         super(game, name, x, y, hp, attack, speed, exp, player);
+        dropItems = new DropItem[] {
+            (DropItem) new entity.ExpOrb(game, x, y, exp, player)
+        };
+        dropRates = new float[] {1.0f};
     }
 
     public void update() {

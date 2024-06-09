@@ -3,23 +3,23 @@ package entity;
 import java.awt.Color;
 import java.awt.Graphics;
 
-import main.*;
+import main.Game;
 
-public class ExpOrb extends DropItem {
-    
-    private int exp;
+public class HealBag extends DropItem {
 
-    public ExpOrb(Game game, float x, float y, int exp, Player player) {
+    private int heal;
+
+    public HealBag(Game game, float x, float y, int heal, Player player) {
         super(game, x, y, 8, 8, player);
-        this.exp = exp;
+        this.heal = heal;
     }
 
     public void beCollected() {
-        player.addExp(exp);
+        player.heal(heal);
     }
 
     public void draw(Graphics g) {
-        g.setColor(Color.BLUE);
+        g.setColor(Color.RED);
         // draw a rhombus
         int screenX = game.translateToScreenX(x);
         int screenY = game.translateToScreenY(y);
@@ -27,5 +27,5 @@ public class ExpOrb extends DropItem {
         int[] yPoints = {screenY - height/2, screenY, screenY + height/2, screenY};
         g.fillPolygon(xPoints, yPoints, 4);
     }
-     
+    
 }

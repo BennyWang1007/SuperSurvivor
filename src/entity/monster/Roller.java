@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
 
+import entity.DropItem;
 import entity.Player;
 import main.Game;
 
@@ -21,6 +22,11 @@ public class Roller extends Monster {
 
     public Roller(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
         super(game, name, x, y, hp, attack, speed, exp, player);
+        dropItems = new DropItem[] {
+            (DropItem) new entity.ExpOrb(game, x, y, exp, player),
+            (DropItem) new entity.HealBag(game, x, y, 10, player)
+        };
+        dropRates = new float[] {1.0f, 0.5f};
     }
 
     @Override

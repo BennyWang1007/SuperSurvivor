@@ -18,12 +18,14 @@ public class Player extends Entity{
     public int level;
     public final int maxLevel = 39;
     // public int[] expTable = {0, 100, 200, 400, 800, 1600, 3200, 6400};
-    public int[] expTable = {0, 100, 100, 100, 100, 100, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 520, 540, 560, 580, 600, 620, 640, 660, 680, 700, 720, 740, 760, 780, 800};
+    public int[] expTable = {0, 1000000, 100, 100, 100, 100, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 520, 540, 560, 580, 600, 620, 640, 660, 680, 700, 720, 740, 760, 780, 800};
 
     public int damageCooldown;
     private int curMaxDamage;
 
     private Set<Weapon> weapons;
+
+    public float collectRange = 150f;
 
     public Player(Game game, String name, int x, int y, int speed) {
         super(game, x, y, 50, 50);
@@ -98,7 +100,7 @@ public class Player extends Entity{
     }
 
     public void collideWith(Projectile projectile) {
-        hp -= projectile.attack - defense;
+        damage(projectile.attack);
     }
 
     private void takeDamage() {
@@ -109,11 +111,14 @@ public class Player extends Entity{
     }
 
     private void damage(int damage) {
-        if (damage <= 0) return;
+        if (damage <= defense) return;
         hp -= damage - defense;
-        if (hp < 0) {
-            hp = 0;
-        }
+        // if (hp < 0) hp = 0;
+    }
+
+    public void heal(int heal) {
+        hp += heal;
+        if (hp > maxHp) hp = maxHp;
     }
 
     public void setAttack(int attack) {

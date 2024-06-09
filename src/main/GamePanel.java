@@ -18,7 +18,7 @@ public class GamePanel extends Canvas {
     private final Game game;
     private Player player;
     private Set<Monster> monsters;
-    private Set<ExpOrb> exps;
+    private Set<DropItem> dropItems;
     private Set<Projectile> projectiles;
 
     private ArrayList<LevelUpChoice> levelUpChoices;
@@ -83,7 +83,7 @@ public class GamePanel extends Canvas {
 
     public void setPlayer(Player player) { this.player = player; }
     public void setMonsters(Set<Monster> monsters) { this.monsters = monsters; }
-    public void setExpOrbs(Set<ExpOrb> exps) { this.exps = exps; }
+    public void setDropItems(Set<DropItem> dropItems) { this.dropItems = dropItems; }
     public void setProjectiles(Set<Projectile> projectiles) { this.projectiles = projectiles; }
 
     public void render() {
@@ -226,7 +226,7 @@ public class GamePanel extends Canvas {
         ((Graphics2D) g).setStroke(new BasicStroke(3));
 
         g.drawRoundRect(x, y, w, h, arc, arc);
-        exps.forEach(exp -> exp.draw(g));
+        dropItems.forEach(item -> item.draw(g));
     }
 
     private void drawDamageReceived(Graphics g) {

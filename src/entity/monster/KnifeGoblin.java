@@ -3,12 +3,17 @@ package entity.monster;
 import java.awt.Graphics;
 
 import entity.Player;
+import entity.DropItem;
 import main.Game;
 
 public class KnifeGoblin extends Monster {
     
     public KnifeGoblin(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
         super(game, name, x, y, hp, attack, speed, exp, player);
+        dropItems = new DropItem[] {
+            (DropItem) new entity.ExpOrb(game, x, y, exp, player)
+        };
+        dropRates = new float[] {1.0f};
     }
 
     
