@@ -10,7 +10,6 @@ import java.util.Set;
 
 import entity.*;
 import entity.monster.Monster;
-import listeners.GameKeyboardListener;
 import listeners.GameMouseListener;
 import weapons.*;
 
@@ -25,21 +24,20 @@ public class GamePanel extends Canvas {
     private ArrayList<LevelUpChoice> levelUpChoices;
     private LevelUpChoice[] curLevelUpChoices = new LevelUpChoice[3];
 
-    private final TileManager tileManager;
-    private final GameKeyboardListener keyboardListener;
+    public final GameMap gameMap;
+    public final int mapNums = 3;
 
     private final GameMouseListener mouseListener;
     private final TitleScreen titleScreen;
-    private Font cubicFont;
+    Font cubicFont;
     
     private static final boolean DEBUG = true;
 
-    public GamePanel(Game game, GameMouseListener mouseListener, GameKeyboardListener keyboardListener) {
+    public GamePanel(Game game, GameMouseListener mouseListener) {
         super();
         this.game = game;
         this.mouseListener = mouseListener;
-        this.keyboardListener = keyboardListener;
-        this.tileManager = new TileManager(game, this);
+        this.gameMap = new GameMap(game, this);
         this.titleScreen = new TitleScreen(game, this, mouseListener);
         setupFont();
         setupScreenSize(game.screenWidth, game.screenHeight);
@@ -62,7 +60,7 @@ public class GamePanel extends Canvas {
     }
 
     public void setMap(int level) {
-        tileManager.loadMap("/maps/lv" + level + ".txt");
+        gameMap.loadMap("/maps/lv" + level + ".txt");
     }
 
     public void initLevelUpChoices() {
@@ -152,7 +150,7 @@ public class GamePanel extends Canvas {
     }
 
     private void drawBackground(Graphics g) {
-        tileManager.draw(g);
+        gameMap.draw(g);
     }
 
     private void drawPauseView(Graphics g) {

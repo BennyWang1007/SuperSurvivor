@@ -1,26 +1,26 @@
 package main;
 
-import entity.Player;
 import utils.ImageTools;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class TileManager {
+public class GameMap {
     private final Game game;
     private final GamePanel gp;
-    private Tile [] tile;
-    private int mapTileNum[][];
+    public final MapTile[] tile;
+    public int mapTileNum[][];
     private ArrayList<String> fileNames = new ArrayList<>();
     private ArrayList<String> collisionStatus = new ArrayList<>();
 
-    public TileManager(Game game, GamePanel gp){
+    public GameMap(Game game, GamePanel gp){
         this.game = game;
         this.gp = gp;
-        tile = new Tile[100];
+        tile = new MapTile[100];
         mapTileNum = new int[game.maxWorldCol][game.maxWorldRow];
         InputStream is = getClass().getResourceAsStream("/maps/tile.txt");
         Scanner sc = new Scanner(new InputStreamReader(is));
@@ -49,7 +49,7 @@ public class TileManager {
     }
 
     public void setup(int index, String imagePath, boolean collision) {
-        tile[index] = new Tile();
+        tile[index] = new MapTile();
         tile[index].image = ImageTools.readImage("/tiles/" + imagePath);
         tile[index].image = ImageTools.scaleImage(tile[index].image, game.tileSize, game.tileSize);
         tile[index].collision = collision;
@@ -70,6 +70,29 @@ public class TileManager {
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public BufferedImage getMiniMap() {
+        int worldMapWidth = game.tileSize * game.maxWorldCol;
+        int worldMapHeight = game.tileSize * game.maxWorldRow;
+        BufferedImage worldMap = new BufferedImage(worldMapWidth, worldMapHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = worldMap.createGraphics();
+
+        int col = 0;
+        int row = 0;
+        while (col < game.maxWorldCol && row < game.maxWorldRow) {
+            int tileNum = mapTileNum[row][col];
+            int x = col * game.tileSize;
+            int y = row * game.tileSize;
+            g2.drawImage(tile[tileNum].image, x, y, null);
+            col++;
+            if (col == game.maxWorldCol) {
+                col = 0;
+                row++;
+            }
+        }
+        g2.dispose();
+        return worldMap;
     }
 
     public void draw(Graphics g){

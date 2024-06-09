@@ -20,7 +20,7 @@ public class Game {
     public static final double DELTA_TIME = 1. / FPS;
     private static final double NANO_TIME_PER_FRAME = 1000000000.0 / FPS;
 
-    private static final boolean skipTitleScreen = true;
+    private static final boolean skipTitleScreen = false;
 
     // Window frame / panel
     private final JFrame gameFrame;
@@ -45,8 +45,8 @@ public class Game {
     public final int worldHeight = maxWorldRow * tileSize;
 
     // Listener
-    private final GameKeyboardListener keyboardListener;
-    private final GameMouseListener mouseListener;
+    public final GameKeyboardListener keyboardListener;
+    public final GameMouseListener mouseListener;
 
     // Player
     private Player player;
@@ -101,7 +101,7 @@ public class Game {
         keyboardListener = new GameKeyboardListener(this, player);
 
         // game panel
-        gamePanel = new GamePanel(this, mouseListener, keyboardListener);
+        gamePanel = new GamePanel(this, mouseListener);
         gamePanel.setPlayer(player);
         gamePanel.setMonsters(monsters);
         gamePanel.setExpOrbs(exps);
