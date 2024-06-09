@@ -9,7 +9,9 @@ import utils.ImageTools;
 
 public class StoneThrower extends Monster {
     private int direction = 0; // 0: right | 1: left
-    private BufferedImage[][] animationImage; // // direction | index
+    private static int fixedWidth = 50;
+    public static int fixedHeight = 50;
+    private BufferedImage[][] animationImage = loadAnimationImage(); // // direction | index
     private final int animFramesPerImage = Game.FPS / 8;
     private int animFrameCounter = 0;
     private int animImageIndex = 0;
@@ -17,15 +19,15 @@ public class StoneThrower extends Monster {
     private float shootRange = 500;
     public StoneThrower(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
         super(game, name, x, y, hp, attack, speed, exp, player);
-        loadAnimationImage();
     }
 
-    private void loadAnimationImage() {
-        animationImage = new BufferedImage[2][4];
+    private static BufferedImage[][] loadAnimationImage() {
+        BufferedImage[][] images = new BufferedImage[2][4];
         for (int i = 0; i < 4; i++) {
-            animationImage[0][i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/necromancer/necromancer" + i + ".png"), width, height);
-            animationImage[1][i] = ImageTools.mirrorImage(animationImage[0][i]);
+            images[0][i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/necromancer/necromancer" + i + ".png"), fixedWidth, fixedHeight);
+            images[1][i] = ImageTools.mirrorImage(images[0][i]);
         }
+        return images;
     }
 
     public void update() {
@@ -55,7 +57,7 @@ public class StoneThrower extends Monster {
         }
         shootCooldown = Game.FPS*3;
         float degree = (float)Math.toDegrees(Math.atan2(player.y - y, player.x - x));
-        game.addProjectile(new Stone(game, x, y, 20, 20, 10, 5, degree, player));
+        game.addProjectile(new Stone(game, x, y, 10, 5, degree, player));
     }
 
     public void draw(Graphics g) {

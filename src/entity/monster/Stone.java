@@ -9,7 +9,9 @@ import entity.Player;
 import main.Game;
 
 public class Stone extends Projectile {
-    private BufferedImage[] animationImage;
+    private static int fixedWidth = 20;
+    private static int fixedHeight = 20;
+    private static BufferedImage[] animationImage = loadAnimationImage();
     private final int animFramesPerImage = Game.FPS / 8;
     private int animFrameCounter = 0;
     private int animImageIndex = 0;
@@ -17,17 +19,17 @@ public class Stone extends Projectile {
     private Player player;
     private int cooldown;
 
-    public Stone(Game game, float x, float y, int width, int height, int attack, float speed, float degree, Player player) {
-        super(game, x, y, width, height, attack, speed, degree);
+    public Stone(Game game, float x, float y, int attack, float speed, float degree, Player player) {
+        super(game, x, y, fixedWidth, fixedHeight, attack, speed, degree);
         this.player = player;
-        loadAnimationImage();
     }
 
-    private void loadAnimationImage() {
-        animationImage = new BufferedImage[4];
+    private static BufferedImage[] loadAnimationImage() {
+        BufferedImage[] images = new BufferedImage[4];
         for (int i = 0; i < 4; i++) {
-            animationImage[i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/necromancer/ball" + i + ".png"), width, height);
+            images[i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/necromancer/ball" + i + ".png"), fixedWidth, fixedHeight);
         }
+        return images;
     }
 
     @Override

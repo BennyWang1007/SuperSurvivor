@@ -12,7 +12,9 @@ import utils.ImageTools;
 
 public class Roller extends Monster {
     private int direction = 0; // 0: right, 1: left
-    private BufferedImage[][][] animationImage; // direction | [idle/run] | index
+    private static int fixedWidth = 75;
+    private static int fixedHeight = 75;
+    private static BufferedImage[][][] animationImage = loadAnimationImage(); // direction | [idle/run] | index
 
     private final int animFramesPerImage = Game.FPS / 8;
     private int animFrameCounter = 0;
@@ -31,17 +33,17 @@ public class Roller extends Monster {
         super(game, name, x, y, hp, attack, speed, exp, player);
         width = 75;
         height = 75;
-        loadAnimationImage();
     }
 
-    private void loadAnimationImage() {
-        animationImage = new BufferedImage[2][2][4];
+    private static BufferedImage[][][] loadAnimationImage() {
+        BufferedImage[][][] images = new BufferedImage[2][2][4];
         for (int i = 0; i < 4; i++) {
-            animationImage[0][0][i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/roller/roller_idle_" + i + ".png"), width, height);
-            animationImage[1][0][i] = ImageTools.mirrorImage(animationImage[0][0][i]);
-            animationImage[0][1][i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/roller/roller_run_" + i + ".png"), width, height);
-            animationImage[1][1][i] = ImageTools.mirrorImage(animationImage[0][1][i]);
+            images[0][0][i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/roller/roller_idle_" + i + ".png"), fixedWidth, fixedHeight);
+            images[1][0][i] = ImageTools.mirrorImage(images[0][0][i]);
+            images[0][1][i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/roller/roller_run_" + i + ".png"), fixedWidth, fixedHeight);
+            images[1][1][i] = ImageTools.mirrorImage(images[0][1][i]);
         }
+        return images;
     }
 
     @Override

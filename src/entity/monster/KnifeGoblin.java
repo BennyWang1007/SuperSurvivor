@@ -9,7 +9,9 @@ import utils.ImageTools;
 
 public class KnifeGoblin extends Monster {
     private int direction = 0; // 0: right, 1: left
-    private BufferedImage[][] animationImage; // direction | index
+    private static int fixedWidth = 50;
+    private static int fixedHeight = 50;
+    private static BufferedImage[][] animationImage = loadAnimationImage(); // direction | index
 
     private final int animFramesPerImage = Game.FPS / 8;
     private int animFrameCounter = 0;
@@ -17,15 +19,15 @@ public class KnifeGoblin extends Monster {
     
     public KnifeGoblin(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
         super(game, name, x, y, hp, attack, speed, exp, player);
-        loadAnimationImage();
     }
 
-    private void loadAnimationImage() {
-        animationImage = new BufferedImage[2][4];
+    private static BufferedImage[][] loadAnimationImage() {
+        BufferedImage[][] images = new BufferedImage[2][4];
         for (int i = 0; i < 4; i++) {
-            animationImage[0][i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/goblin/goblin" + i + ".png"), width, height);
-            animationImage[1][i] = ImageTools.mirrorImage(animationImage[0][i]);
+            images[0][i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/goblin/goblin" + i + ".png"), fixedWidth, fixedHeight);
+            images[1][i] = ImageTools.mirrorImage(images[0][i]);
         }
+        return images;
     }
     
     public void update() {
