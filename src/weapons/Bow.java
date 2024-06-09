@@ -31,7 +31,7 @@ public class Bow extends Weapon {
         }
         arrows.removeIf(arrow -> arrow.toDelete);
 
-        if (shotCooldown > 0 || arrows.size() > 20) {
+        if (shotCooldown > 0) {
             shotCooldown--;
             return;
         }
@@ -43,6 +43,19 @@ public class Bow extends Weapon {
         float degree = (float) Math.toDegrees(Math.atan2(mouseListener.mouseY - centerY, mouseListener.mouseX - centerX));
         arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, speed / Game.FPS, degree, player));
         shotCooldown = (int) (shotInterval * Game.FPS);
+
+        if (level > 1) {
+            arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, speed / Game.FPS, degree + 10, player));
+            arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, speed / Game.FPS, degree - 10, player));
+        }
+        if (level > 3) {
+            arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, speed / Game.FPS, degree + 20, player));
+            arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, speed / Game.FPS, degree - 20, player));
+        }
+        if (level > 4) {
+            arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, speed / Game.FPS, degree + 30, player));
+            arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, speed / Game.FPS, degree - 30, player));
+        }
 
         // // find nearest monster
         // Monster nearestMonster = null;

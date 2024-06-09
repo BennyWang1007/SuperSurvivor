@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
+import entity.DropItem;
 import entity.Player;
 import main.Game;
 import utils.ImageTools;
@@ -33,6 +34,11 @@ public class Roller extends Monster {
         super(game, name, x, y, hp, attack, speed, exp, player);
         width = 75;
         height = 75;
+        dropItems = new DropItem[] {
+            (DropItem) new entity.ExpOrb(game, x, y, exp, player),
+            (DropItem) new entity.HealBag(game, x, y, 10, player)
+        };
+        dropRates = new float[] {1.0f, 0.5f};
     }
 
     private static BufferedImage[][][] loadAnimationImage() {

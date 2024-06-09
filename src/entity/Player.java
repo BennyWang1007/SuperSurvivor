@@ -26,6 +26,8 @@ public class Player extends Entity{
 
     private Set<Weapon> weapons;
 
+    public float collectRange = 150f;
+
     public Player(Game game, String name, int x, int y, int speed) {
         super(game, x, y, 50, 50);
         this.name = name;
@@ -94,16 +96,6 @@ public class Player extends Entity{
     public SpinningSword getSpinningSword() { return getWeapon(SpinningSword.class); }
     public Bow getBow() { return getWeapon(Bow.class); }
 
-    public ArrayList<SpinningSword> getSwords() {
-        ArrayList<SpinningSword> swords = new ArrayList<>();
-        for (Weapon weapon : weapons) {
-            if (weapon instanceof SpinningSword) {
-                swords.add((SpinningSword) weapon);
-            }
-        }
-        return swords;
-    }
-
     public void addBow() { weapons.add(new Bow(game, 100, 100, 5, 360, 1, this)); }
     public void addSpinningSword() { weapons.add(new SpinningSword(game, 100, 100, 1, 300, 100, this)); }
     public void addAura() { weapons.add(new Aura(game, 200, 200, 0.5f, 100, this)); }
@@ -125,11 +117,14 @@ public class Player extends Entity{
     }
 
     private void damage(int damage) {
-        if (damage <= 0) return;
-        hp -= Math.max(0, damage - defense);
-        if (hp < 0) {
-            hp = 0;
-        }
+        if (damage <= defense) return;
+        hp -= damage - defense;
+        // if (hp < 0) hp = 0;
+    }
+
+    public void heal(int heal) {
+        hp += heal;
+        if (hp > maxHp) hp = maxHp;
     }
 
     public void setAttack(int attack) {

@@ -18,7 +18,7 @@ public class GamePanel extends Canvas {
     private final Game game;
     private Player player;
     private Set<Monster> monsters;
-    private Set<ExpOrb> exps;
+    private Set<DropItem> dropItems;
     private Set<Projectile> projectiles;
 
     private ArrayList<LevelUpChoice> levelUpChoices;
@@ -88,7 +88,7 @@ public class GamePanel extends Canvas {
 
     public void setPlayer(Player player) { this.player = player; }
     public void setMonsters(Set<Monster> monsters) { this.monsters = monsters; }
-    public void setExpOrbs(Set<ExpOrb> exps) { this.exps = exps; }
+    public void setDropItems(Set<DropItem> dropItems) { this.dropItems = dropItems; }
     public void setProjectiles(Set<Projectile> projectiles) { this.projectiles = projectiles; }
 
     public void render() {
@@ -191,6 +191,27 @@ public class GamePanel extends Canvas {
             g.drawRoundRect(boxX[i], boxY, boxWidth, boxHeight, 10, 10);
             g.drawString(curLevelUpChoices[i].getName(), boxX[i] + boxWidth / 2 - curLevelUpChoices[i].getName().length() * 5, boxY + boxHeight / 2);
         }
+
+        int smallBoxWidth = 100;
+        int smallBoxHeight = 100;
+
+        int smallBoxX[] = {panelWidth / 2 - smallBoxWidth * 3 - margin / 2 * 5, panelWidth / 2 - smallBoxWidth * 2 - margin / 2 * 3, panelWidth / 2 - smallBoxWidth - margin / 2, panelWidth / 2 + margin / 2, panelWidth / 2 + smallBoxWidth + margin / 2 * 3, panelWidth / 2 + smallBoxWidth * 2 + margin / 2 * 5};
+        int smallBoxY = panelHeight / 2 + boxHeight / 2 + margin;
+
+
+        for (int i = 0; i < 6; i++) {
+            g.setColor(Color.WHITE);
+            g.fillRoundRect(smallBoxX[i], smallBoxY, smallBoxWidth, smallBoxHeight, 10, 10);
+            g.setColor(Color.BLACK);
+            g.drawRoundRect(smallBoxX[i], smallBoxY, smallBoxWidth, smallBoxHeight, 10, 10);
+        }
+        int weaponIdx = 0;
+        for (Weapon weapon : player.getWeapons()) {
+            // String str = weapon.getClass().getSimpleName() + " Lv." + weapon.getLevel();
+            String str = " Lv." + weapon.getLevel();
+            g.drawString(str, smallBoxX[weaponIdx] + smallBoxWidth / 2 - str.length() * 5, smallBoxY + smallBoxHeight + 20);
+            weaponIdx++;
+        }
         
         if (mouseListener.mouseClicked) {
             for (int i = 0; i < 3; i++) {
@@ -233,7 +254,7 @@ public class GamePanel extends Canvas {
         ((Graphics2D) g).setStroke(new BasicStroke(3));
 
         g.drawRoundRect(x, y, w, h, arc, arc);
-        exps.forEach(exp -> exp.draw(g));
+        dropItems.forEach(item -> item.draw(g));
     }
 
     private void drawDamageReceived(Graphics g) {

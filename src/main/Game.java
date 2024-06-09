@@ -2,8 +2,10 @@ package main;
 
 import javax.swing.*;
 
+import entity.DropItem;
 import entity.Entity;
 import entity.ExpOrb;
+import entity.HealBag;
 import entity.Hitbox;
 import entity.Player;
 import entity.monster.Monster;
@@ -62,7 +64,7 @@ public class Game {
     private int monsterCooldownCounter = 0;
 
     // ExpOrbs
-    private Set<ExpOrb> exps;
+    private Set<DropItem> dropItems;
 
     // Projectiles
     private Set<Projectile> projectiles;
@@ -95,8 +97,8 @@ public class Game {
         // projectiles
         projectiles = new HashSet<>();
 
-        // exp orbs
-        exps = new HashSet<>();
+        // drop items
+        dropItems = new HashSet<>();
 
         // keyboard listener
         keyboardListener = new GameKeyboardListener(this, player);
@@ -105,7 +107,7 @@ public class Game {
         gamePanel = new GamePanel(this, mouseListener);
         gamePanel.setPlayer(player);
         gamePanel.setMonsters(monsters);
-        gamePanel.setExpOrbs(exps);
+        gamePanel.setDropItems(dropItems);
         gamePanel.setProjectiles(projectiles);
         gamePanel.addMouseListener(mouseListener);
         gamePanel.addMouseMotionListener(mouseListener);
@@ -269,18 +271,18 @@ public class Game {
         if (gameState == GameState.LEVEL_UP) return;
         keyboardListener.update();
         player.update();
-        exps.forEach(ExpOrb::update);
+        dropItems.forEach(DropItem::update);
         monsters.forEach(Monster::update);
         projectiles.forEach(Projectile::update);
         processCollision();
         monsters.forEach(monster -> {
             if (monster.isDead()) {
-                addExpOrb(new ExpOrb(this, monster.x, monster.y, monster.exp, player));
+                monster.dropItems();
             }
         });
         monsters.removeIf(Monster::isDead);
         projectiles.removeIf(proj -> proj.toDelete);
-        exps.removeIf(exp -> exp.isCollected);
+        dropItems.removeIf(item -> item.isCollected);
         processMonsterSpawn();
         calculateCenter();
     }
@@ -331,13 +333,8 @@ public class Game {
         }
     }
 
-    
-    public void addExpOrb(ExpOrb expOrb) {
-        exps.add(expOrb);
-    }
-
-    public void removeExpOrb(ExpOrb expOrb) {
-        exps.remove(expOrb);
+    public void addDropItem(DropItem dropItem) {
+        dropItems.add(dropItem);
     }
 
     public void addProjectile(Projectile projectile) {

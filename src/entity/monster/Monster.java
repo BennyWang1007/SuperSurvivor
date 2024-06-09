@@ -29,6 +29,8 @@ public abstract class Monster extends Entity {
     
     protected Player player;
     protected ArrayList<DamageReceive> damageReceived = new ArrayList<DamageReceive>();
+    protected DropItem[] dropItems;
+    protected float[] dropRates;
 
     public Monster(Game game, String name, int x, int y, int hp, int attack, float speed, int exp, Player player) {
         super(game, x, y, 50, 50);
@@ -45,6 +47,19 @@ public abstract class Monster extends Entity {
     public void setId(int id) { this.id = id; }
 
     public boolean isDead() { return hp <= 0; }
+
+    public void dropItems() {
+        for (int i = 0; i < dropItems.length; i++) {
+            if (Math.random() < dropRates[i]) {
+                dropItems[i].x = x;
+                dropItems[i].y = y;
+                // randomize the drop item position
+                dropItems[i].x += (int)(Math.random() * 20 - 10);
+                dropItems[i].y += (int)(Math.random() * 20 - 10);
+                game.addDropItem(dropItems[i]);
+            }
+        }
+    }
 
     public void damage(int damage) {
         hp -= damage;
