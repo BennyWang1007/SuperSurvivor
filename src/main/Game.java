@@ -12,6 +12,7 @@ import listeners.GameMouseListener;
 import weapons.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Game {
@@ -212,6 +213,14 @@ public class Game {
 
     public GameMouseListener getMouseListener() {
         return mouseListener;
+    }
+
+    public int[][] getMapTileNum() {
+        return gamePanel.gameMap.mapTileNum;
+    }
+
+    public MapTile[] getMapTiles() {
+        return gamePanel.gameMap.tile;
     }
 
     private void startGameLoop() {

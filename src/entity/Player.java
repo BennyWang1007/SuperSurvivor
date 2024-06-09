@@ -5,6 +5,7 @@ import java.util.*;
 
 import entity.monster.Monster;
 import main.Game;
+import main.MapTile;
 import weapons.*;
 
 public class Player extends Entity{
@@ -40,15 +41,22 @@ public class Player extends Entity{
     }
 
     public void moveUp() {
+        if (checkMapTileCollision("up")) return;
         move(x, (float)(y - speed * Game.DELTA_TIME));
     }
+
     public void moveDown() {
+        if (checkMapTileCollision("down")) return;
         move(x, (float)(y + speed * Game.DELTA_TIME));
     }
+
     public void moveLeft() {
+        if (checkMapTileCollision("left")) return;
         move((float)(x - speed * Game.DELTA_TIME), y);
     }
+
     public void moveRight() {
+        if (checkMapTileCollision("right")) return;
         move((float)(x + speed * Game.DELTA_TIME), y);
     }
 
@@ -148,6 +156,56 @@ public class Player extends Entity{
 
     public void addExp(int exp) {
         this.exp += exp;
+    }
+
+    private boolean checkMapTileCollision(String direction) {
+        int playerLeft = (int) x - 16;
+        int playerRight = (int) x + 16;
+        int playerTop = (int) y;
+        int playerButtom = (int) y + 24;
+        int playerLeftCol = playerLeft / game.tileSize;
+        int playerRightCol = playerRight / game.tileSize;
+        int playerTopRow = playerTop / game.tileSize;
+        int playerButtomRow = playerButtom / game.tileSize;
+
+        int tileNum1, tileNum2;
+        int[][] mapTileNum = game.getMapTileNum();
+        MapTile[] mapTiles = game.getMapTiles();
+        switch (direction) {
+            case "up":
+                playerTopRow = (playerTop - (int)(speed * Game.DELTA_TIME)) / game.tileSize;
+                tileNum1 = mapTileNum[playerTopRow][playerLeftCol];
+                tileNum2 = mapTileNum[playerTopRow][playerRightCol];
+                if (mapTiles[tileNum1].collision || mapTiles[tileNum2].collision) {
+                    return true;
+                }
+                break;
+            case "down":
+                playerButtomRow = (playerButtom +(int)(speed * Game.DELTA_TIME)) / game.tileSize;
+                tileNum1 = mapTileNum[playerButtomRow][playerLeftCol];
+                tileNum2 = mapTileNum[playerButtomRow][playerRightCol];
+                if (mapTiles[tileNum1].collision || mapTiles[tileNum2].collision) {
+                    return true;
+                }
+                break;
+            case "right":
+                playerRightCol = (playerRight +(int)(speed * Game.DELTA_TIME)) / game.tileSize;
+                tileNum1 = mapTileNum[playerTopRow][playerRightCol];
+                tileNum2 = mapTileNum[playerButtomRow][playerRightCol];
+                if (mapTiles[tileNum1].collision || mapTiles[tileNum2].collision) {
+                    return true;
+                }
+                break;
+            case "left":
+                playerLeftCol = (playerLeft -(int)(speed * Game.DELTA_TIME)) / game.tileSize;
+                tileNum1 = mapTileNum[playerTopRow][playerLeftCol];
+                tileNum2 = mapTileNum[playerButtomRow][playerLeftCol];
+                if (mapTiles[tileNum1].collision || mapTiles[tileNum2].collision) {
+                    return true;
+                }
+                break;
+        }
+        return false;
     }
 
     /**
