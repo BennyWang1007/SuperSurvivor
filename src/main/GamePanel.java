@@ -1,14 +1,12 @@
 package main;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.Buffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
 import entity.*;
 import entity.monster.Monster;
@@ -30,9 +28,19 @@ public class GamePanel extends Canvas {
     public final GameMap gameMap;
     public final int mapNums = 3;
 
-    private final GameMouseListener mouseListener;
+    // Title screen
+    private GameMouseListener mouseListener;
     private final TitleScreen titleScreen;
     Font cubicFont;
+    final Color normalBackColor = Color.WHITE;
+    final Color hoverBackColor = Color.LIGHT_GRAY;
+    final Color clickBackColor = Color.GRAY;
+    Stroke borderStroke = new BasicStroke(3);
+    Color textColor = Color.BLACK;
+    Color borderColor = Color.BLACK;
+    Color backColor = normalBackColor;
+    Map<String, Boolean> buttonClicked;
+    boolean startGame;
     
     private static final boolean DEBUG = true;
 
@@ -41,9 +49,15 @@ public class GamePanel extends Canvas {
         this.game = game;
         this.mouseListener = mouseListener;
         this.gameMap = new GameMap(game, this);
-        this.titleScreen = new TitleScreen(game, this, mouseListener);
+        this.titleScreen = new TitleScreen(game, this);
         setupFont();
         setupScreenSize(game.screenWidth, game.screenHeight);
+        buttonClicked = new HashMap<>();
+    }
+
+    public void init() {
+        initLevelUpChoices();
+        titleScreen.init();
     }
 
     private void setupFont() {
@@ -108,8 +122,6 @@ public class GamePanel extends Canvas {
         GameState gameState = game.getGameState();
 
         if (gameState == GameState.TITLE_SCREEN) {
-            g.setColor(new Color(0xFF, 0xFF, 0xFF, 128));
-            g.fillRect(0, 0, getWidth(), getHeight());
             titleScreen.draw(g);
         } else if (gameState != GameState.TITLE_SCREEN) {
             drawBackground(g);
@@ -140,6 +152,7 @@ public class GamePanel extends Canvas {
                 g.setFont(getFont().deriveFont(12.0f));
             }
             drawFPS(g);
+            g.setFont(cubicFont);
 
             if (gameState == GameState.PAUSE) {
                 drawPauseView(g);
@@ -157,13 +170,53 @@ public class GamePanel extends Canvas {
     }
 
     private void drawPauseView(Graphics g) {
-        int panelWidth = getWidth();
-        int panelHeight = getHeight();
-        // print pause at the middle of screen with big font with red color
+        int x, y;
+
+        // background
+        g.setColor(new Color(0xFF, 0xFF, 0xFF, 128));
+        g.fillRect(0, 0, getWidth(), getHeight());
+
+        // sub background
+        x = getWidth()*2/7;
+        y = getHeight()/7;
+        int width = getWidth()*3/7;
+        int height = getHeight()*5/7;
+        g.setColor(new Color(102, 102, 102, 200));
+        g.fillRoundRect(x, y, width, height, 5, 5);
+
+        // title
+        g.setFont(g.getFont().deriveFont(64f));
+        String textPause = "暫停";
+        x = getXForCenterText(g, textPause);
+        y = getHeight()/4;
+        g.setColor(new Color(143, 0, 0));
+        g.drawString(textPause, x+3, y+3);
         g.setColor(Color.RED);
-        g.setFont(getFont().deriveFont(50.0f));
-        g.drawString("PAUSE", panelWidth / 2 - 100, panelHeight / 2);
-        g.setFont(getFont().deriveFont(12.0f));
+        g.drawString(textPause, x, y);
+
+        // button setup
+        g.setFont(g.getFont().deriveFont(48f));
+        g.setColor(Color.BLACK);
+        int buttonGap = 30;
+        int textHeight = (int) g.getFontMetrics().getStringBounds("中", g).getHeight();
+        // resume button
+        String textResume = "繼續遊戲";
+        x = getXForCenterText(g, textResume);
+        y = getHeight()/2;
+        drawButton(g, textResume, x, y, 25, true, true, game::resume);
+
+        // setting button
+        String textSetting = "設定";
+        x = getXForCenterText(g, textSetting);
+        y += textHeight + buttonGap;
+        drawButton(g, textSetting, x, y, 25+getStringWidth(g, "中中")/2, true, true, () -> {});
+
+        // back to main menu button
+        String textMainMenu = "回到主頁";
+        x = getXForCenterText(g, textMainMenu);
+        y += textHeight + buttonGap;
+        drawButton(g, textMainMenu, x, y, 25, true, true, game::reset);
+
     }
 
     private void drawUpdateScreen(Graphics g) {
@@ -276,6 +329,74 @@ public class GamePanel extends Canvas {
         String str = String.format("FPS: %d", game.getMeasuredFPS());
         g.setColor(Color.GREEN);
         g.drawString(str, 10, 15);
+    }
+
+    int getXForCenterText(Graphics g, String text) {
+        int textWidth = getStringWidth(g, text);
+        int centerX = getWidth()/2 - textWidth/2;
+        return centerX;
+    }
+
+    int getStringWidth(Graphics g, String text) {
+        return (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
+    }
+
+    void drawButton(Graphics g, String text, int x, int y, int horzPadding, boolean animation, boolean border, Runnable onClick) {
+        Rectangle2D rect = getTextRectangle(g, text, x, y, horzPadding);
+        boolean clicked = buttonClicked.getOrDefault(text, false);
+        if (!startGame) {
+            if (isClicked(rect)) {
+                if (animation) backColor = clickBackColor;
+                if (!clicked) buttonClicked.put(text, true);
+            } else {
+                if (isHover(rect)) {
+                    if (animation) backColor = hoverBackColor;
+                } else {
+                    backColor = normalBackColor;
+                }
+                if (clicked) {
+                    buttonClicked.put(text, false);
+                    onClick.run();
+                }
+            }
+        } else {
+            backColor = normalBackColor;
+        }
+        if (border) drawTextBounds(g, rect);
+        g.setColor(textColor);
+        g.drawString(text, x, y);
+    }
+
+    void drawTextBounds(Graphics g, Rectangle2D rect) {
+        Stroke originalStroke = ((Graphics2D)g).getStroke();
+        int width = (int) rect.getWidth();
+        int height = (int) rect.getHeight();
+        int x = (int) rect.getX();
+        int y = (int) rect.getY();
+        g.setColor(backColor);
+        g.fillRect(x, y, width, height);
+        g.setColor(borderColor);
+        ((Graphics2D) g).setStroke(borderStroke);
+        g.drawRect(x, y, width, height);
+        ((Graphics2D) g).setStroke(originalStroke);
+    }
+
+    Rectangle2D getTextRectangle(Graphics g, String text, int x, int y, int horzPadding) {
+        Rectangle2D rect = g.getFontMetrics().getStringBounds(text, g);
+        int width = (int) rect.getWidth() + 2*horzPadding;
+        int height = (int) rect.getHeight();
+        x = x - horzPadding;
+        y = (int) (y - rect.getHeight()*73/100.);
+        rect.setRect(x, y, width, height);
+        return rect;
+    }
+
+    boolean isHover(Rectangle2D rect) {
+        return rect.contains(mouseListener.mouseX, mouseListener.mouseY);
+    }
+
+    boolean isClicked(Rectangle2D rect) {
+        return mouseListener.mouseClicked && isHover(rect);
     }
     
 }

@@ -4,8 +4,6 @@ import javax.swing.*;
 
 import entity.DropItem;
 import entity.Entity;
-import entity.ExpOrb;
-import entity.HealBag;
 import entity.Hitbox;
 import entity.Player;
 import entity.monster.Monster;
@@ -14,7 +12,6 @@ import listeners.GameMouseListener;
 import weapons.*;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class Game {
@@ -82,12 +79,12 @@ public class Game {
         gameFrame = new JFrame("Game");
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setResizable(false);
-        
+
         // mouse listener
         mouseListener = new GameMouseListener();
 
         // player
-        player = new Player(this, "PlayerName", worldWidth/2, worldHeight/2, 250);
+        player = new Player(this, "PlayerName", worldWidth/2, worldHeight/2);
         player.addBow();
 
         // monster
@@ -127,6 +124,19 @@ public class Game {
 
         // close the frame
         gameFrame.dispose();
+    }
+
+    public void init() {
+        monsters.clear();
+        currentMonsterId = 0;
+        monsterCooldownCounter = 0;
+        dropItems.clear();
+        projectiles.clear();
+        measuredFPS = 0;
+        player.init();
+        player.moveTo(worldWidth/2, worldHeight/2);
+        player.addBow();
+        gamePanel.init();
     }
 
     public int getMeasuredFPS() {
@@ -194,10 +204,17 @@ public class Game {
 
     public void pause() {
         gameState = GameState.PAUSE;
+        keyboardListener.setPause(true);
     }
 
     public void resume() {
         gameState = GameState.MAIN_GAME;
+        keyboardListener.setPause(false);
+    }
+
+    public void reset() {
+        init();
+        gameState = GameState.TITLE_SCREEN;
     }
 
     public void levelUp() {

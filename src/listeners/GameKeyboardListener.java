@@ -24,6 +24,10 @@ public class GameKeyboardListener implements KeyListener {
         this.player = player;
     }
 
+    public void setPause(boolean pause) {
+        isPause = pause;
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {
         // System.out.println("Key typed" + e.getKeyCode());

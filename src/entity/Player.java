@@ -1,11 +1,13 @@
 package entity;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.*;
 
 import entity.monster.Monster;
 import main.Game;
 import main.MapTile;
+import utils.ImageTools;
 import weapons.*;
 
 public class Player extends Entity{
@@ -28,10 +30,16 @@ public class Player extends Entity{
 
     public float collectRange = 150f;
 
-    public Player(Game game, String name, int x, int y, int speed) {
+    private BufferedImage up1,up2,down1,down2,right1,right2,left1,left2;
+    private BufferedImage currentPlayerImage;
+    private int tileCounter = 0;
+    private int tileNum = 1;
+    private final int framesToChange = Game.FPS / 5;
+
+    public Player(Game game, String name, int x, int y) {
         super(game, x, y, 50, 50);
         this.name = name;
-        this.speed = speed;
+        this.speed = 250;
         this.attack = 20;
         this.hp = 500;
         this.maxHp = 500;
@@ -40,24 +48,78 @@ public class Player extends Entity{
         this.level = 1;
         this.damageCooldown = 0;
         this.weapons = new HashSet<>();
+        getPlayerImage();
+    }
+
+    public void init() {
+        this.speed = 250;
+        this.attack = 20;
+        this.hp = 500;
+        this.maxHp = 500;
+        this.defense = 0;
+        this.exp = 0;
+        this.level = 1;
+        this.damageCooldown = 0;
+        weapons.clear();
+        tileCounter = 0;
+        tileNum = 1;
+        damageCooldown = 0;
+        curMaxDamage = 0;
+        currentPlayerImage = down1;
+    }
+
+    private void getPlayerImage(){
+        up1 = ImageTools.scaleImage(ImageTools.readImage("/player/forward1.png"), width, height);
+        up2 = ImageTools.scaleImage(ImageTools.readImage("/player/forward2.png"), width, height);
+        down1 = ImageTools.scaleImage(ImageTools.readImage("/player/backward1.png"), width, height);
+        down2 = ImageTools.scaleImage(ImageTools.readImage("/player/backward2.png"), width, height);
+        left1 = ImageTools.scaleImage(ImageTools.readImage("/player/left1.png"), width, height);
+        left2 = ImageTools.scaleImage(ImageTools.readImage("/player/left2.png"), width, height);
+        right1 = ImageTools.scaleImage(ImageTools.readImage("/player/right1.png"), width, height);
+        right2 = ImageTools.scaleImage(ImageTools.readImage("/player/right2.png"), width, height);
+        currentPlayerImage = down1;
     }
 
     public void moveUp() {
+        tileCounter++;
+        if (tileCounter >= framesToChange) {
+            tileNum = (tileNum == 1 ? 2 : 1);
+            tileCounter = 0;
+        }
+        currentPlayerImage = (tileNum == 1 ? up1 : up2);
         if (checkMapTileCollision("up")) return;
         move(x, (float)(y - speed * Game.DELTA_TIME));
     }
 
     public void moveDown() {
+        tileCounter++;
+        if (tileCounter >= framesToChange) {
+            tileNum = (tileNum == 1 ? 2 : 1);
+            tileCounter = 0;
+        }
+        currentPlayerImage = (tileNum == 1 ? down1 : down2);
         if (checkMapTileCollision("down")) return;
         move(x, (float)(y + speed * Game.DELTA_TIME));
     }
 
     public void moveLeft() {
+        tileCounter++;
+        if (tileCounter >= framesToChange) {
+            tileNum = (tileNum == 1 ? 2 : 1);
+            tileCounter = 0;
+        }
+        currentPlayerImage = (tileNum == 1 ? left1 : left2);
         if (checkMapTileCollision("left")) return;
         move((float)(x - speed * Game.DELTA_TIME), y);
     }
 
     public void moveRight() {
+        tileCounter++;
+        if (tileCounter >= framesToChange) {
+            tileNum = (tileNum == 1 ? 2 : 1);
+            tileCounter = 0;
+        }
+        currentPlayerImage = (tileNum == 1 ? right1 : right2);
         if (checkMapTileCollision("right")) return;
         move((float)(x + speed * Game.DELTA_TIME), y);
     }
@@ -217,7 +279,7 @@ public class Player extends Entity{
         ((Graphics2D) g).setStroke(new BasicStroke(2));
         weapons.forEach(weapon -> weapon.draw(g));
         g.setColor(java.awt.Color.BLUE);
-        g.drawRect(drawX, drawY, width, height);
+        g.drawImage(currentPlayerImage, drawX, drawY, width, height, null);
         g.drawString(name, drawX, drawY - 5);
         
         // Draw health bar
