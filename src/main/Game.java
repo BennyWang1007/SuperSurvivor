@@ -267,7 +267,6 @@ public class Game {
         processCollision();
         monsters.forEach(monster -> {
             if (monster.isDead()) {
-                // addDropItem(new ExpOrb(this, monster.x, monster.y, monster.exp, player));
                 monster.dropItems();
             }
         });
@@ -326,12 +325,6 @@ public class Game {
 
     public void addDropItem(DropItem dropItem) {
         dropItems.add(dropItem);
-        if (dropItem instanceof HealBag) {
-            System.out.println("HealBag added");
-        }
-        if (dropItem instanceof ExpOrb) {
-            System.out.println("ExpOrb added");
-        }
     }
 
     public void addProjectile(Projectile projectile) {

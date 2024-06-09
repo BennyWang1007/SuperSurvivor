@@ -184,6 +184,27 @@ public class GamePanel extends Canvas {
             g.drawRoundRect(boxX[i], boxY, boxWidth, boxHeight, 10, 10);
             g.drawString(curLevelUpChoices[i].getName(), boxX[i] + boxWidth / 2 - curLevelUpChoices[i].getName().length() * 5, boxY + boxHeight / 2);
         }
+
+        int smallBoxWidth = 100;
+        int smallBoxHeight = 100;
+
+        int smallBoxX[] = {panelWidth / 2 - smallBoxWidth * 3 - margin / 2 * 5, panelWidth / 2 - smallBoxWidth * 2 - margin / 2 * 3, panelWidth / 2 - smallBoxWidth - margin / 2, panelWidth / 2 + margin / 2, panelWidth / 2 + smallBoxWidth + margin / 2 * 3, panelWidth / 2 + smallBoxWidth * 2 + margin / 2 * 5};
+        int smallBoxY = panelHeight / 2 + boxHeight / 2 + margin;
+
+
+        for (int i = 0; i < 6; i++) {
+            g.setColor(Color.WHITE);
+            g.fillRoundRect(smallBoxX[i], smallBoxY, smallBoxWidth, smallBoxHeight, 10, 10);
+            g.setColor(Color.BLACK);
+            g.drawRoundRect(smallBoxX[i], smallBoxY, smallBoxWidth, smallBoxHeight, 10, 10);
+        }
+        int weaponIdx = 0;
+        for (Weapon weapon : player.getWeapons()) {
+            // String str = weapon.getClass().getSimpleName() + " Lv." + weapon.getLevel();
+            String str = " Lv." + weapon.getLevel();
+            g.drawString(str, smallBoxX[weaponIdx] + smallBoxWidth / 2 - str.length() * 5, smallBoxY + smallBoxHeight + 20);
+            weaponIdx++;
+        }
         
         if (mouseListener.mouseClicked) {
             for (int i = 0; i < 3; i++) {

@@ -53,6 +53,9 @@ public abstract class Monster extends Entity {
             if (Math.random() < dropRates[i]) {
                 dropItems[i].x = x;
                 dropItems[i].y = y;
+                // randomize the drop item position
+                dropItems[i].x += (int)(Math.random() * 20 - 10);
+                dropItems[i].y += (int)(Math.random() * 20 - 10);
                 game.addDropItem(dropItems[i]);
             }
         }

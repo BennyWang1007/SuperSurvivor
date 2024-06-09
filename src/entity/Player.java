@@ -18,7 +18,7 @@ public class Player extends Entity{
     public int level;
     public final int maxLevel = 39;
     // public int[] expTable = {0, 100, 200, 400, 800, 1600, 3200, 6400};
-    public int[] expTable = {0, 1000000, 100, 100, 100, 100, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 520, 540, 560, 580, 600, 620, 640, 660, 680, 700, 720, 740, 760, 780, 800};
+    public int[] expTable = {0, 100, 100, 100, 100, 100, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 520, 540, 560, 580, 600, 620, 640, 660, 680, 700, 720, 740, 760, 780, 800};
 
     public int damageCooldown;
     private int curMaxDamage;
@@ -79,16 +79,6 @@ public class Player extends Entity{
     public Aura getAura() { return getWeapon(Aura.class); }
     public SpinningSword getSpinningSword() { return getWeapon(SpinningSword.class); }
     public Bow getBow() { return getWeapon(Bow.class); }
-
-    public ArrayList<SpinningSword> getSwords() {
-        ArrayList<SpinningSword> swords = new ArrayList<>();
-        for (Weapon weapon : weapons) {
-            if (weapon instanceof SpinningSword) {
-                swords.add((SpinningSword) weapon);
-            }
-        }
-        return swords;
-    }
 
     public void addBow() { weapons.add(new Bow(game, 100, 100, 5, 360, 1, this)); }
     public void addSpinningSword() { weapons.add(new SpinningSword(game, 100, 100, 1, 300, 100, this)); }
