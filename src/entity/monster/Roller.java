@@ -4,12 +4,19 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
 
 import entity.Player;
 import main.Game;
+import utils.ImageTools;
 
 public class Roller extends Monster {
+    private int direction = 0; // 0: right, 1: left
+    private BufferedImage[][][] animationImage; // direction | [idle/run] | index
 
+    private final int animFramesPerImage = Game.FPS / 8;
+    private int animFrameCounter = 0;
+    private int animImageIndex = 0;
 
     private float rollDistance = 300;
     private float rolledDistance = 0;
@@ -22,6 +29,19 @@ public class Roller extends Monster {
 
     public Roller(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
         super(game, name, x, y, hp, attack, speed, exp, player);
+        width = 75;
+        height = 75;
+        loadAnimationImage();
+    }
+
+    private void loadAnimationImage() {
+        animationImage = new BufferedImage[2][2][4];
+        for (int i = 0; i < 4; i++) {
+            animationImage[0][0][i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/roller/roller_idle_" + i + ".png"), width, height);
+            animationImage[1][0][i] = ImageTools.mirrorImage(animationImage[0][0][i]);
+            animationImage[0][1][i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/roller/roller_run_" + i + ".png"), width, height);
+            animationImage[1][1][i] = ImageTools.mirrorImage(animationImage[0][1][i]);
+        }
     }
 
     @Override
@@ -46,6 +66,7 @@ public class Roller extends Monster {
             rollDegree = (float) Math.toDegrees(Math.atan2(player.y - this.y, player.x - this.x));
             rollDx = speedPerFrame * (float) Math.cos(Math.toRadians(rollDegree));
             rollDy = speedPerFrame * (float) Math.sin(Math.toRadians(rollDegree));
+            direction = (rollDx > 0 ? 0 : 1);
             charging = true;
         }
 
@@ -80,8 +101,7 @@ public class Roller extends Monster {
             g2d.setTransform(originalTransform);
         }
         
-        g.setColor(Color.YELLOW);
-        g.fillRect(screenX, screenY, width, height);
+        drawBody(g, screenX, screenY);
 
         // draw health bar, red and green, above the monster
         int healthBarWidth = width;
@@ -95,6 +115,16 @@ public class Roller extends Monster {
 
         drawDamageReceived(g);
         
+    }
+
+    private void drawBody(Graphics g, int cx, int cy) {
+        int idleRun = (rolling ? 1 : 0);
+        g.drawImage(animationImage[direction][idleRun][animImageIndex], cx, cy, width, height, null);
+        animFrameCounter++;
+        if (animFrameCounter >= animFramesPerImage) {
+            animFrameCounter -= animFramesPerImage;
+            animImageIndex = (animImageIndex + 1) % 4;
+        }
     }
     
 }
