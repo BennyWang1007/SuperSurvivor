@@ -10,6 +10,7 @@ import java.util.Set;
 
 import entity.*;
 import entity.monster.Monster;
+import listeners.GameKeyboardListener;
 import listeners.GameMouseListener;
 import weapons.*;
 
@@ -25,6 +26,7 @@ public class GamePanel extends Canvas {
     private LevelUpChoice[] curLevelUpChoices = new LevelUpChoice[3];
 
     private final TileManager tileManager;
+    private final GameKeyboardListener keyboardListener;
 
     private final GameMouseListener mouseListener;
     private final TitleScreen titleScreen;
@@ -32,11 +34,12 @@ public class GamePanel extends Canvas {
     
     private static final boolean DEBUG = true;
 
-    public GamePanel(Game game, GameMouseListener mouseListener) {
+    public GamePanel(Game game, GameMouseListener mouseListener, GameKeyboardListener keyboardListener) {
         super();
         this.game = game;
         this.mouseListener = mouseListener;
-        this.tileManager = new TileManager(game, this, player);
+        this.keyboardListener = keyboardListener;
+        this.tileManager = new TileManager(game, this);
         this.titleScreen = new TitleScreen(game, this, mouseListener);
         setupFont();
         setupScreenSize(game.screenWidth, game.screenHeight);
@@ -58,7 +61,11 @@ public class GamePanel extends Canvas {
         setMaximumSize(screenSize);
     }
 
-     public void initLevelUpChoices() {
+    public void setMap(int level) {
+        tileManager.loadMap("/maps/lv" + level + ".txt");
+    }
+
+    public void initLevelUpChoices() {
         levelUpChoices = new ArrayList<>();
         levelUpChoices.add(new LevelUpChoice("Spinning Sword", LevelUpChoice.ADD_WEAPON, new SpinningSword(game, 100, 100, player.attack, 300, 100, player), player));
         levelUpChoices.add(new LevelUpChoice("Aura", LevelUpChoice.ADD_WEAPON, new Aura(game, 150, 150, 0.5f, 75, player), player));
@@ -100,6 +107,8 @@ public class GamePanel extends Canvas {
         GameState gameState = game.getGameState();
 
         if (gameState == GameState.TITLE_SCREEN) {
+            g.setColor(new Color(0xFF, 0xFF, 0xFF, 128));
+            g.fillRect(0, 0, getWidth(), getHeight());
             titleScreen.draw(g);
         } else if (gameState != GameState.TITLE_SCREEN) {
             drawBackground(g);

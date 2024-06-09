@@ -1,16 +1,32 @@
 package entity.monster;
 
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 import entity.Player;
 import main.Game;
+import utils.ImageTools;
 
 public class KnifeGoblin extends Monster {
+    private int direction = 0; // 0: right, 1: left
+    private BufferedImage[][] animationImage; // direction | index
+
+    private final int animFramesPerImage = Game.FPS / 8;
+    private int animFrameCounter = 0;
+    private int animImageIndex = 0;
     
     public KnifeGoblin(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
         super(game, name, x, y, hp, attack, speed, exp, player);
+        loadAnimationImage();
     }
 
+    private void loadAnimationImage() {
+        animationImage = new BufferedImage[2][4];
+        for (int i = 0; i < 4; i++) {
+            animationImage[0][i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/goblin/goblin" + i + ".png"), width, height);
+            animationImage[1][i] = ImageTools.mirrorImage(animationImage[0][i]);
+        }
+    }
     
     public void update() {
         // move towards player
@@ -18,6 +34,8 @@ public class KnifeGoblin extends Monster {
         float dy = player.y - this.y;
         float distance = (float)Math.hypot(dx, dy);
         if (distance < 1) return;
+
+        direction = (dx > 0 ? 0 : 1);
 
         dx *= speedPerFrame / distance;
         dy *= speedPerFrame / distance;
@@ -33,8 +51,7 @@ public class KnifeGoblin extends Monster {
         int cy = (int)Math.round(screenY - height/2.0);
         g.setColor(java.awt.Color.BLACK);
         g.setFont(g.getFont().deriveFont(12f));
-        g.drawRect(cx, cy, width, height);
-        g.fillRect(cx, cy, width, height);
+        drawBody(g, cx, cy);
         // use id instead of name
         g.drawString(Integer.toString(id), cx, cy - 5);
 
@@ -54,5 +71,14 @@ public class KnifeGoblin extends Monster {
         // // draw hitbox
         // g.setColor(java.awt.Color.RED);
         // g.drawRect(cx, cy, width, height);
+    }
+
+    private void drawBody(Graphics g, int cx, int cy) {
+        g.drawImage(animationImage[direction][animImageIndex], cx, cy, width, height, null);
+        animFrameCounter++;
+        if (animFrameCounter >= animFramesPerImage) {
+            animFrameCounter -= animFramesPerImage;
+            animImageIndex = (animImageIndex + 1) % 4;
+        }
     }
 }

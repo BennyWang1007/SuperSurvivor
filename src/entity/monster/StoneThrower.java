@@ -1,26 +1,43 @@
 package entity.monster;
 
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 import entity.Player;
 import main.Game;
+import utils.ImageTools;
 
 public class StoneThrower extends Monster {
+    private int direction = 0; // 0: right | 1: left
+    private BufferedImage[][] animationImage; // // direction | index
+    private final int animFramesPerImage = Game.FPS / 8;
+    private int animFrameCounter = 0;
+    private int animImageIndex = 0;
 
     private float shootRange = 500;
     public StoneThrower(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
         super(game, name, x, y, hp, attack, speed, exp, player);
+        loadAnimationImage();
+    }
+
+    private void loadAnimationImage() {
+        animationImage = new BufferedImage[2][4];
+        for (int i = 0; i < 4; i++) {
+            animationImage[0][i] = ImageTools.scaleImage(ImageTools.readImage("/monsters/necromancer/necromancer" + i + ".png"), width, height);
+            animationImage[1][i] = ImageTools.mirrorImage(animationImage[0][i]);
+        }
     }
 
     public void update() {
         // move towards player
         float dx = player.x - this.x;
         float dy = player.y - this.y;
+        direction = (dx > 0 ? 0 : 1);
         float distance = (float)Math.hypot(dx, dy);
         if (distance < shootRange) {
             shoot();
             return ;
-        };
+        }
         
         dx *= speedPerFrame / distance;
         dy *= speedPerFrame / distance;
@@ -36,7 +53,7 @@ public class StoneThrower extends Monster {
             shootCooldown--;
             return;
         }
-        shootCooldown = Game.FPS;
+        shootCooldown = Game.FPS*3;
         float degree = (float)Math.toDegrees(Math.atan2(player.y - y, player.x - x));
         game.addProjectile(new Stone(game, x, y, 20, 20, 10, 5, degree, player));
     }
@@ -49,7 +66,7 @@ public class StoneThrower extends Monster {
         int cy = (int)Math.round(screenY - height/2.0);
         g.setColor(java.awt.Color.BLUE);
         g.setFont(g.getFont().deriveFont(12f));
-        g.fillRect(cx, cy, width, height);
+        drawBody(g, cx, cy);
         // use id instead of name
         g.drawString(Integer.toString(id), cx, cy - 5);
 
@@ -68,5 +85,14 @@ public class StoneThrower extends Monster {
         // // draw hitbox
         // g.setColor(java.awt.Color.RED);
         // g.drawRect(cx, cy, width, height);
+    }
+
+    private void drawBody(Graphics g, int cx, int cy) {
+        g.drawImage(animationImage[direction][animImageIndex], cx, cy, width, height, null);
+        animFrameCounter++;
+        if (animFrameCounter >= animFramesPerImage) {
+            animFrameCounter -= animFramesPerImage;
+            animImageIndex = (animImageIndex + 1) % 4;
+        }
     }
 }

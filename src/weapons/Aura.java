@@ -19,7 +19,7 @@ public class Aura extends Weapon {
 
     public Aura(Game game, int width, int height, float attackMul, float radius, Player player) {
         super(game, width, height, attackMul, player);
-        readImage("/Aura.png");
+        readImage("/weapons/Aura.png");
         this.radius = radius;
         monsters = game.getMonsters();
         loadAnimation();

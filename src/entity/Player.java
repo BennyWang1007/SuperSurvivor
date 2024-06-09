@@ -39,10 +39,18 @@ public class Player extends Entity{
         this.weapons = new HashSet<>();
     }
 
-    public void moveUp() { move(x, (float)(y - speed * Game.DELTA_TIME)); }
-    public void moveDown() { move(x, (float)(y + speed * Game.DELTA_TIME)); }
-    public void moveLeft() { move((float)(x - speed * Game.DELTA_TIME), y); }
-    public void moveRight() { move((float)(x + speed * Game.DELTA_TIME), y); }
+    public void moveUp() {
+        move(x, (float)(y - speed * Game.DELTA_TIME));
+    }
+    public void moveDown() {
+        move(x, (float)(y + speed * Game.DELTA_TIME));
+    }
+    public void moveLeft() {
+        move((float)(x - speed * Game.DELTA_TIME), y);
+    }
+    public void moveRight() {
+        move((float)(x + speed * Game.DELTA_TIME), y);
+    }
 
     public void move(float x, float y) {
         if (game.isValidPosition(x, y)) {
@@ -98,7 +106,7 @@ public class Player extends Entity{
     }
 
     public void collideWith(Projectile projectile) {
-        hp -= projectile.attack - defense;
+        damage(projectile.attack);
     }
 
     private void takeDamage() {
@@ -110,7 +118,7 @@ public class Player extends Entity{
 
     private void damage(int damage) {
         if (damage <= 0) return;
-        hp -= damage - defense;
+        hp -= Math.max(0, damage - defense);
         if (hp < 0) {
             hp = 0;
         }

@@ -57,7 +57,7 @@ public class TitleScreen {
         drawButton(g, textStart, x, y, () -> startGame = true);
 
         // CHOOSE LEVEL
-        String textLevel = "選擇關卡";
+        String textLevel = "選擇地圖";
         x = getXForCenterText(g, textLevel);
         y += textHeight + gap;
         drawButton(g, textLevel, x, y, () -> {});

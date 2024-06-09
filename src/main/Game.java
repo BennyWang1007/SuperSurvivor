@@ -101,7 +101,7 @@ public class Game {
         keyboardListener = new GameKeyboardListener(this, player);
 
         // game panel
-        gamePanel = new GamePanel(this, mouseListener);
+        gamePanel = new GamePanel(this, mouseListener, keyboardListener);
         gamePanel.setPlayer(player);
         gamePanel.setMonsters(monsters);
         gamePanel.setExpOrbs(exps);
@@ -118,6 +118,7 @@ public class Game {
         gameFrame.setVisible(true);
 
         gamePanel.initLevelUpChoices();
+        gamePanel.setMap(1);
         // game loop
         startGameLoop();
 

@@ -12,19 +12,17 @@ import java.util.Scanner;
 public class TileManager {
     private final Game game;
     private final GamePanel gp;
-    private final Player player;
     private Tile [] tile;
     private int mapTileNum[][];
     private ArrayList<String> fileNames = new ArrayList<>();
     private ArrayList<String> collisionStatus = new ArrayList<>();
 
-    public TileManager(Game game, GamePanel gp, Player player){
+    public TileManager(Game game, GamePanel gp){
         this.game = game;
         this.gp = gp;
-        this.player = player;
         tile = new Tile[100];
         mapTileNum = new int[game.maxWorldCol][game.maxWorldRow];
-        InputStream is = getClass().getResourceAsStream("/maps/tiledata.txt");
+        InputStream is = getClass().getResourceAsStream("/maps/tile.txt");
         Scanner sc = new Scanner(new InputStreamReader(is));
         while (sc.hasNext()) {
             String fileName = sc.next();
@@ -35,7 +33,6 @@ public class TileManager {
         sc.close();
 
         getTileImage();
-        loadMap("/maps/lv1.txt");
     }
 
     private void getTileImage(){

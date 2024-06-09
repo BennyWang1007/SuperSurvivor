@@ -40,6 +40,18 @@ public class ImageTools {
         return rotatedImage;
     }
 
+    public static BufferedImage mirrorImage(BufferedImage originalImage) {
+        int width = originalImage.getWidth();
+        int height = originalImage.getHeight();
+        BufferedImage mirroredImage = new BufferedImage(width, height, originalImage.getType());
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                mirroredImage.setRGB(width-x-1, y, originalImage.getRGB(x, y));
+            }
+        }
+        return mirroredImage;
+    }
+
     private static InputStream getResourceInputStream(String resourcePath) {
         return ImageTools.class.getResourceAsStream(resourcePath);
     }

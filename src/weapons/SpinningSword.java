@@ -19,7 +19,7 @@ public class SpinningSword extends Weapon{
         this.degreePerSecond = degreePerSecond;
         this.distance = distance;
         this.degree = 0;
-        readImage("/Sword.png");
+        readImage("/weapons/Sword.png");
         cooldownTime = 0.5f;
     }
 

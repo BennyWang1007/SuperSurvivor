@@ -10,6 +10,7 @@ import main.Game;
 
 public class Roller extends Monster {
 
+
     private float rollDistance = 300;
     private float rolledDistance = 0;
     private float chargedDistance = 0;
