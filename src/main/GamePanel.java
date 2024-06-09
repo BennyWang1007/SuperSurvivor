@@ -2,8 +2,10 @@ package main;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
@@ -12,6 +14,7 @@ import entity.*;
 import entity.monster.Monster;
 import listeners.GameMouseListener;
 import weapons.*;
+import utils.ImageTools;
 
 public class GamePanel extends Canvas {
 
@@ -187,9 +190,10 @@ public class GamePanel extends Canvas {
         for (int i = 0; i < 3; i++) {
             g.setColor(Color.WHITE);
             g.fillRoundRect(boxX[i], boxY, boxWidth, boxHeight, 10, 10);
+            g.drawImage(curLevelUpChoices[i].iconImage, boxX[i] + 25, boxY + 10, boxWidth - 50, boxHeight - 50, null);
             g.setColor(Color.BLACK);
             g.drawRoundRect(boxX[i], boxY, boxWidth, boxHeight, 10, 10);
-            g.drawString(curLevelUpChoices[i].getName(), boxX[i] + boxWidth / 2 - curLevelUpChoices[i].getName().length() * 5, boxY + boxHeight / 2);
+            g.drawString(curLevelUpChoices[i].getName(), boxX[i] + boxWidth / 2 - curLevelUpChoices[i].getName().length() * 5, boxY + boxHeight - 20);
         }
 
         int smallBoxWidth = 100;
@@ -207,7 +211,9 @@ public class GamePanel extends Canvas {
         }
         int weaponIdx = 0;
         for (Weapon weapon : player.getWeapons()) {
-            // String str = weapon.getClass().getSimpleName() + " Lv." + weapon.getLevel();
+            // fill the IconImage to the small box
+            g.drawImage(weapon.iconImage, smallBoxX[weaponIdx] + 5, smallBoxY + 5, smallBoxWidth - 10, smallBoxHeight - 10, null);
+
             String str = " Lv." + weapon.getLevel();
             g.drawString(str, smallBoxX[weaponIdx] + smallBoxWidth / 2 - str.length() * 5, smallBoxY + smallBoxHeight + 20);
             weaponIdx++;
@@ -281,6 +287,7 @@ class LevelUpChoice {
     private Weapon weapon;
     private int abilityType;
     private int abilityValue;
+    public BufferedImage iconImage;
 
     public static final int ADD_WEAPON = 1;
     public static final int UPGRADE_WEAPON = 2;
@@ -291,11 +298,21 @@ class LevelUpChoice {
     public static final int UPGRADE_HP = 3;
     public static final int UPGRADE_SPD = 4;
 
+    public static final BufferedImage[] weaponImages = loadWeaponImages();
+    public static final BufferedImage[] abilityImages = loadAbilityImages();
+
     public LevelUpChoice(String name, int type, Weapon weapon, Player player) {
         this.name = name;
         this.type = type;
         this.weapon = weapon;
         this.player = player;
+        if (weapon instanceof SpinningSword) {
+            iconImage = weaponImages[0];
+        } else if (weapon instanceof Bow) {
+            iconImage = weaponImages[1];
+        } else if (weapon instanceof Aura) {
+            iconImage = weaponImages[2];
+        }
     }
 
     public LevelUpChoice(String name, int type, int abilityType, int abilityValue, Player player) {
@@ -304,6 +321,7 @@ class LevelUpChoice {
         this.abilityType = abilityType;
         this.abilityValue = abilityValue;
         this.player = player;
+        iconImage = abilityImages[abilityType - 1];
     }
 
     public String getName() { return name; }
@@ -342,5 +360,41 @@ class LevelUpChoice {
         }
 
         return null;
+    }
+
+    private static BufferedImage[] loadWeaponImages() {
+        BufferedImage[] images = new BufferedImage[3];
+        images[0] = ImageTools.rotateImage(ImageTools.readImage("/weapons/Sword.png"), -45);
+        images[1] = ImageTools.rotateImage(ImageTools.readImage("/weapons/Bow.png"), -45);
+        images[2] = ImageTools.readImage("/weapons/Aura.png");
+        return images; 
+    }
+
+    private static BufferedImage[] loadAbilityImages() {
+        BufferedImage[] images = new BufferedImage[4];
+        // TODO: load ability images
+        // images[0] = ImageTools.readImage("/icons/atk.png");
+        // images[1] = ImageTools.readImage("/icons/def.png");
+        // images[2] = ImageTools.readImage("/icons/hp.png");
+        // images[3] = ImageTools.readImage("/icons/spd.png");
+
+        // use string to represent ability icon
+        images[0] = genTextImage("ATK");
+        images[1] = genTextImage("DEF");
+        images[2] = genTextImage("HP");
+        images[3] = genTextImage("SPD");
+
+        return images;
+    }
+
+    private static BufferedImage genTextImage(String text) {
+        BufferedImage img = new BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
+        // g.setColor(Color.BLACK);
+        // g.fillRect(0, 0, 50, 50);
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.PLAIN, 20));
+        g.drawString(text, 23 - text.length() * 5, 35);
+        return img;
     }
 }
