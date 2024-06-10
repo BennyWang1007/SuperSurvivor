@@ -3,7 +3,9 @@ package weapons;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Set;
 
+import entity.Hitbox;
 import entity.Player;
 import entity.monster.Monster;
 import main.Game;
@@ -40,8 +42,18 @@ public class SpinningSword extends Weapon{
         y = player.y + offsetY;
         decreaseCooldowns();
 
+        Set<Monster> monsters = game.getMonsters();
+        Hitbox hitbox;
         for (int i = 0; i < level - 1; i++) {
             childSwords[i].update();
+        }
+        for (Monster monster : monsters) {
+            hitbox = monster.getHitBox();
+            for (int i = 0; i < level - 1; i++) {
+                if (childSwords[i].getHitBox().isCollideWith(hitbox)) {
+                    childSwords[i].attackOn(monster);
+                }
+            }
         }
     }
 
@@ -94,7 +106,7 @@ public class SpinningSword extends Weapon{
         degree = 0;
         childSwords[level - 2] = new SpinningSword(game, width, height, attackMul, degreePerSecond, distance, player);
         for (int i = 0; i < level - 1; i++) {
-            childSwords[i].degree = 360 / (level - 1) * i;
+            childSwords[i].degree = 360 / level * (i + 1);
         }
     }
 

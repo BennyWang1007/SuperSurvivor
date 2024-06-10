@@ -15,7 +15,7 @@ public class Aura extends Weapon {
     private float radius;
     private int animationIndex = 0;
     Set<Monster> monsters;
-    private final float deltaRadius = 20;
+    private final float deltaRadius = 40;
     // private float degreeOfTransparency = 0.0f; // cos(degree) = transparency
 
     private Sound hitSound;

@@ -30,8 +30,13 @@ public class Roller extends Monster {
     private float rollDx = 0;
     private float rollDy = 0;
 
-    public Roller(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
-        super(game, name, x, y, hp, attack, speed, exp, player);
+    private static final int defaultHp = 150;
+    private static final int defaultAttack = 40;
+    private static final int defaultSpeed = 150;
+    private static final int defaultExp = 50;
+
+    public Roller(Game game, String name, int x, int y, double strength, Player player) {
+        super(game, name, x, y, defaultHp, defaultAttack, defaultSpeed, defaultExp, strength, player);
         width = 75;
         height = 75;
         dropItems = new DropItem[] {
@@ -40,6 +45,7 @@ public class Roller extends Monster {
         };
         dropRates = new float[] {1.0f, 0.5f};
     }
+
 
     private static BufferedImage[][][] loadAnimationImage() {
         BufferedImage[][][] images = new BufferedImage[2][2][4];

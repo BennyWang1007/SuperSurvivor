@@ -24,14 +24,10 @@ public class GameKeyboardListener implements KeyListener {
         this.player = player;
     }
 
-    public void setPause(boolean pause) {
-        isPause = pause;
-    }
+    public void setPause(boolean pause) { isPause = pause; }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-        // System.out.println("Key typed" + e.getKeyCode());
-    }
+    public void keyTyped(KeyEvent e) {}
 
     @Override
     public void keyPressed(KeyEvent e) {
@@ -80,17 +76,18 @@ public class GameKeyboardListener implements KeyListener {
     }
 
     public void update() {
-        if (upPressed) {
-            player.moveUp();
-        }
-        if (downPressed) {
-            player.moveDown();
-        }
         if (leftPressed) {
-            player.moveLeft();
+            if (upPressed) player.moveLeftUp();
+            else if (downPressed) player.moveLeftDown();
+            else player.moveLeft();
         }
-        if (rightPressed) {
-            player.moveRight();
+        else if (rightPressed) {
+            if (upPressed) player.moveRightUp();
+            else if (downPressed) player.moveRightDown();
+            else player.moveRight();
+        } else {
+            if (upPressed) player.moveUp();
+            else if (downPressed) player.moveDown();
         }
     }
     

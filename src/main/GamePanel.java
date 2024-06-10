@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.*;
 
 import entity.*;
+import entity.monster.KnifeGoblin;
 import entity.monster.Monster;
 import listeners.GameMouseListener;
 import weapons.*;
@@ -135,21 +136,25 @@ public class GamePanel extends Canvas {
             drawProjectiles(g);
             drawPlayer(g);
             drawDamageReceived(g);
+            drawScore(g);
             if (DEBUG) {
                 // draw a rectangle as background of debug info
+                int startY = 115;
                 g.setColor(Color.BLACK);
-                g.fillRect(0, 0, 310, 100 + 20 * player.getWeapons().size());
+                g.fillRect(0, 0, 310, startY + 5 + 20 * player.getWeapons().size());
                 // info
                 g.setColor(Color.WHITE);
                 g.setFont(getFont().deriveFont(20.0f));
                 g.drawString("Player: (" + (int)player.x + ", " + (int)player.y + "), atk: " + player.attack, 10, 35);
-                g.drawString("def: " + player.defense + ", hp: " + player.hp + " / " + player.maxHp + ", spd: " + player.speed, 10, 55);
+                g.drawString("def: " + player.defense + ", hp: " + player.hp + " / " + player.maxHp + ", spd: " + player.getSpeed(), 10, 55);
                 g.drawString("Exp: " + player.exp + "/" + player.expTable[player.level] + ", Level: " + player.level, 10, 75);
+                g.drawString("GameTime: " + String.format("%.2f", Game.gameTime) + ", Strength: " + String.format("%.2f", Game.monsterStrength), 10, 95);
+                
                 if (player.getWeapons().size() > 0) {
-                    g.drawString("Weapons: ", 10, 95);
+                    g.drawString("Weapons: ", 10, startY);
                     int i = 0;
                     for (Weapon weapon : player.getWeapons()) {
-                        g.drawString(weapon.getClass().getSimpleName() + " lv: " + weapon.getLevel() + "atk " + weapon.attack, 10, 115 + 20 * i);
+                        g.drawString(weapon.getClass().getSimpleName() + " lv: " + weapon.getLevel() + "atk " + weapon.attack, 10, startY + 20 + 20 * i);
                         i++;
                     }
                 }
@@ -324,6 +329,13 @@ public class GamePanel extends Canvas {
         monsters.forEach(monster -> monster.drawDamageReceived(g));
     }
 
+    private void drawScore(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.setFont(getFont().deriveFont(20.0f));
+        String str = "Score: " + player.score;
+        g.drawString(str, getWidth() - getStringWidth(g, str) - 10, 20);
+    }
+
     private void drawPlayer(Graphics g) {
         player.draw(g);
     }
@@ -470,9 +482,9 @@ class LevelUpChoice {
                 player.defense += abilityValue;
             } else if (abilityType == UPGRADE_HP) {
                 player.maxHp += abilityValue;
-                player.hp = player.maxHp;
+                player.hp += abilityValue;
             } else if (abilityType == UPGRADE_SPD) {
-                player.speed += abilityValue;
+                player.addSpeed(abilityValue);
             }
         }
     }

@@ -24,16 +24,16 @@ public class MonsterSpawner {
         this.monsters = monsters;
     }
 
-    public void spawnMonster(int id, int exp) {
+    public void spawnMonster(int id, double strength) {
         int[] pos = getSpawnPositionRandomly();
         Monster monster;
         float rand = random.nextFloat();
         if (rand < 0.5) {
-            monster = new KnifeGoblin(game, "Monster", pos[0], pos[1], 100, 20, 60, exp, player);
+            monster = new KnifeGoblin(game, "Monster", pos[0], pos[1], strength, player);
         } else if (rand < 0.9) {
-            monster = new StoneThrower(game, "Monster", pos[0], pos[1], 100, 20, 60, exp, player);
+            monster = new StoneThrower(game, "Monster", pos[0], pos[1], strength, player);
         } else {
-            monster = new Roller(game, "Monster", pos[0], pos[1], 100, 20, 240, exp, player);
+            monster = new Roller(game, "Monster", pos[0], pos[1], strength, player);
         }
         monster.setId(id);
         monsters.add(monster);

@@ -6,6 +6,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class TitleScreen {
     private enum MenuPage {
@@ -223,7 +225,18 @@ public class TitleScreen {
         g.fillRoundRect(x, y, width, height, 20, 20);
 
         // Rank list
-        // TODO: Rank List
+        ArrayList<ScoreEntry> scoreEntries = Game.scores;
+        g.setFont(g.getFont().deriveFont(36f));
+        int gap = 20;
+        int textHeight = (int) g.getFontMetrics().getStringBounds("中", g).getHeight();
+        x = gamePanel.getWidth() / 4;
+        y = gamePanel.getHeight() / 4;
+        for (int i = 0; i < scoreEntries.size(); i++) {
+            ScoreEntry entry = scoreEntries.get(i);
+            String text = (i+1) + ". " + entry.getName() + " - " + entry.getScore() + "分";
+            g.drawString(text, x, y);
+            y += textHeight + gap;
+        }
 
         // back button
         g.setFont(g.getFont().deriveFont(36f));

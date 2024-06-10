@@ -19,6 +19,7 @@ public class ExpOrb extends DropItem {
     public void beCollected() {
         player.addExp(exp);
         if (game.settings.isSoundOn()) collectSound.play();
+        player.addScore(exp / 2);
     }
 
     public void draw(Graphics g) {
