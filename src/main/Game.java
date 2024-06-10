@@ -11,14 +11,19 @@ import listeners.GameKeyboardListener;
 import listeners.GameMouseListener;
 import weapons.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.io.*;
 
 public class Game {
 
     public static final int FPS = 60;
     public static final double DELTA_TIME = 1. / FPS;
     private static final double NANO_TIME_PER_FRAME = 1000000000.0 / FPS;
+
+    public static double gameTime = 0; // in seconds
+    public static double monsterStrength = 1;
+
+    public static ArrayList<ScoreEntry> scores;
 
     private static final boolean skipTitleScreen = false;
 
@@ -80,6 +85,9 @@ public class Game {
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setResizable(false);
 
+        // load scores
+        loadScores();
+
         // mouse listener
         mouseListener = new GameMouseListener();
 
@@ -136,6 +144,8 @@ public class Game {
         player.init();
         player.moveTo(worldWidth/2, worldHeight/2);
         player.addBow();
+        gameTime = 0;
+        monsterStrength = 1;
         gamePanel.init();
     }
 
@@ -242,6 +252,44 @@ public class Game {
         return gamePanel.gameMap.tile;
     }
 
+    @SuppressWarnings("unchecked")
+    private void loadScores() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("scores.dat"))) {
+            scores = (ArrayList<ScoreEntry>) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            scores = new ArrayList<>();
+        }
+    }
+
+    private void saveScores() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("scores.dat"))) {
+            oos.writeObject(scores);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addScoreEntry(String name, int score) {
+        scores.add(new ScoreEntry(name, score));
+        Collections.sort(scores, (s1, s2) -> Integer.compare(s2.getScore(), s1.getScore()));
+        saveScores();
+    }
+
+    private void endGame() {
+        // set default name player.name in showInputDialog and add a discard button
+        String name = JOptionPane.showInputDialog(gameFrame, "Game Over! Enter your name(cancel to discard)", player.name);
+        
+        if (name != null && !name.trim().isEmpty()) {
+            addScoreEntry(name, player.getScore());
+        }
+        int choice = JOptionPane.showConfirmDialog(gameFrame, "Game Over! Do you want to play again?", "Game Over", JOptionPane.YES_NO_OPTION);
+        if (choice == JOptionPane.YES_OPTION) {
+            reset();
+        } else {
+            System.exit(0);
+        }
+    }
+
     private void startGameLoop() {
         // For actual game update
         long previousTime = System.nanoTime();
@@ -273,11 +321,12 @@ public class Game {
                 previousTimeMillis = currentTimeMillis;
                 measuredFPS = frames;
                 frames = 0;
+                monsterStrength = strengthFormula(gameTime);
             }
 
             // end game ?
             if (isOver()) {
-                break;
+                endGame();
             }
         }
     }
@@ -286,6 +335,7 @@ public class Game {
         if (gameState == GameState.TITLE_SCREEN) return;
         if (gameState == GameState.PAUSE) return;
         if (gameState == GameState.LEVEL_UP) return;
+        gameTime += DELTA_TIME;
         keyboardListener.update();
         player.update();
         dropItems.forEach(DropItem::update);
@@ -294,6 +344,7 @@ public class Game {
         processCollision();
         monsters.forEach(monster -> {
             if (monster.isDead()) {
+                player.addScore((int)(monster.exp * (0.5 + Math.random() * 0.5)));
                 monster.dropItems();
             }
         });
@@ -337,16 +388,16 @@ public class Game {
     private void processMonsterSpawn() {
         if (monsterCooldownCounter >= monsterSpawnCooldown) {
             monsterCooldownCounter -= monsterSpawnCooldown;
-            addMonster(20);
+            addMonster();
         } else {
             monsterCooldownCounter++;
         }
     }
 
-    private void addMonster(int exp) {
+    private void addMonster() {
         if (monsters.size() < maxMonsterCount) {
             currentMonsterId++;
-            monsterSpawner.spawnMonster(currentMonsterId, exp);
+            monsterSpawner.spawnMonster(currentMonsterId, monsterStrength);
         }
     }
 
@@ -356,6 +407,17 @@ public class Game {
 
     public void addProjectile(Projectile projectile) {
         projectiles.add(projectile);
+    }
+
+    public double getMonsterStrength() {
+        return strengthFormula(gameTime);
+    }
+
+    public double strengthFormula(double x) {
+        double strengh = 0.03 * x + 1;
+        if (x > 100) strengh += Math.pow(1.03, (x - 100));
+        if (x > 200) strengh += 0.0002 * (x - 200) * (x - 200);
+        return strengh;
     }
 
 }

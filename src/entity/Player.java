@@ -16,10 +16,12 @@ public class Player extends Entity{
     public int maxHp;
     public int attack;
     public int defense;
-    public float speed;
+    private float speed;
+    private float speedPerFrame;
     public int exp;
     public int level;
     public final int maxLevel = 39;
+    public int score;
     // public int[] expTable = {0, 100, 200, 400, 800, 1600, 3200, 6400};
     public int[] expTable = {0, 100, 100, 100, 100, 100, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 520, 540, 560, 580, 600, 620, 640, 660, 680, 700, 720, 740, 760, 780, 800};
 
@@ -33,19 +35,21 @@ public class Player extends Entity{
     private BufferedImage up1,up2,down1,down2,right1,right2,left1,left2;
     private BufferedImage currentPlayerImage;
     private int tileCounter = 0;
-    private int tileNum = 1;
+    private boolean isFrame1 = true;
     private final int framesToChange = Game.FPS / 5;
 
     public Player(Game game, String name, int x, int y) {
         super(game, x, y, 50, 50);
         this.name = name;
         this.speed = 250;
+        this.speedPerFrame = speed / Game.FPS;
         this.attack = 20;
         this.hp = 500;
         this.maxHp = 500;
         this.defense = 0;
         this.exp = 0;
         this.level = 1;
+        this.score = 0;
         this.damageCooldown = 0;
         this.weapons = new HashSet<>();
         getPlayerImage();
@@ -53,6 +57,7 @@ public class Player extends Entity{
 
     public void init() {
         this.speed = 250;
+        this.speedPerFrame = speed / Game.FPS;
         this.attack = 20;
         this.hp = 500;
         this.maxHp = 500;
@@ -62,7 +67,7 @@ public class Player extends Entity{
         this.damageCooldown = 0;
         weapons.clear();
         tileCounter = 0;
-        tileNum = 1;
+        isFrame1 = true;
         damageCooldown = 0;
         curMaxDamage = 0;
         currentPlayerImage = down1;
@@ -80,55 +85,65 @@ public class Player extends Entity{
         currentPlayerImage = down1;
     }
 
-    public void moveUp() {
+    public void processMoveTile() {
         tileCounter++;
         if (tileCounter >= framesToChange) {
-            tileNum = (tileNum == 1 ? 2 : 1);
+            isFrame1 = !isFrame1;
             tileCounter = 0;
         }
-        currentPlayerImage = (tileNum == 1 ? up1 : up2);
-        if (checkMapTileCollision("up")) return;
-        move(x, (float)(y - speed * Game.DELTA_TIME));
     }
-
-    public void moveDown() {
-        tileCounter++;
-        if (tileCounter >= framesToChange) {
-            tileNum = (tileNum == 1 ? 2 : 1);
-            tileCounter = 0;
+    
+    public void move(float deltaX, float deltaY, String direction) {
+        processMoveTile();
+        switch (direction) {
+            case "up":
+                currentPlayerImage = (isFrame1 ? up1 : up2);
+                break;
+            case "down":
+                currentPlayerImage = (isFrame1 ? down1 : down2);
+                break;
+            case "left":
+                currentPlayerImage = (isFrame1 ? left1 : left2);
+                break;
+            case "right":
+                currentPlayerImage = (isFrame1 ? right1 : right2);
+                break;
         }
-        currentPlayerImage = (tileNum == 1 ? down1 : down2);
-        if (checkMapTileCollision("down")) return;
-        move(x, (float)(y + speed * Game.DELTA_TIME));
+        float nextX = x + deltaX;
+        float nextY = y + deltaY;
+        if (!checkMapTileCollision(nextX, nextY)) move(nextX, nextY);
     }
-
-    public void moveLeft() {
-        tileCounter++;
-        if (tileCounter >= framesToChange) {
-            tileNum = (tileNum == 1 ? 2 : 1);
-            tileCounter = 0;
-        }
-        currentPlayerImage = (tileNum == 1 ? left1 : left2);
-        if (checkMapTileCollision("left")) return;
-        move((float)(x - speed * Game.DELTA_TIME), y);
-    }
-
-    public void moveRight() {
-        tileCounter++;
-        if (tileCounter >= framesToChange) {
-            tileNum = (tileNum == 1 ? 2 : 1);
-            tileCounter = 0;
-        }
-        currentPlayerImage = (tileNum == 1 ? right1 : right2);
-        if (checkMapTileCollision("right")) return;
-        move((float)(x + speed * Game.DELTA_TIME), y);
-    }
-
+    
     public void move(float x, float y) {
         if (game.isValidPosition(x, y)) {
             this.x = x;
             this.y = y;
         }
+    }
+    
+    public void moveUp() { move(0, -speedPerFrame, "up"); }
+    public void moveDown() { move(0, speedPerFrame, "down"); }
+    public void moveLeft() { move(-speedPerFrame, 0, "left"); }
+    public void moveRight() { move(speedPerFrame, 0, "right"); }
+
+    public void moveLeftUp() {
+        float delta = speedPerFrame / 1.414f;
+        move(-delta, -delta, "left");
+    }
+    
+    public void moveRightUp() {
+        float delta = speedPerFrame / 1.414f;
+        move(delta, -delta, "right");
+    }
+    
+    public void moveLeftDown() {
+        float delta =  speedPerFrame / 1.414f;
+        move(-delta, delta, "left");
+    }
+    
+    public void moveRightDown() {
+        float delta = speedPerFrame / 1.414f;
+        move(delta, delta, "right");
     }
 
     public void update() {
@@ -160,7 +175,7 @@ public class Player extends Entity{
 
     public void addBow() { weapons.add(new Bow(game, 100, 100, 5, 360, 1, this)); }
     public void addSpinningSword() { weapons.add(new SpinningSword(game, 100, 100, 1, 300, 100, this)); }
-    public void addAura() { weapons.add(new Aura(game, 200, 200, 0.5f, 100, this)); }
+    public void addAura() { weapons.add(new Aura(game, 200, 200, 0.5f, 200, this)); }
 
     public void collideWith(Monster monster) {
         if (damageCooldown > 0) return;
@@ -202,66 +217,63 @@ public class Player extends Entity{
         }
     }
 
+    public void addSpeed(float speed) {
+        this.speed += speed;
+        this.speedPerFrame = this.speed / Game.FPS;
+    }
+
+    public float getSpeed() { return speed; }
+
     private void levelUp() {
         level++;
         maxHp += 10;
-        hp = maxHp;
         addAttack(5);
         defense += 2;
         game.levelUp();
     }
 
-    public void addExp(int exp) {
-        this.exp += exp;
-    }
+    public void addExp(int exp) { this.exp += exp;}
+    public void addScore(int score) { this.score += score; }
+    public int getScore() { return score; }
 
-    private boolean checkMapTileCollision(String direction) {
-        int playerLeft = (int) x - 16;
-        int playerRight = (int) x + 16;
-        int playerTop = (int) y;
-        int playerButtom = (int) y + 24;
+    private boolean checkMapTileCollision(float nextX, float nextY) {
+        int playerLeft = (int) nextX - 16;
+        int playerRight = (int) nextX + 16;
+        int playerTop = (int) nextY;
+        int playerBottom = (int) nextY + 24;
         int playerLeftCol = playerLeft / game.tileSize;
         int playerRightCol = playerRight / game.tileSize;
         int playerTopRow = playerTop / game.tileSize;
-        int playerButtomRow = playerButtom / game.tileSize;
+        int playerBottomRow = playerBottom / game.tileSize;
 
-        int tileNum1, tileNum2;
+        int TileNum1, TileNum2;
         int[][] mapTileNum = game.getMapTileNum();
         MapTile[] mapTiles = game.getMapTiles();
-        switch (direction) {
-            case "up":
-                playerTopRow = (playerTop - (int)(speed * Game.DELTA_TIME)) / game.tileSize;
-                tileNum1 = mapTileNum[playerTopRow][playerLeftCol];
-                tileNum2 = mapTileNum[playerTopRow][playerRightCol];
-                if (mapTiles[tileNum1].collision || mapTiles[tileNum2].collision) {
-                    return true;
-                }
-                break;
-            case "down":
-                playerButtomRow = (playerButtom +(int)(speed * Game.DELTA_TIME)) / game.tileSize;
-                tileNum1 = mapTileNum[playerButtomRow][playerLeftCol];
-                tileNum2 = mapTileNum[playerButtomRow][playerRightCol];
-                if (mapTiles[tileNum1].collision || mapTiles[tileNum2].collision) {
-                    return true;
-                }
-                break;
-            case "right":
-                playerRightCol = (playerRight +(int)(speed * Game.DELTA_TIME)) / game.tileSize;
-                tileNum1 = mapTileNum[playerTopRow][playerRightCol];
-                tileNum2 = mapTileNum[playerButtomRow][playerRightCol];
-                if (mapTiles[tileNum1].collision || mapTiles[tileNum2].collision) {
-                    return true;
-                }
-                break;
-            case "left":
-                playerLeftCol = (playerLeft -(int)(speed * Game.DELTA_TIME)) / game.tileSize;
-                tileNum1 = mapTileNum[playerTopRow][playerLeftCol];
-                tileNum2 = mapTileNum[playerButtomRow][playerLeftCol];
-                if (mapTiles[tileNum1].collision || mapTiles[tileNum2].collision) {
-                    return true;
-                }
-                break;
+        
+        TileNum1 = mapTileNum[playerTopRow][playerLeftCol];
+        TileNum2 = mapTileNum[playerTopRow][playerRightCol];
+        if (mapTiles[TileNum1].collision || mapTiles[TileNum2].collision) {
+            return true;
         }
+
+        TileNum1 = mapTileNum[playerBottomRow][playerLeftCol];
+        TileNum2 = mapTileNum[playerBottomRow][playerRightCol];
+        if (mapTiles[TileNum1].collision || mapTiles[TileNum2].collision) {
+            return true;
+        }
+
+        TileNum1 = mapTileNum[playerTopRow][playerLeftCol];
+        TileNum2 = mapTileNum[playerBottomRow][playerLeftCol];
+        if (mapTiles[TileNum1].collision || mapTiles[TileNum2].collision) {
+            return true;
+        }
+
+        TileNum1 = mapTileNum[playerTopRow][playerRightCol];
+        TileNum2 = mapTileNum[playerBottomRow][playerRightCol];
+        if (mapTiles[TileNum1].collision || mapTiles[TileNum2].collision) {
+            return true;
+        }
+
         return false;
     }
 
@@ -291,6 +303,21 @@ public class Player extends Entity{
         g.fillRect(healthBarX, healthBarY, healthBarWidth, healthBarHeight);
         g.setColor(java.awt.Color.GREEN);
         g.fillRect(healthBarX, healthBarY, healthBarWidth * hp / maxHp, healthBarHeight);
+
+        // Draw hitbox
+        g.setColor(java.awt.Color.RED);
+        Hitbox hitbox = getHitBox();
+        int screenSX = game.translateToScreenX(hitbox.startX);
+        int screenSY = game.translateToScreenY(hitbox.startY);
+        int screenEX = game.translateToScreenX(hitbox.endX);
+        int screenEY = game.translateToScreenY(hitbox.endY);
+        g.drawRect(screenSX, screenSY, screenEX - screenSX, screenEY - screenSY);
+
+    }
+
+    @Override
+    public Hitbox getHitBox() {
+        return new Hitbox((int)(x - width/3), (int)(y - height/3), (int)(x + width/3), (int)(y + height/3));
     }
 
 }

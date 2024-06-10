@@ -17,9 +17,14 @@ public class KnifeGoblin extends Monster {
     private final int animFramesPerImage = Game.FPS / 8;
     private int animFrameCounter = 0;
     private int animImageIndex = 0;
+
+    private static final int defaltHp = 100;
+    private static final int defaultAttack = 20;
+    private static final int defaultSpeed = 60;
+    private static final int defaultExp = 20;
     
-    public KnifeGoblin(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
-        super(game, name, x, y, hp, attack, speed, exp, player);
+    public KnifeGoblin(Game game, String name, int x, int y, double strength, Player player) {
+        super(game, name, x, y, defaltHp, defaultAttack, defaultSpeed, defaultExp, strength, player);
         dropItems = new DropItem[] {
             (DropItem) new entity.ExpOrb(game, x, y, exp, player)
         };

@@ -17,9 +17,17 @@ public class StoneThrower extends Monster {
     private int animFrameCounter = 0;
     private int animImageIndex = 0;
 
+    private static final int defaultHp = 70;
+    private static final int defaultAttack = 30;
+    private static final int defaultSpeed = 60;
+    private static final int defaultExp = 30;
+
     private float shootRange = 500;
-    public StoneThrower(Game game, String name, int x, int y, int hp, int attack, int speed, int exp, Player player) {
-        super(game, name, x, y, hp, attack, speed, exp, player);
+    private float stoneSpeed = 5;
+
+    public StoneThrower(Game game, String name, int x, int y, double strength, Player player) {
+        super(game, "StoneThrower", x, y, defaultHp, defaultAttack, defaultSpeed, defaultExp, strength, player);
+        stoneSpeed = speed / 12;
         dropItems = new DropItem[] {
             (DropItem) new entity.ExpOrb(game, x, y, exp, player)
         };
@@ -62,7 +70,7 @@ public class StoneThrower extends Monster {
         }
         shootCooldown = Game.FPS*3;
         float degree = (float)Math.toDegrees(Math.atan2(player.y - y, player.x - x));
-        game.addProjectile(new Stone(game, x, y, 10, 5, degree, player));
+        game.addProjectile(new Stone(game, x, y, attack, stoneSpeed, degree, player));
     }
 
     public void draw(Graphics g) {

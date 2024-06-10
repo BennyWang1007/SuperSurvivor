@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 
 import utils.ImageTools;
 import weapons.Projectile;
+import entity.Hitbox;
 import entity.Player;
 import main.Game;
 
@@ -45,7 +46,7 @@ public class Stone extends Projectile {
         if (player.getHitBox().isCollideWith(getHitBox())) {
             attackOn(player);
             cooldown = Game.FPS;
-             toDelete = true;
+            toDelete = true;
         }
     }
 
@@ -68,6 +69,16 @@ public class Stone extends Projectile {
         int cy = (int)Math.round(screenY - height/2.0);
         g.setColor(java.awt.Color.BLACK);
         drawBody(g, cx, cy);
+
+        // Draw hitbox
+        Hitbox hitbox = getHitBox();
+        int screenSX = game.translateToScreenX(hitbox.startX);
+        int screenSY = game.translateToScreenY(hitbox.startY);
+        int screenEX = game.translateToScreenX(hitbox.endX);
+        int screenEY = game.translateToScreenY(hitbox.endY);
+        g.drawRect(screenSX, screenSY, screenEX - screenSX, screenEY - screenSY);
+
+
     }
 
     private void drawBody(Graphics g, int cx, int cy) {

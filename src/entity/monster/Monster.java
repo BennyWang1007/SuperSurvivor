@@ -44,6 +44,10 @@ public abstract class Monster extends Entity {
         this.player = player;
     }
 
+    public Monster(Game game, String name, int x, int y, int hp, int attack, float speed, int exp, double strength, Player player) {
+        this(game, name, x, y, (int)(hp * strength), (int)(attack * strength), (int)(speed * Math.min(4, strength / 5 + 1)), (int)(exp * strength), player);
+    }
+
     public void setId(int id) { this.id = id; }
 
     public boolean isDead() { return hp <= 0; }

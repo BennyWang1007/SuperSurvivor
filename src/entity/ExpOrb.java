@@ -16,6 +16,7 @@ public class ExpOrb extends DropItem {
 
     public void beCollected() {
         player.addExp(exp);
+        player.addScore(exp / 2);
     }
 
     public void draw(Graphics g) {
