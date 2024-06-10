@@ -5,14 +5,18 @@ import java.awt.*;
 import entity.Player;
 import entity.monster.Monster;
 import main.Game;
+import main.Sound;
 import utils.ImageTools;
 
 public class Arrow extends Projectile {
+
+    private Sound hitSound;
 
     public Arrow(Game game, float x, float y, int width, int height, int attack, float speed, float degree, Player player) {
         super(game, x, y, width, height, attack, speed, degree);
         originalImage = ImageTools.scaleImage(ImageTools.readImage("/weapons/Arrow.png"), width, height);
         image = ImageTools.rotateImage(originalImage, degree);
+        hitSound = new Sound("hit_monster.wav");
     }
 
     @Override
@@ -31,6 +35,7 @@ public class Arrow extends Projectile {
 
     @Override
     public void attackOn(Monster monster) {
+        if (game.settings.isSoundOn()) hitSound.play();
         monster.damage(attack);
         toDelete = true;
     }

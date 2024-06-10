@@ -41,6 +41,9 @@ public class GamePanel extends Canvas {
     Color backColor = normalBackColor;
     Map<String, Boolean> buttonClicked;
     boolean startGame;
+
+    // sound
+    private Sound buttonClickSound;
     
     private static final boolean DEBUG = true;
 
@@ -53,6 +56,7 @@ public class GamePanel extends Canvas {
         setupFont();
         setupScreenSize(game.screenWidth, game.screenHeight);
         buttonClicked = new HashMap<>();
+        buttonClickSound = new Sound("button_click.wav");
     }
 
     public void init() {
@@ -203,19 +207,19 @@ public class GamePanel extends Canvas {
         String textResume = "繼續遊戲";
         x = getXForCenterText(g, textResume);
         y = getHeight()/2;
-        drawButton(g, textResume, x, y, 25, true, true, game::resume);
+        drawButton(g, "resume", textResume, x, y, 25, true, true, game::resume);
 
         // setting button
         String textSetting = "設定";
         x = getXForCenterText(g, textSetting);
         y += textHeight + buttonGap;
-        drawButton(g, textSetting, x, y, 25+getStringWidth(g, "中中")/2, true, true, () -> {});
+        drawButton(g, "in_game_setting", textSetting, x, y, 25+getStringWidth(g, "中中")/2, true, true, titleScreen::openSetting);
 
         // back to main menu button
         String textMainMenu = "回到主頁";
         x = getXForCenterText(g, textMainMenu);
         y += textHeight + buttonGap;
-        drawButton(g, textMainMenu, x, y, 25, true, true, game::reset);
+        drawButton(g, "back_to_menu", textMainMenu, x, y, 25, true, true, game::reset);
 
     }
 
@@ -341,13 +345,17 @@ public class GamePanel extends Canvas {
         return (int) g.getFontMetrics().getStringBounds(text, g).getWidth();
     }
 
-    void drawButton(Graphics g, String text, int x, int y, int horzPadding, boolean animation, boolean border, Runnable onClick) {
+    int getStringHeight(Graphics g, String text) {
+        return (int) g.getFontMetrics().getStringBounds(text, g).getHeight();
+    }
+
+    void drawButton(Graphics g, String name, String text, int x, int y, int horzPadding, boolean animation, boolean border, Runnable onClick) {
         Rectangle2D rect = getTextRectangle(g, text, x, y, horzPadding);
-        boolean clicked = buttonClicked.getOrDefault(text, false);
+        boolean clicked = buttonClicked.getOrDefault(name, false);
         if (!startGame) {
             if (isClicked(rect)) {
                 if (animation) backColor = clickBackColor;
-                if (!clicked) buttonClicked.put(text, true);
+                if (!clicked) buttonClicked.put(name, true);
             } else {
                 if (isHover(rect)) {
                     if (animation) backColor = hoverBackColor;
@@ -355,7 +363,8 @@ public class GamePanel extends Canvas {
                     backColor = normalBackColor;
                 }
                 if (clicked) {
-                    buttonClicked.put(text, false);
+                    buttonClicked.put(name, false);
+                    if (game.settings.isSoundOn()) buttonClickSound.play();
                     onClick.run();
                 }
             }

@@ -23,9 +23,14 @@ public class Game {
     private static final boolean skipTitleScreen = false;
 
     // Window frame / panel
-    private final JFrame gameFrame;
-    private final GamePanel gamePanel;
-    private GameState gameState;
+    final JFrame gameFrame;
+    final GamePanel gamePanel;
+    public final GameSettings settings;
+    GameState gameState;
+    private boolean inGame = false;
+
+    // Sound
+    Sound bgm;
 
     // Screen
     private final int originalTileSize = 16;
@@ -49,7 +54,7 @@ public class Game {
     public final GameMouseListener mouseListener;
 
     // Player
-    private Player player;
+    Player player;
 
     // Monsters
     private MonsterSpawner monsterSpawner;
@@ -75,6 +80,10 @@ public class Game {
     }
 
     public Game() {
+        // game settings
+        settings = new GameSettings();
+        bgm = new Sound("bgm.wav");
+
         // create the frame
         gameFrame = new JFrame("Game");
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -120,6 +129,7 @@ public class Game {
         gamePanel.initLevelUpChoices();
         gamePanel.setMap(1);
         // game loop
+        bgm.loop();
         startGameLoop();
 
         // close the frame
@@ -137,6 +147,7 @@ public class Game {
         player.moveTo(worldWidth/2, worldHeight/2);
         player.addBow();
         gamePanel.init();
+        inGame = false;
     }
 
     public int getMeasuredFPS() {
@@ -210,11 +221,17 @@ public class Game {
     public void resume() {
         gameState = GameState.MAIN_GAME;
         keyboardListener.setPause(false);
+        inGame = true;
     }
 
     public void reset() {
         init();
         gameState = GameState.TITLE_SCREEN;
+        inGame = false;
+    }
+
+    public boolean isInGame() {
+        return inGame;
     }
 
     public void levelUp() {
@@ -224,6 +241,14 @@ public class Game {
     public void quit() {
         // TODO: Quit Game
         System.exit(0);
+    }
+
+    public void startBGM() {
+        bgm.loop();
+    }
+
+    public void stopBGM() {
+        bgm.stop();
     }
 
     public GameState getGameState() {

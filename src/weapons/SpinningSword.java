@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import entity.Player;
 import entity.monster.Monster;
 import main.Game;
+import main.Sound;
 import utils.ImageTools;
 
 public class SpinningSword extends Weapon{
@@ -16,6 +17,7 @@ public class SpinningSword extends Weapon{
     private float degree;
 
     private SpinningSword[] childSwords;
+    private Sound hitSound;
 
     public SpinningSword(Game game, int width, int height, float attackMul, float degreePerSecond, float distance, Player owner){
         super(game, width, height, attackMul, owner);
@@ -25,6 +27,7 @@ public class SpinningSword extends Weapon{
         readImage("/weapons/Sword.png");
         cooldownTime = 0.5f;
         this.childSwords = new SpinningSword[4];
+        hitSound = new Sound("hit_monster.wav");
     }
 
     public void update() {
@@ -54,6 +57,7 @@ public class SpinningSword extends Weapon{
         if (attackCooldowns.containsKey(monster.id)) {
             return;
         }
+        if (game.settings.isSoundOn()) hitSound.play();
         monster.damage(attack);
         attackCooldowns.put(monster.id, Game.FPS);
     }

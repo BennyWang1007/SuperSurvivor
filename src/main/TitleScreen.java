@@ -2,6 +2,7 @@ package main;
 
 import utils.ImageTools;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
@@ -48,6 +49,11 @@ public class TitleScreen {
         previousNanoTime = 0;
     }
 
+    public void openSetting() {
+        game.gameState = GameState.TITLE_SCREEN;
+        currentPage = MenuPage.SETTING;
+    }
+
     private void loadMapImage() {
         mapImage = ImageTools.scaleImage(gamePanel.gameMap.getMiniMap(), miniMapWidth, miniMapHeight);
     }
@@ -57,7 +63,7 @@ public class TitleScreen {
         g.drawImage(titleScreenImage, 0, 0, game.screenWidth, game.screenHeight,null );
         g.setColor(new Color(0xFF, 0xFF, 0xFF, 128));
         g.fillRect(0, 0, gamePanel.getWidth(), gamePanel.getHeight());
-        g.drawImage(playerImage,game.screenCenterX+800,game.screenCenterY+500,72,96,null);
+        g.drawImage(playerImage,800,500,72,96,null);
 
         // draw body
         if (currentPage == MenuPage.MAIN) {
@@ -91,13 +97,13 @@ public class TitleScreen {
         int textHeight = (int) g.getFontMetrics().getStringBounds(textStart, g).getHeight();
         x = gamePanel.getXForCenterText(g, textStart);
         y = gamePanel.getHeight()/2;
-        gamePanel.drawButton(g, textStart, x, y, 75, true, true, () -> gamePanel.startGame = true);
+        gamePanel.drawButton(g, "start", textStart, x, y, 75, true, true, () -> gamePanel.startGame = true);
 
         // CHOOSE LEVEL
         String textLevel = "選擇地圖";
         x = gamePanel.getXForCenterText(g, textLevel);
         y += textHeight + gap;
-        gamePanel.drawButton(g, textLevel, x, y, 75, true, true, () -> {
+        gamePanel.drawButton(g, "choose_map", textLevel, x, y, 75, true, true, () -> {
             currentPage = MenuPage.SELECT_MAP;
             loadMapImage();
         });
@@ -106,7 +112,7 @@ public class TitleScreen {
         String textScoreboard = "排行榜";
         x = gamePanel.getXForCenterText(g, textScoreboard);
         y += textHeight + gap;
-        gamePanel.drawButton(g, textScoreboard, x, y, 75+gamePanel.getStringWidth(g, "中")/2, true, true, () -> {
+        gamePanel.drawButton(g, "scoreboard", textScoreboard, x, y, 75+gamePanel.getStringWidth(g, "中")/2, true, true, () -> {
             currentPage = MenuPage.SCOREBOARD;
         });
 
@@ -114,7 +120,7 @@ public class TitleScreen {
         String textSetting = "設定";
         x = gamePanel.getXForCenterText(g, textSetting);
         y += textHeight + gap;
-        gamePanel.drawButton(g, textSetting, x, y, 75+gamePanel.getStringWidth(g, "中中")/2, true, true, () -> {
+        gamePanel.drawButton(g, "menu_setting", textSetting, x, y, 75+gamePanel.getStringWidth(g, "中中")/2, true, true, () -> {
             currentPage = MenuPage.SETTING;
         });
 
@@ -122,7 +128,7 @@ public class TitleScreen {
         String textQuit = "離開遊戲";
         x = gamePanel.getXForCenterText(g, textQuit);
         y += textHeight + gap;
-        gamePanel.drawButton(g, textQuit, x, y, 75, true, true, game::quit);
+        gamePanel.drawButton(g, "exit", textQuit, x, y, 75, true, true, game::quit);
 
 
         if (gamePanel.startGame) {
@@ -169,7 +175,7 @@ public class TitleScreen {
         g.setFont(g.getFont().deriveFont(36f));
         g.setColor(Color.BLACK);
         x = (int) (rect.getX() - 100);
-        gamePanel.drawButton(g, leftButton, x, y, 0, false, false, () -> {
+        gamePanel.drawButton(g, "map_left", leftButton, x, y, 0, false, false, () -> {
             selectedMapLevel = (selectedMapLevel - 1 - 1 + gamePanel.mapNums) % gamePanel.mapNums + 1;
             gamePanel.setMap(selectedMapLevel);
             loadMapImage();
@@ -180,7 +186,7 @@ public class TitleScreen {
         g.setFont(g.getFont().deriveFont(36f));
         g.setColor(Color.BLACK);
         x = (int) (rect.getX() + rect.getWidth() + 100 - gamePanel.getStringWidth(g, rightButton));
-        gamePanel.drawButton(g, rightButton, x, y, 0, false, false, () -> {
+        gamePanel.drawButton(g, "map_right", rightButton, x, y, 0, false, false, () -> {
             selectedMapLevel = (selectedMapLevel - 1 + 1) % gamePanel.mapNums + 1;
             gamePanel.setMap(selectedMapLevel);
             loadMapImage();
@@ -191,19 +197,30 @@ public class TitleScreen {
         String backString = "儲存並返回";
         x = gamePanel.getXForCenterText(g, backString);
         y = gamePanel.getHeight()*7/8;
-        gamePanel.drawButton(g, backString, x, y, 75, true, true, () -> currentPage = MenuPage.MAIN);
+        gamePanel.drawButton(g, "map_save", backString, x, y, 75, true, true, () -> currentPage = MenuPage.MAIN);
     }
 
     private void drawScoreboard(Graphics g) {
         int x, y;
+        int width, height;
 
         // TITLE
         String title = "排行榜";
         g.setFont(g.getFont().deriveFont(48f));
-        g.setColor(Color.BLACK);
         x = gamePanel.getXForCenterText(g, title);
         y = gamePanel.getHeight()/8;
+        g.setColor(Color.GRAY);
+        g.drawString(title, x+3, y+3);
+        g.setColor(Color.BLACK);
         g.drawString(title, x, y);
+
+        // background
+        x = gamePanel.getWidth()*2/6;
+        y = gamePanel.getHeight()/6;
+        width = gamePanel.getWidth()*2/6;
+        height = gamePanel.getHeight()*4/6;
+        g.setColor(new Color(102, 102, 102, 250));
+        g.fillRoundRect(x, y, width, height, 20, 20);
 
         // Rank list
         // TODO: Rank List
@@ -212,27 +229,98 @@ public class TitleScreen {
         g.setFont(g.getFont().deriveFont(36f));
         String backString = "返回";
         x = gamePanel.getXForCenterText(g, backString);
-        y = gamePanel.getHeight()*7/8;
-        gamePanel.drawButton(g, backString, x, y, 75, true, true, () -> currentPage = MenuPage.MAIN);
+        y = gamePanel.getHeight()*8/9;
+        gamePanel.drawButton(g, "scoreboard_back", backString, x, y, 75, true, true, () -> currentPage = MenuPage.MAIN);
     }
 
     private void drawSettingsPage(Graphics g) {
         int x, y;
+        int width, height;
 
         // TITLE
         String title = "設定";
         g.setFont(g.getFont().deriveFont(48f));
-        g.setColor(Color.BLACK);
         x = gamePanel.getXForCenterText(g, title);
         y = gamePanel.getHeight()/8;
+        g.setColor(Color.GRAY);
+        g.drawString(title, x+3, y+3);
+        g.setColor(Color.BLACK);
         g.drawString(title, x, y);
+
+        // background
+        x = gamePanel.getWidth()*2/6;
+        y = gamePanel.getHeight()/6;
+        width = gamePanel.getWidth()*2/6;
+        height = gamePanel.getHeight()*4/6;
+        g.setColor(new Color(102, 102, 102, 250));
+        g.fillRoundRect(x, y, width, height, 20, 20);
+
+        g.setFont(g.getFont().deriveFont(28f));
+        int padding = 20;
+        int labelX = x + padding;
+        int buttonX = x + width/2;
+        int textHeight = gamePanel.getStringHeight(g, "中");
+        // player name
+        String labelPlayerName = "玩家名稱";
+        String playerName = game.player.getName();
+        boolean cut = false;
+        while (gamePanel.getStringWidth(g, playerName) > width*3/8) {
+            playerName = playerName.substring(0, playerName.length()-1);
+            cut = true;
+        }
+        if (cut) playerName += "...";
+        y += textHeight + padding;
+        g.setColor(Color.DARK_GRAY);
+        g.drawString(labelPlayerName, labelX+3, y+3);
+        g.setColor(Color.WHITE);
+        g.drawString(labelPlayerName, labelX, y);
+        gamePanel.drawButton(g, "menu_setting_playerName", playerName, buttonX, y, 10, true, true, () -> {
+            String input = JOptionPane.showInputDialog(game.gameFrame, "原始名稱：" + game.player.getName() + "\n輸入玩家名稱");
+            if (input == null) return;
+            input = input.trim();
+            if (input.isEmpty()) return;
+            game.player.setName(input);
+        });
+
+        // music voice
+        String labelMusic = "背景音樂";
+        String musicOnOff = (game.settings.isMusicOn() ? "開啟" : "關閉");
+        y += textHeight + padding;
+        g.setColor(Color.DARK_GRAY);
+        g.drawString(labelMusic, labelX+3, y+3);
+        g.setColor(Color.WHITE);
+        g.drawString(labelMusic, labelX, y);
+        gamePanel.drawButton(g, "menu_setting_music", musicOnOff, buttonX, y, 10, true, true, () -> {
+            boolean on = !game.settings.isMusicOn();
+            game.settings.setMusicOnOff(on);
+            if (on) game.startBGM();
+            else game.stopBGM();
+        });
+
+        // sound effect
+        String labelSound = "遊戲音效";
+        String soundOnOff = (game.settings.isSoundOn() ? "開啟" : "關閉");
+        y += textHeight + padding;
+        g.setColor(Color.DARK_GRAY);
+        g.drawString(labelSound, labelX+3, y+3);
+        g.setColor(Color.WHITE);
+        g.drawString(labelSound, labelX, y);
+        gamePanel.drawButton(g, "menu_setting_sound", soundOnOff, buttonX, y, 10, true, true, () -> {
+            game.settings.setSoundOnOff(!game.settings.isSoundOn());
+        });
 
         // back button
         g.setFont(g.getFont().deriveFont(36f));
         String backString = "返回";
         x = gamePanel.getXForCenterText(g, backString);
-        y = gamePanel.getHeight()*7/8;
-        gamePanel.drawButton(g, backString, x, y, 75, true, true, () -> currentPage = MenuPage.MAIN);
+        y = gamePanel.getHeight()*8/9;
+        gamePanel.drawButton(g, "menu_setting_back", backString, x, y, 75, true, true, () -> {
+            if (game.isInGame()) {
+                game.pause();
+            } else {
+                currentPage = MenuPage.MAIN;
+            }
+        });
     }
 
     private void drawStartGameAnimation(Graphics g) {
