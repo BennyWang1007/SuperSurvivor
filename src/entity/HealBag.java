@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import main.Game;
+import main.SoundType;
 
 public class HealBag extends DropItem {
 
@@ -15,6 +16,7 @@ public class HealBag extends DropItem {
     }
 
     public void beCollected() {
+        game.playSound(SoundType.HEALBAG_COLLECT);
         player.heal(heal);
     }
 

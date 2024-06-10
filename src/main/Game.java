@@ -1,5 +1,6 @@
 package main;
 
+import javax.sound.sampled.FloatControl;
 import javax.swing.*;
 
 import entity.DropItem;
@@ -137,6 +138,8 @@ public class Game {
         gamePanel.initLevelUpChoices();
         gamePanel.setMap(1);
         // game loop
+        setBgmVolume(settings.musicVolumeLevel);
+        setSoundVolume(settings.soundVolumeLevel);
         bgm.loop();
         startGameLoop();
 
@@ -158,6 +161,7 @@ public class Game {
         monsterStrength = 1;
         gamePanel.init();
         inGame = false;
+        keyboardListener.reset();
     }
 
     public int getMeasuredFPS() {
@@ -253,14 +257,6 @@ public class Game {
         System.exit(0);
     }
 
-    public void startBGM() {
-        bgm.loop();
-    }
-
-    public void stopBGM() {
-        bgm.stop();
-    }
-
     public GameState getGameState() {
         return gameState;
     }
@@ -275,6 +271,18 @@ public class Game {
 
     public MapTile[] getMapTiles() {
         return gamePanel.gameMap.tile;
+    }
+
+    public void playSound(SoundType soundType) {
+        soundType.play();
+    }
+
+    public void setBgmVolume(int level) {
+        bgm.setVolume(level);
+    }
+
+    public void setSoundVolume(int level) {
+        SoundType.setVolume(level);
     }
 
     @SuppressWarnings("unchecked")
@@ -334,7 +342,7 @@ public class Game {
             previousTime = currentTime;
 
             if (deltaF >= 1) {
-                deltaF--;
+                deltaF = 0;
                 frames++;
                 processUpdate();
                 processFrame();

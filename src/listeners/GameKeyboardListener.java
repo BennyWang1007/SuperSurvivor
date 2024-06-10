@@ -26,6 +26,15 @@ public class GameKeyboardListener implements KeyListener {
 
     public void setPause(boolean pause) { isPause = pause; }
 
+    public void reset() {
+        isPause = false;
+        escPressed = false;
+        upPressed = false;
+        downPressed = false;
+        leftPressed = false;
+        rightPressed = false;
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {}
 

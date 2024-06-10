@@ -297,29 +297,51 @@ public class TitleScreen {
 
         // music voice
         String labelMusic = "背景音樂";
-        String musicOnOff = (game.settings.isMusicOn() ? "開啟" : "關閉");
         y += textHeight + padding;
         g.setColor(Color.DARK_GRAY);
         g.drawString(labelMusic, labelX+3, y+3);
         g.setColor(Color.WHITE);
         g.drawString(labelMusic, labelX, y);
-        gamePanel.drawButton(g, "menu_setting_music", musicOnOff, buttonX, y, 10, true, true, () -> {
-            boolean on = !game.settings.isMusicOn();
-            game.settings.setMusicOnOff(on);
-            if (on) game.startBGM();
-            else game.stopBGM();
+        // minus button
+        gamePanel.drawButton(g, "menu_setting_music_minus", "-", buttonX, y, 10, true, true, () -> {
+            int newLevel = game.settings.musicVolumeLevel - 1;
+            if (newLevel < 0) newLevel = 0;
+            game.setBgmVolume(newLevel);
+            game.settings.musicVolumeLevel = newLevel;
         });
+        // music volume
+        gamePanel.drawButton(g, "None", ""+game.settings.musicVolumeLevel, buttonX+50, y, 10, true, true, () -> {});
+        // plus button
+        gamePanel.drawButton(g, "menu_setting_music_plus", "+", buttonX+100, y, 10, true, true, () -> {
+            int newLevel = game.settings.musicVolumeLevel + 1;
+            if (newLevel > 5) newLevel = 5;
+            game.setBgmVolume(newLevel);
+            game.settings.musicVolumeLevel = newLevel;
+        });
+
 
         // sound effect
         String labelSound = "遊戲音效";
-        String soundOnOff = (game.settings.isSoundOn() ? "開啟" : "關閉");
         y += textHeight + padding;
         g.setColor(Color.DARK_GRAY);
         g.drawString(labelSound, labelX+3, y+3);
         g.setColor(Color.WHITE);
         g.drawString(labelSound, labelX, y);
-        gamePanel.drawButton(g, "menu_setting_sound", soundOnOff, buttonX, y, 10, true, true, () -> {
-            game.settings.setSoundOnOff(!game.settings.isSoundOn());
+        // minus button
+        gamePanel.drawButton(g, "menu_setting_sound_minus", "-", buttonX, y, 10, true, true, () -> {
+            int newLevel = game.settings.soundVolumeLevel - 1;
+            if (newLevel < 0) newLevel = 0;
+            game.setSoundVolume(newLevel);
+            game.settings.soundVolumeLevel = newLevel;
+        });
+        // music volume
+        gamePanel.drawButton(g, "None", ""+game.settings.soundVolumeLevel, buttonX+50, y, 10, true, true, () -> {});
+        // plus button
+        gamePanel.drawButton(g, "menu_setting_sound_plus", "+", buttonX+100, y, 10, true, true, () -> {
+            int newLevel = game.settings.soundVolumeLevel + 1;
+            if (newLevel > 5) newLevel = 5;
+            game.setSoundVolume(newLevel);
+            game.settings.soundVolumeLevel = newLevel;
         });
 
         // back button

@@ -8,6 +8,7 @@ import entity.Player;
 import entity.monster.Monster;
 import main.Game;
 import main.Sound;
+import main.SoundType;
 import utils.ImageTools;
 
 public class Aura extends Weapon {
@@ -18,14 +19,11 @@ public class Aura extends Weapon {
     private final float deltaRadius = 40;
     // private float degreeOfTransparency = 0.0f; // cos(degree) = transparency
 
-    private Sound hitSound;
-
     public Aura(Game game, int width, int height, float attackMul, float radius, Player player) {
         super(game, width, height, attackMul, player);
         readImage("/weapons/Aura.png");
         this.radius = radius;
         monsters = game.getMonsters();
-        hitSound = new Sound("hit_monster.wav");
         loadAnimation();
     }
 
@@ -46,7 +44,7 @@ public class Aura extends Weapon {
         if (attackCooldowns.containsKey(monster.id)) {
             return;
         }
-        if (game.settings.isSoundOn()) hitSound.play();
+        game.playSound(SoundType.HIT_MONSTER);
         monster.damage(attack);
         attackCooldowns.put(monster.id, (int) (0.5f * Game.FPS)); // 0.5s cooldown
     }

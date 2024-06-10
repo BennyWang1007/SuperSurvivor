@@ -282,6 +282,7 @@ public class GamePanel extends Canvas {
         }
         
         if (mouseListener.mouseClicked) {
+            game.playSound(SoundType.SELECT_BUFF);
             for (int i = 0; i < 3; i++) {
                 if (mouseListener.mouseX > boxX[i] && mouseListener.mouseX < boxX[i] + boxWidth &&
                     mouseListener.mouseY > boxY && mouseListener.mouseY < panelHeight / 2 + boxHeight / 2) {
@@ -376,7 +377,7 @@ public class GamePanel extends Canvas {
                 }
                 if (clicked) {
                     buttonClicked.put(name, false);
-                    if (game.settings.isSoundOn()) buttonClickSound.play();
+                    game.playSound(SoundType.BUTTON_CLICK);
                     onClick.run();
                 }
             }

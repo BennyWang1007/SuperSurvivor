@@ -8,6 +8,7 @@ import java.util.HashSet;
 import entity.Player;
 import entity.monster.Monster;
 import main.Game;
+import main.SoundType;
 import utils.ImageTools;
 import listeners.GameMouseListener;
 
@@ -45,6 +46,8 @@ public class Bow extends Weapon {
         float degree = (float) Math.toDegrees(Math.atan2(mouseListener.mouseY - centerY, mouseListener.mouseX - centerX));
         arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, speed / Game.FPS, degree, player));
         shotCooldown = (int) (shotInterval * Game.FPS);
+
+        game.playSound(SoundType.ARROW_SHOOT);
 
         if (level > 1) {
             arrows.add(new Arrow(game, player.x, player.y, 40, 40, attack, speed / Game.FPS, degree + 10, player));

@@ -7,7 +7,7 @@ import java.util.*;
 import entity.monster.Monster;
 import main.Game;
 import main.MapTile;
-import main.Sound;
+import main.SoundType;
 import utils.ImageTools;
 import weapons.*;
 
@@ -39,9 +39,6 @@ public class Player extends Entity{
     private boolean isFrame1 = true;
     private final int framesToChange = Game.FPS / 5;
 
-    private Sound levelUpSound;
-    private Sound hurtSound;
-
     public Player(Game game, String name, int x, int y) {
         super(game, x, y, 50, 50);
         this.name = name;
@@ -56,8 +53,6 @@ public class Player extends Entity{
         this.score = 0;
         this.damageCooldown = 0;
         this.weapons = new HashSet<>();
-        levelUpSound = new Sound("level_up.wav");
-        hurtSound = new Sound("player_hurt.wav");
         getPlayerImage();
     }
 
@@ -202,13 +197,13 @@ public class Player extends Entity{
 
     private void takeDamage() {
         if (curMaxDamage == 0) return;
-        if (game.settings.isSoundOn()) hurtSound.play();
         damage(curMaxDamage);
         damageCooldown = Game.FPS / 2;
         curMaxDamage = 0;
     }
 
     private void damage(int damage) {
+        game.playSound(SoundType.PLAYER_HURT);
         if (damage <= defense) return;
         hp -= damage - defense;
         // if (hp < 0) hp = 0;
@@ -240,7 +235,7 @@ public class Player extends Entity{
     public float getSpeed() { return speed; }
 
     private void levelUp() {
-        if (game.settings.isSoundOn()) levelUpSound.play();
+        game.playSound(SoundType.LEVEL_UP);
         level++;
         maxHp += 10;
         addAttack(5);

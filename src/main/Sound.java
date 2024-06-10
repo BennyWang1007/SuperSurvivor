@@ -1,7 +1,8 @@
 package main;
 
+import com.sun.jdi.FloatType;
+
 import javax.sound.sampled.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -47,6 +48,11 @@ public class Sound {
 
     public void stop() {
         clip.stop();
+    }
+
+    public void setVolume(int level) {
+        FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        gainControl.setValue(20f * (float) Math.log10(level / 5.));
     }
 
 }
