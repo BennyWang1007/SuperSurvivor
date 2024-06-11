@@ -7,9 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 public class TitleScreen {
     private enum MenuPage {

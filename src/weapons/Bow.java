@@ -93,9 +93,7 @@ public class Bow extends Weapon {
     }
 
     @Override
-    public void loadAnimation() {
-        // TODO
-    }
+    public void loadAnimation() {}
 
     @Override
     protected BufferedImage loadIconImage() {

@@ -5,7 +5,6 @@ import java.awt.image.BufferedImage;
 
 import utils.ImageTools;
 import weapons.Projectile;
-import entity.Hitbox;
 import entity.Player;
 import main.Game;
 

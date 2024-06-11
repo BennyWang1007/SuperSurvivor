@@ -5,7 +5,6 @@ import java.awt.*;
 import entity.Player;
 import entity.monster.Monster;
 import main.Game;
-import main.Sound;
 import main.SoundType;
 import utils.ImageTools;
 

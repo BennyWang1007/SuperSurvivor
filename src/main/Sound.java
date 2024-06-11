@@ -1,7 +1,5 @@
 package main;
 
-import com.sun.jdi.FloatType;
-
 import javax.sound.sampled.*;
 
 import java.io.BufferedInputStream;
