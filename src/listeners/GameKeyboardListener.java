@@ -60,11 +60,15 @@ public class GameKeyboardListener implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_D) {
             rightPressed = true;
         }
-        
+
         // secret key
         if (e.isControlDown() && e.isShiftDown() && e.isAltDown() && e.getKeyCode() == KeyEvent.VK_G) {
             Game.DEBUG = !Game.DEBUG;
             // System.out.println("Debug mode: " + Game.DEBUG);
+        }
+
+        if (Game.DEBUG && e.getKeyCode() == KeyEvent.VK_F10) {
+            Game.GOD_MODE = !Game.GOD_MODE;
         }
 
         if (Game.DEBUG && e.getKeyCode() == KeyEvent.VK_F9) {

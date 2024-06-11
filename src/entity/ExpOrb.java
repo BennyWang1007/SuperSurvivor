@@ -7,7 +7,7 @@ import main.*;
 
 public class ExpOrb extends DropItem {
     
-    private int exp;
+    private final int exp;
 
     public ExpOrb(Game game, float x, float y, int exp, Player player) {
         super(game, x, y, 8, 8, player);

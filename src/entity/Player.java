@@ -23,7 +23,6 @@ public class Player extends Entity{
     public int level;
     public final int maxLevel = 39;
     public int score;
-    // public int[] expTable = {0, 100, 200, 400, 800, 1600, 3200, 6400};
     public int[] expTable = {0, 1, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000,
                              1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900,
                              2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800,
@@ -68,6 +67,7 @@ public class Player extends Entity{
         this.defense = 0;
         this.exp = 0;
         this.level = 1;
+        this.score = 0;
         this.damageCooldown = 0;
         weapons.clear();
         tileCounter = 0;
@@ -206,9 +206,8 @@ public class Player extends Entity{
 
     private void damage(int damage) {
         game.playSound(SoundType.PLAYER_HURT);
-        if (damage <= defense) return;
+        if (Game.GOD_MODE || damage <= defense) return;
         hp -= damage - defense;
-        // if (hp < 0) hp = 0;
     }
 
     public void heal(int heal) {

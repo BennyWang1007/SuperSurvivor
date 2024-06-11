@@ -18,6 +18,7 @@ public class Game {
     public static final double DELTA_TIME = 1. / FPS;
     private static final double NANO_TIME_PER_FRAME = 1000000000.0 / FPS;
     public static boolean DEBUG = false;
+    public static boolean GOD_MODE = false;
 
     public static double gameTime = 0; // in seconds
     public static double monsterStrength = 1;

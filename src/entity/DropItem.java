@@ -18,7 +18,6 @@ public abstract class DropItem extends Entity {
         super(game, x, y, width, height);
         this.player = player;
         speedUpThreshold = player.collectRange;
-        speed = defaultSpeed;
     }
 
     // public abstract void update();

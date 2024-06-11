@@ -106,7 +106,7 @@ public class Bow extends Weapon {
     @Override
     public void levelUp() {
         level++;
-        shotInterval *= 0.6;
+        shotInterval *= 0.6f;
     }
 
 }

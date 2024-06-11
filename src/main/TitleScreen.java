@@ -47,9 +47,7 @@ public class TitleScreen {
     public TitleScreen(Game game, GamePanel gamePanel) {
         this.game = game;
         this.gamePanel = gamePanel;
-        this.gamePanel.addMouseWheelListener(
-            e -> handleMouseWheelEvent(e)
-        );
+        this.gamePanel.addMouseWheelListener(this::handleMouseWheelEvent);
         titleScreenImage = ImageTools.scaleImage(ImageTools.readImage("/ui/titlescreen.png"),863,483);
         playerImage = ImageTools.scaleImage(ImageTools.readImage("/player/backward1.png"), 36, 48);
         init();
@@ -60,6 +58,7 @@ public class TitleScreen {
         selectedMapLevel = 1;
         nanoTimeElapsed = 0;
         previousNanoTime = 0;
+        scrollY = 0;
     }
 
     public void openSetting() {
@@ -248,44 +247,44 @@ public class TitleScreen {
         // Generate the scoreboard image if it doesn't exist or needs to be updated
         scoreImageWidth = width - 30;
         scoreImageHeight = height - 30;
-        if (scoreboardImage == null) {
-            int textHeight = (int) g.getFontMetrics().getStringBounds("中", g).getHeight();
-            int offScreenHeight = Game.scores.size() * (textHeight + 10) + 20; // calculate based on the number of scores
-            scoreboardImage = new BufferedImage(scoreImageWidth, offScreenHeight, BufferedImage.TYPE_INT_ARGB);
-            Graphics gOffScreen = scoreboardImage.getGraphics();
-    
-            // Draw the rank list
-            int cx = 15;
-            int cy = 30;
-            gOffScreen.setFont(g.getFont().deriveFont(36f));
-            for (int i = 0; i < Game.scores.size(); i++) {
-                ScoreEntry entry = Game.scores.get(i);
-                String text = (i + 1) + ". " + entry.getName() + " - " + entry.getScore() + "分";
-                gOffScreen.setFont(g.getFont().deriveFont(36f));
-                gOffScreen.setColor(Color.BLACK);
-                gOffScreen.drawString(text, cx + 3, cy + 3);
-                gOffScreen.setColor(new Color(220, 220, 220));
-                gOffScreen.drawString(text, cx, cy);
-                
-                // draw timestamp with smaller font at the right
-                gOffScreen.setFont(g.getFont().deriveFont(24f));
-                LocalDateTime timestamp = entry.getTimestamp();
-                
-                String timeStr = String.format("%04d/%02d/%02d %02d:%02d",
-                    timestamp.getYear(),
-                    timestamp.getMonthValue(),
-                    timestamp.getDayOfMonth(),
-                    timestamp.getHour(),
-                    timestamp.getMinute()
-                );
-                gOffScreen.setColor(Color.BLACK);
-                gOffScreen.drawString(timeStr, scoreImageWidth - (g.getFontMetrics().stringWidth(timeStr) / 2) - 15, cy);
+        
+        // generate the scoreboard image
+        int textHeight = (int) g.getFontMetrics().getStringBounds("中", g).getHeight();
+        int offScreenHeight = Game.scores.size() * (textHeight + 10) + 20; // calculate based on the number of scores
+        scoreboardImage = new BufferedImage(scoreImageWidth, offScreenHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics gOffScreen = scoreboardImage.getGraphics();
 
-                cy += textHeight;
-            }
-    
-            gOffScreen.dispose();
+        // Draw the rank list
+        int cx = 15;
+        int cy = 30;
+        gOffScreen.setFont(g.getFont().deriveFont(36f));
+        for (int i = 0; i < Game.scores.size(); i++) {
+            ScoreEntry entry = Game.scores.get(i);
+            String text = (i + 1) + ". " + entry.getName() + " - " + entry.getScore() + "分";
+            gOffScreen.setFont(g.getFont().deriveFont(36f));
+            gOffScreen.setColor(Color.BLACK);
+            gOffScreen.drawString(text, cx + 3, cy + 3);
+            gOffScreen.setColor(new Color(220, 220, 220));
+            gOffScreen.drawString(text, cx, cy);
+            
+            // draw timestamp with smaller font at the right
+            gOffScreen.setFont(g.getFont().deriveFont(24f));
+            LocalDateTime timestamp = entry.getTimestamp();
+            
+            String timeStr = String.format("%04d/%02d/%02d %02d:%02d",
+                timestamp.getYear(),
+                timestamp.getMonthValue(),
+                timestamp.getDayOfMonth(),
+                timestamp.getHour(),
+                timestamp.getMinute()
+            );
+            gOffScreen.setColor(Color.BLACK);
+            gOffScreen.drawString(timeStr, scoreImageWidth - (g.getFontMetrics().stringWidth(timeStr) / 2) - 15, cy);
+
+            cy += textHeight;
         }
+
+        gOffScreen.dispose();
     
         // Draw the visible portion of the scoreboard image
         int clipX = x + 15;

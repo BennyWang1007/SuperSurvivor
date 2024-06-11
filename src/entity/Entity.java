@@ -8,7 +8,7 @@ public abstract class Entity {
     public float y; // center y
     public int width;
     public int height;
-    private Hitbox hitbox;
+    private final Hitbox hitbox;
 
     public Entity(Game game, float x, float y, int width, int height) {
         this.game = game;
