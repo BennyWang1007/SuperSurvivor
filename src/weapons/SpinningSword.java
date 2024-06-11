@@ -73,7 +73,6 @@ public class SpinningSword extends Weapon{
     }
 
     public void draw(Graphics g) {
-        // System.out.println("Drawing weapon");
         int screenX = game.translateToScreenX(x);
         int screenY = game.translateToScreenY(y);
 
@@ -90,9 +89,9 @@ public class SpinningSword extends Weapon{
             g.drawString(String.valueOf(i), screenX, screenY);
         }
 
-        // draw hitbox
-//        g.setColor(Color.RED);
-//        ((Graphics2D) g).drawRect(cx, cy, width, height);
+        if (Game.DEBUG) {
+            getHitBox().draw(g);
+        }
     }
 
     public void loadAnimation() {}

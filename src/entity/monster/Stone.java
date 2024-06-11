@@ -16,13 +16,10 @@ public class Stone extends Projectile {
     private final int animFramesPerImage = Game.FPS / 8;
     private int animFrameCounter = 0;
     private int animImageIndex = 0;
-
-    private Player player;
     private int cooldown;
 
-    public Stone(Game game, float x, float y, int attack, float speed, float degree, Player player) {
+    public Stone(Game game, float x, float y, int attack, float speed, float degree) {
         super(game, x, y, fixedWidth, fixedHeight, attack, speed, degree);
-        this.player = player;
     }
 
     private static BufferedImage[] loadAnimationImage() {
@@ -43,11 +40,6 @@ public class Stone extends Projectile {
         if (!game.isValidPosition(x, y) || !game.isInScreen(x, y)) {
             toDelete = true;
         }
-        if (player.getHitBox().isCollideWith(getHitBox())) {
-            attackOn(player);
-            cooldown = Game.FPS;
-            toDelete = true;
-        }
     }
 
     @Override
@@ -58,6 +50,8 @@ public class Stone extends Projectile {
     @Override
     public void attackOn(Player player) {
         player.collideWith(this);
+        cooldown = Game.FPS;
+        toDelete = true;
     }
 
     @Override
@@ -70,15 +64,9 @@ public class Stone extends Projectile {
         g.setColor(java.awt.Color.BLACK);
         drawBody(g, cx, cy);
 
-        // Draw hitbox
-        Hitbox hitbox = getHitBox();
-        int screenSX = game.translateToScreenX(hitbox.startX);
-        int screenSY = game.translateToScreenY(hitbox.startY);
-        int screenEX = game.translateToScreenX(hitbox.endX);
-        int screenEY = game.translateToScreenY(hitbox.endY);
-        g.drawRect(screenSX, screenSY, screenEX - screenSX, screenEY - screenSY);
-
-
+        if (Game.DEBUG) {
+            getHitBox().draw(g);
+        }
     }
 
     private void drawBody(Graphics g, int cx, int cy) {

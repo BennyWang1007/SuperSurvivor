@@ -60,6 +60,25 @@ public class GameKeyboardListener implements KeyListener {
         if (e.getKeyCode() == KeyEvent.VK_D) {
             rightPressed = true;
         }
+        
+        // secret key
+        if (e.isControlDown() && e.isShiftDown() && e.isAltDown() && e.getKeyCode() == KeyEvent.VK_G) {
+            Game.DEBUG = !Game.DEBUG;
+            // System.out.println("Debug mode: " + Game.DEBUG);
+        }
+
+        if (Game.DEBUG && e.getKeyCode() == KeyEvent.VK_F9) {
+            player.heal(10000000);
+        }
+
+        if (Game.DEBUG && e.getKeyCode() == KeyEvent.VK_F8) {
+            player.exp = player.expTable[player.level];
+        }
+        
+        if (Game.DEBUG && e.getKeyCode() == KeyEvent.VK_K) {
+            game.getMonsters().clear();
+            game.getMonsterProjectiles().clear();
+        }
     }
 
     @Override

@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.util.*;
 
 import entity.*;
-import entity.monster.KnifeGoblin;
 import entity.monster.Monster;
 import listeners.GameMouseListener;
 import weapons.*;
@@ -43,11 +42,6 @@ public class GamePanel extends Canvas {
     Map<String, Boolean> buttonClicked;
     boolean startGame;
 
-    // sound
-    private Sound buttonClickSound;
-    
-    private static final boolean DEBUG = true;
-
     public GamePanel(Game game, GameMouseListener mouseListener) {
         super();
         this.game = game;
@@ -57,7 +51,6 @@ public class GamePanel extends Canvas {
         setupFont();
         setupScreenSize(game.screenWidth, game.screenHeight);
         buttonClicked = new HashMap<>();
-        buttonClickSound = new Sound("button_click.wav");
     }
 
     public void init() {
@@ -101,7 +94,6 @@ public class GamePanel extends Canvas {
 
     // randomly choose 3 choices from levelUpChoices to curLevelUpChoices
     private void randomCurLevelUpChoices() {
-        // System.out.println("Random curLevelUpChoices from size " + levelUpChoices.size());
         Collections.shuffle(levelUpChoices);
         for (int i = 0; i < 3; i++) {
             curLevelUpChoices[i] = levelUpChoices.get(i);
@@ -128,7 +120,7 @@ public class GamePanel extends Canvas {
 
         if (gameState == GameState.TITLE_SCREEN) {
             titleScreen.draw(g);
-        } else if (gameState != GameState.TITLE_SCREEN) {
+        } else {
             drawBackground(g);
             // draw : monster -> weapon -> player
             drawMonsters(g);
@@ -137,20 +129,20 @@ public class GamePanel extends Canvas {
             drawPlayer(g);
             drawDamageReceived(g);
             drawScore(g);
-            if (DEBUG) {
+            if (Game.DEBUG) {
                 // draw a rectangle as background of debug info
                 int startY = 115;
                 g.setColor(Color.BLACK);
                 g.fillRect(0, 0, 310, startY + 5 + 20 * player.getWeapons().size());
                 // info
                 g.setColor(Color.WHITE);
-                g.setFont(getFont().deriveFont(20.0f));
+                g.setFont(g.getFont().deriveFont(20.0f));
                 g.drawString("Player: (" + (int)player.x + ", " + (int)player.y + "), atk: " + player.attack, 10, 35);
                 g.drawString("def: " + player.defense + ", hp: " + player.hp + " / " + player.maxHp + ", spd: " + player.getSpeed(), 10, 55);
                 g.drawString("Exp: " + player.exp + "/" + player.expTable[player.level] + ", Level: " + player.level, 10, 75);
                 g.drawString("GameTime: " + String.format("%.2f", Game.gameTime) + ", Strength: " + String.format("%.2f", Game.monsterStrength), 10, 95);
                 
-                if (player.getWeapons().size() > 0) {
+                if (!player.getWeapons().isEmpty()) {
                     g.drawString("Weapons: ", 10, startY);
                     int i = 0;
                     for (Weapon weapon : player.getWeapons()) {
@@ -158,7 +150,7 @@ public class GamePanel extends Canvas {
                         i++;
                     }
                 }
-                g.setFont(getFont().deriveFont(12.0f));
+                g.setFont(g.getFont().deriveFont(12.0f));
             }
             drawFPS(g);
             g.setFont(cubicFont);
@@ -241,27 +233,29 @@ public class GamePanel extends Canvas {
         int boxHeight = 200;
         int margin = 20;
 
-        int boxX[] = {panelWidth / 2 - boxWidth / 2 * 3 - margin, panelWidth / 2 - boxWidth / 2, panelWidth / 2 + boxWidth / 2 + margin};
+        int[] boxX = {panelWidth / 2 - boxWidth / 2 * 3 - margin, panelWidth / 2 - boxWidth / 2, panelWidth / 2 + boxWidth / 2 + margin};
         int boxY = panelHeight / 2 - boxHeight / 2;
 
         g.setColor(Color.BLACK);
         ((Graphics2D) g).setStroke(new BasicStroke(3));
 
-        g.setFont(getFont().deriveFont(20.0f));
-        g.drawString("Choose one upgrade", panelWidth / 2 - "Choose one upgrade".length() * 5, boxY - 20);
+        g.setFont(g.getFont().deriveFont(30.0f));
+        g.drawString("選擇一個升級", getXForCenterText(g, "選擇一個升級"), boxY - 30);
         for (int i = 0; i < 3; i++) {
+            g.setFont(g.getFont().deriveFont(20.0f));
             g.setColor(Color.WHITE);
             g.fillRoundRect(boxX[i], boxY, boxWidth, boxHeight, 10, 10);
             g.drawImage(curLevelUpChoices[i].iconImage, boxX[i] + 25, boxY + 10, boxWidth - 50, boxHeight - 50, null);
             g.setColor(Color.BLACK);
             g.drawRoundRect(boxX[i], boxY, boxWidth, boxHeight, 10, 10);
-            g.drawString(curLevelUpChoices[i].getName(), boxX[i] + boxWidth / 2 - curLevelUpChoices[i].getName().length() * 5, boxY + boxHeight - 20);
+            // g.drawString(curLevelUpChoices[i].getName(), boxX[i] + boxWidth / 2 - curLevelUpChoices[i].getName().length() * 10, boxY + boxHeight - 20);
+            g.drawString(curLevelUpChoices[i].getName(), boxX[i] + boxWidth / 2 - getStringWidth(g, curLevelUpChoices[i].getName()) / 2, boxY + boxHeight - 20);
         }
 
         int smallBoxWidth = 100;
         int smallBoxHeight = 100;
 
-        int smallBoxX[] = {panelWidth / 2 - smallBoxWidth * 3 - margin / 2 * 5, panelWidth / 2 - smallBoxWidth * 2 - margin / 2 * 3, panelWidth / 2 - smallBoxWidth - margin / 2, panelWidth / 2 + margin / 2, panelWidth / 2 + smallBoxWidth + margin / 2 * 3, panelWidth / 2 + smallBoxWidth * 2 + margin / 2 * 5};
+        int[] smallBoxX = {panelWidth / 2 - smallBoxWidth * 3 - margin / 2 * 5, panelWidth / 2 - smallBoxWidth * 2 - margin / 2 * 3, panelWidth / 2 - smallBoxWidth - margin / 2, panelWidth / 2 + margin / 2, panelWidth / 2 + smallBoxWidth + margin / 2 * 3, panelWidth / 2 + smallBoxWidth * 2 + margin / 2 * 5};
         int smallBoxY = panelHeight / 2 + boxHeight / 2 + margin;
 
 
@@ -310,9 +304,9 @@ public class GamePanel extends Canvas {
 
     private void drawExp(Graphics g) {
         g.setColor(Color.BLACK);
-        g.setFont(getFont().deriveFont(20.0f));
-        g.drawString("Level: " + player.level, 10, 75);
+        g.setFont(g.getFont().deriveFont(32.0f));
         int x = 350, y = 100, h = 50, arc = 10;
+        g.drawString("Level: " + player.level, x, y - 20);
         int w = getWidth() - 2 * x;
         // draw the background of the exp bar
         g.setColor(Color.GREEN);
@@ -332,9 +326,9 @@ public class GamePanel extends Canvas {
 
     private void drawScore(Graphics g) {
         g.setColor(Color.BLACK);
-        g.setFont(getFont().deriveFont(20.0f));
+        g.setFont(g.getFont().deriveFont(32.0f));
         String str = "Score: " + player.score;
-        g.drawString(str, getWidth() - getStringWidth(g, str) - 10, 20);
+        g.drawString(str, getWidth() - getStringWidth(g, str) - 10, 35);
     }
 
     private void drawPlayer(Graphics g) {
@@ -343,15 +337,15 @@ public class GamePanel extends Canvas {
 
     private void drawFPS(Graphics g) {
         g.setColor(Color.BLACK);
+        g.setFont(g.getFont().deriveFont(20.0f));
         String str = String.format("FPS: %d", game.getMeasuredFPS());
         g.setColor(Color.GREEN);
-        g.drawString(str, 10, 15);
+        g.drawString(str, 10, 20);
     }
 
     int getXForCenterText(Graphics g, String text) {
         int textWidth = getStringWidth(g, text);
-        int centerX = getWidth()/2 - textWidth/2;
-        return centerX;
+        return getWidth()/2 - textWidth/2;
     }
 
     int getStringWidth(Graphics g, String text) {
@@ -515,11 +509,6 @@ class LevelUpChoice {
 
     private static BufferedImage[] loadAbilityImages() {
         BufferedImage[] images = new BufferedImage[4];
-        // TODO: load ability images
-        // images[0] = ImageTools.readImage("/icons/atk.png");
-        // images[1] = ImageTools.readImage("/icons/def.png");
-        // images[2] = ImageTools.readImage("/icons/hp.png");
-        // images[3] = ImageTools.readImage("/icons/spd.png");
 
         // use string to represent ability icon
         images[0] = genTextImage("ATK");
@@ -533,10 +522,8 @@ class LevelUpChoice {
     private static BufferedImage genTextImage(String text) {
         BufferedImage img = new BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = img.createGraphics();
-        // g.setColor(Color.BLACK);
-        // g.fillRect(0, 0, 50, 50);
         g.setColor(Color.BLACK);
-        g.setFont(new Font("Arial", Font.PLAIN, 20));
+        g.setFont(g.getFont().deriveFont(20.0f));
         g.drawString(text, 23 - text.length() * 5, 35);
         return img;
     }

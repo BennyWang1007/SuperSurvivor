@@ -4,9 +4,11 @@ import utils.ImageTools;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Array;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class TitleScreen {
@@ -31,6 +33,12 @@ public class TitleScreen {
     private BufferedImage playerImage;
     private BufferedImage titleScreenImage;
 
+    private int scrollY = 0;
+    private static final int SCROLL_SPEED = 20;
+    private BufferedImage scoreboardImage;
+
+    private int scoreImageWidth = 0;
+    private int scoreImageHeight = 0;
     // For start game animation
     private final int secondsToStartGame = 2;
     private long nanoTimeElapsed;
@@ -39,6 +47,9 @@ public class TitleScreen {
     public TitleScreen(Game game, GamePanel gamePanel) {
         this.game = game;
         this.gamePanel = gamePanel;
+        this.gamePanel.addMouseWheelListener(
+            e -> handleMouseWheelEvent(e)
+        );
         titleScreenImage = ImageTools.scaleImage(ImageTools.readImage("/ui/titlescreen.png"),863,483);
         playerImage = ImageTools.scaleImage(ImageTools.readImage("/player/backward1.png"), 36, 48);
         init();
@@ -65,7 +76,9 @@ public class TitleScreen {
         g.drawImage(titleScreenImage, 0, 0, game.screenWidth, game.screenHeight,null );
         g.setColor(new Color(0xFF, 0xFF, 0xFF, 128));
         g.fillRect(0, 0, gamePanel.getWidth(), gamePanel.getHeight());
-        g.drawImage(playerImage,800,500,72,96,null);
+        if (currentPage != MenuPage.SCOREBOARD) {
+            g.drawImage(playerImage,800,500,72,96,null);
+        }
 
         // draw body
         if (currentPage == MenuPage.MAIN) {
@@ -205,45 +218,102 @@ public class TitleScreen {
     private void drawScoreboard(Graphics g) {
         int x, y;
         int width, height;
-
+    
         // TITLE
         String title = "排行榜";
         g.setFont(g.getFont().deriveFont(48f));
         x = gamePanel.getXForCenterText(g, title);
-        y = gamePanel.getHeight()/8;
+        y = gamePanel.getHeight() / 8;
         g.setColor(Color.GRAY);
-        g.drawString(title, x+3, y+3);
+        g.drawString(title, x + 3, y + 3);
         g.setColor(Color.BLACK);
         g.drawString(title, x, y);
-
-        // background
-        x = gamePanel.getWidth()*2/6;
-        y = gamePanel.getHeight()/6;
-        width = gamePanel.getWidth()*2/6;
-        height = gamePanel.getHeight()*4/6;
-        g.setColor(new Color(102, 102, 102, 250));
+    
+        // Background
+        x = gamePanel.getWidth() / 7;
+        y = gamePanel.getHeight() / 6;
+        width = gamePanel.getWidth() - x * 2;
+        height = gamePanel.getHeight() * 4 / 6;
+        g.setColor(new Color(102, 102, 102, 160));
         g.fillRoundRect(x, y, width, height, 20, 20);
 
-        // Rank list
-        ArrayList<ScoreEntry> scoreEntries = Game.scores;
-        g.setFont(g.getFont().deriveFont(36f));
-        int gap = 20;
-        int textHeight = (int) g.getFontMetrics().getStringBounds("中", g).getHeight();
-        x = gamePanel.getWidth() / 4;
-        y = gamePanel.getHeight() / 4;
-        for (int i = 0; i < scoreEntries.size(); i++) {
-            ScoreEntry entry = scoreEntries.get(i);
-            String text = (i+1) + ". " + entry.getName() + " - " + entry.getScore() + "分";
-            g.drawString(text, x, y);
-            y += textHeight + gap;
-        }
+        // draw 2 buttons for scrolling at bottom right
+        int buttonHeight = 50;
+        int buttonGap = 20;
+        int buttonX = x + width + 20;
+        int buttonY = y + height - buttonHeight - buttonGap - 10;
+        gamePanel.drawButton(g, "scoreboard_up", "↑", buttonX, buttonY, 10, true, true, () -> scoreScroll(-SCROLL_SPEED));
+        gamePanel.drawButton(g, "scoreboard_down", "↓", buttonX, buttonY + buttonHeight + buttonGap, 10, true, true, () -> scoreScroll(SCROLL_SPEED));
 
-        // back button
+        // Generate the scoreboard image if it doesn't exist or needs to be updated
+        scoreImageWidth = width - 30;
+        scoreImageHeight = height - 30;
+        if (scoreboardImage == null) {
+            int textHeight = (int) g.getFontMetrics().getStringBounds("中", g).getHeight();
+            int offScreenHeight = Game.scores.size() * (textHeight + 10) + 20; // calculate based on the number of scores
+            scoreboardImage = new BufferedImage(scoreImageWidth, offScreenHeight, BufferedImage.TYPE_INT_ARGB);
+            Graphics gOffScreen = scoreboardImage.getGraphics();
+    
+            // Draw the rank list
+            int cx = 15;
+            int cy = 30;
+            gOffScreen.setFont(g.getFont().deriveFont(36f));
+            for (int i = 0; i < Game.scores.size(); i++) {
+                ScoreEntry entry = Game.scores.get(i);
+                String text = (i + 1) + ". " + entry.getName() + " - " + entry.getScore() + "分";
+                gOffScreen.setFont(g.getFont().deriveFont(36f));
+                gOffScreen.setColor(Color.BLACK);
+                gOffScreen.drawString(text, cx + 3, cy + 3);
+                gOffScreen.setColor(new Color(220, 220, 220));
+                gOffScreen.drawString(text, cx, cy);
+                
+                // draw timestamp with smaller font at the right
+                gOffScreen.setFont(g.getFont().deriveFont(24f));
+                LocalDateTime timestamp = entry.getTimestamp();
+                
+                String timeStr = String.format("%04d/%02d/%02d %02d:%02d",
+                    timestamp.getYear(),
+                    timestamp.getMonthValue(),
+                    timestamp.getDayOfMonth(),
+                    timestamp.getHour(),
+                    timestamp.getMinute()
+                );
+                gOffScreen.setColor(Color.BLACK);
+                gOffScreen.drawString(timeStr, scoreImageWidth - (g.getFontMetrics().stringWidth(timeStr) / 2) - 15, cy);
+
+                cy += textHeight;
+            }
+    
+            gOffScreen.dispose();
+        }
+    
+        // Draw the visible portion of the scoreboard image
+        int clipX = x + 15;
+        int clipY = y + 15;
+        g.drawImage(scoreboardImage, clipX, clipY, clipX + scoreImageWidth, clipY + scoreImageHeight,
+                    0, scrollY, scoreImageWidth, scrollY + scoreImageHeight, null);
+    
+        // Draw the back button
         g.setFont(g.getFont().deriveFont(36f));
         String backString = "返回";
         x = gamePanel.getXForCenterText(g, backString);
-        y = gamePanel.getHeight()*8/9;
+        y = gamePanel.getHeight() * 8 / 9;
         gamePanel.drawButton(g, "scoreboard_back", backString, x, y, 75, true, true, () -> currentPage = MenuPage.MAIN);
+    }
+
+    public void scoreScroll(int dy) {
+        if (dy > 0) {
+            scrollY = Math.min(scrollY + dy, Math.max(0, scoreboardImage.getHeight() - scoreImageHeight));
+        } else {
+            scrollY = Math.max(0, scrollY + dy);
+        }
+    }
+
+    public void handleMouseWheelEvent(MouseWheelEvent e) {
+        if (currentPage == MenuPage.SCOREBOARD) {
+            int notches = e.getWheelRotation();
+            scoreScroll(notches * SCROLL_SPEED);
+        }
     }
 
     private void drawSettingsPage(Graphics g) {
@@ -318,7 +388,6 @@ public class TitleScreen {
             game.setBgmVolume(newLevel);
             game.settings.musicVolumeLevel = newLevel;
         });
-
 
         // sound effect
         String labelSound = "遊戲音效";

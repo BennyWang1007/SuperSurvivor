@@ -1,5 +1,8 @@
 package entity;
 
+import java.awt.Color;
+import java.awt.Graphics;
+
 public class Hitbox {
     public int startX;
     public int startY;
@@ -23,5 +26,10 @@ public class Hitbox {
         if (startY < other.startY && endY < other.startY) return false;
         if (other.startY < startY && other.endY < startY) return false;
         return true;
+    }
+
+    public void draw(Graphics g) {
+        g.setColor(Color.RED);
+        g.drawRect(startX, startY, endX - startX, endY - startY);
     }
 }

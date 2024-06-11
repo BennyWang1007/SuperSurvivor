@@ -18,7 +18,7 @@ public class KnifeGoblin extends Monster {
     private int animFrameCounter = 0;
     private int animImageIndex = 0;
 
-    private static final int defaltHp = 100;
+    private static final int defaltHp = 90;
     private static final int defaultAttack = 20;
     private static final int defaultSpeed = 60;
     private static final int defaultExp = 20;
@@ -26,9 +26,10 @@ public class KnifeGoblin extends Monster {
     public KnifeGoblin(Game game, String name, int x, int y, double strength, Player player) {
         super(game, name, x, y, defaltHp, defaultAttack, defaultSpeed, defaultExp, strength, player);
         dropItems = new DropItem[] {
-            (DropItem) new entity.ExpOrb(game, x, y, exp, player)
+            (DropItem) new entity.ExpOrb(game, x, y, exp, player),
+            (DropItem) new entity.HealBag(game, x, y, (int)(10 * strength), player)
         };
-        dropRates = new float[] {1.0f};
+        dropRates = new float[] {1.0f, 0.1f};
     }
 
     private static BufferedImage[][] loadAnimationImage() {
@@ -80,9 +81,9 @@ public class KnifeGoblin extends Monster {
 
         drawDamageReceived(g);
 
-        // // draw hitbox
-        // g.setColor(java.awt.Color.RED);
-        // g.drawRect(cx, cy, width, height);
+        if (Game.DEBUG) {
+            getHitBox().draw(g);
+        }
     }
 
     private void drawBody(Graphics g, int cx, int cy) {

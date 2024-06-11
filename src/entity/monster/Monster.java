@@ -79,7 +79,6 @@ public abstract class Monster extends Entity {
         g.setColor(java.awt.Color.RED);
         g.setFont(g.getFont().deriveFont(10.0f));
         for (int i = 0; i < damageReceived.size(); i++) {
-            // TODO: maybe add an animation to show the damage received
             float alpha = (float)damageReceived.get(i).time / Game.FPS;
             cy -= (int)(10 * alpha);
             g.setColor(new java.awt.Color(255, 0, 0, (int)(255 * alpha)));

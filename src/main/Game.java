@@ -1,25 +1,23 @@
 package main;
 
-import javax.sound.sampled.FloatControl;
+import java.io.*;
+import java.util.*;
 import javax.swing.*;
 
 import entity.DropItem;
-import entity.Entity;
-import entity.Hitbox;
-import entity.Player;
 import entity.monster.Monster;
+import entity.Player;
 import listeners.GameKeyboardListener;
 import listeners.GameMouseListener;
 import weapons.*;
 
-import java.util.*;
-import java.io.*;
 
 public class Game {
 
     public static final int FPS = 60;
     public static final double DELTA_TIME = 1. / FPS;
     private static final double NANO_TIME_PER_FRAME = 1000000000.0 / FPS;
+    public static boolean DEBUG = false;
 
     public static double gameTime = 0; // in seconds
     public static double monsterStrength = 1;
@@ -76,6 +74,7 @@ public class Game {
 
     // Projectiles
     private Set<Projectile> projectiles;
+    private Set<Projectile> monsterProjectiles;
 
     // measured FPS & UPS
     private int measuredFPS = 0;
@@ -111,6 +110,7 @@ public class Game {
 
         // projectiles
         projectiles = new HashSet<>();
+        monsterProjectiles = new HashSet<>();
 
         // drop items
         dropItems = new HashSet<>();
@@ -153,6 +153,7 @@ public class Game {
         monsterCooldownCounter = 0;
         dropItems.clear();
         projectiles.clear();
+        monsterProjectiles.clear();
         measuredFPS = 0;
         player.init();
         player.moveTo(worldWidth/2, worldHeight/2);
@@ -170,6 +171,10 @@ public class Game {
 
     public Set<Monster> getMonsters() {
         return monsters;
+    }
+
+    public Set<Projectile> getMonsterProjectiles() {
+        return monsterProjectiles;
     }
 
     public boolean isOver() {
@@ -218,7 +223,6 @@ public class Game {
     }
 
     public boolean isValidPosition(float x, float y) {
-        // TODO: check if the position is valid
         return x >= 0 && x <= worldWidth && y >= 0 && y <= worldHeight;
     }
 
@@ -253,7 +257,6 @@ public class Game {
     }
 
     public void quit() {
-        // TODO: Quit Game
         System.exit(0);
     }
 
@@ -309,17 +312,15 @@ public class Game {
     }
 
     private void endGame() {
-        // set default name player.name in showInputDialog and add a discard button
-        String name = JOptionPane.showInputDialog(gameFrame, "Game Over! Enter your name(cancel to discard)", player.name);
-        
+        String name = JOptionPane.showInputDialog(gameFrame, "遊戲結束! 請輸入你的名字(取消以放棄儲存)", player.name);
         if (name != null && !name.trim().isEmpty()) {
             addScoreEntry(name, player.getScore());
         }
-        int choice = JOptionPane.showConfirmDialog(gameFrame, "Game Over! Do you want to play again?", "Game Over", JOptionPane.YES_NO_OPTION);
+        int choice = JOptionPane.showConfirmDialog(gameFrame, "遊戲結束! 你的分數是 " + player.getScore() + " 分\n" + "是否要再玩一次?", "遊戲結束", JOptionPane.YES_NO_OPTION);
         if (choice == JOptionPane.YES_OPTION) {
             reset();
         } else {
-            System.exit(0);
+            quit();
         }
     }
 
@@ -357,7 +358,7 @@ public class Game {
                 monsterStrength = strengthFormula(gameTime);
             }
 
-            // end game ?
+            // end game
             if (isOver()) {
                 endGame();
             }
@@ -383,6 +384,7 @@ public class Game {
         });
         monsters.removeIf(Monster::isDead);
         projectiles.removeIf(proj -> proj.toDelete);
+        monsterProjectiles.removeIf(proj -> proj.toDelete);
         dropItems.removeIf(item -> item.isCollected);
         processMonsterSpawn();
         calculateCenter();
@@ -394,28 +396,23 @@ public class Game {
 
     private void processCollision() {
         monsters.forEach(monster -> {
-            // monster hit player
-            if (isCollided(player, monster)) {
+            if (player.getHitBox().isCollideWith(monster.getHitBox())) {
                 player.collideWith(monster);
             }
 
             // player's weapon hit monster
             player.getWeapons().forEach(weapon -> {
-                if (isCollided(weapon, monster)) {
+                if (weapon.getHitBox().isCollideWith(monster.getHitBox())) {
                     weapon.attackOn(monster);
                 }
             });
         });
-    }
-
-    private boolean isCollided(Entity e1, Entity e2) {
-        Hitbox b1 = e1.getHitBox();
-        Hitbox b2 = e2.getHitBox();
-        if (b1.startX < b2.startX && b1.endX < b2.startX) return false;
-        if (b2.startX < b1.startX && b2.endX < b1.startX) return false;
-        if (b1.startY < b2.startY && b1.endY < b2.startY) return false;
-        if (b2.startY < b1.startY && b2.endY < b1.startY) return false;
-        return true;
+        
+        monsterProjectiles.forEach(proj -> {
+            if (player.getHitBox().isCollideWith(proj.getHitBox())) {
+                proj.attackOn(player);
+            }
+        });
     }
 
     private void processMonsterSpawn() {
@@ -440,6 +437,10 @@ public class Game {
 
     public void addProjectile(Projectile projectile) {
         projectiles.add(projectile);
+    }
+
+    public void addMonsterProjectile(Projectile projectile) {
+        monsterProjectiles.add(projectile);
     }
 
     public double getMonsterStrength() {

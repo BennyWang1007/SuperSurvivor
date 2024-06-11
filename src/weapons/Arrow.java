@@ -53,9 +53,8 @@ public class Arrow extends Projectile {
         
         g.drawImage(image, cx, cy, null);
 
-        // draw hitbox
-//        g.setColor(Color.RED);
-//        ((Graphics2D) g).drawRect(cx, cy, width, height);
-
+        if (Game.DEBUG) {
+            getHitBox().draw(g);
+        }
     }
 }

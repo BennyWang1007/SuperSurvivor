@@ -3,6 +3,8 @@ package main;
 import com.sun.jdi.FloatType;
 
 import javax.sound.sampled.*;
+
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -14,7 +16,8 @@ public class Sound {
     public Sound(String fileName) {
         try {
             InputStream inputStream = getClass().getResourceAsStream("/sound/" + fileName);
-            AudioInputStream sound = AudioSystem.getAudioInputStream(inputStream);
+            BufferedInputStream buffIn = new BufferedInputStream(inputStream);
+            AudioInputStream sound = AudioSystem.getAudioInputStream(buffIn);
             // load the sound into memory (a Clip)
             clip = AudioSystem.getClip();
             clip.open(sound);

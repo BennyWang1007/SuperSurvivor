@@ -24,7 +24,10 @@ public class Player extends Entity{
     public final int maxLevel = 39;
     public int score;
     // public int[] expTable = {0, 100, 200, 400, 800, 1600, 3200, 6400};
-    public int[] expTable = {0, 100, 100, 100, 100, 100, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500, 520, 540, 560, 580, 600, 620, 640, 660, 680, 700, 720, 740, 760, 780, 800};
+    public int[] expTable = {0, 1, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000,
+                             1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900,
+                             2000, 2100, 2200, 2300, 2400, 2500, 2600, 2700, 2800,
+                             2900, 3000, 3100, 3200, 3300, 3400, 3500, 3600, 3700, 3800};
 
     public int damageCooldown;
     private int curMaxDamage;
@@ -148,7 +151,6 @@ public class Player extends Entity{
     }
 
     public void update() {
-        // System.out.println("\rPlayer at " + x + ", " + y);
         damageCooldown--;
         weapons.forEach(Weapon::update);
         if (damageCooldown > 0) return;
@@ -237,7 +239,9 @@ public class Player extends Entity{
     private void levelUp() {
         game.playSound(SoundType.LEVEL_UP);
         level++;
-        maxHp += 10;
+        int dHp = maxHp / 20;
+        maxHp += dHp;
+        hp += dHp;
         addAttack(5);
         defense += 2;
         game.levelUp();
@@ -293,7 +297,6 @@ public class Player extends Entity{
      * @param g the Graphics object
      */
     public void draw(Graphics g) {
-        // System.out.println("Drawing player at " + x + ", " + y);
         int screenX = game.translateToScreenX(x);
         int screenY = game.translateToScreenY(y);
         int drawX = (screenX - width/2);
@@ -315,14 +318,9 @@ public class Player extends Entity{
         g.setColor(java.awt.Color.GREEN);
         g.fillRect(healthBarX, healthBarY, healthBarWidth * hp / maxHp, healthBarHeight);
 
-        // Draw hitbox
-        g.setColor(java.awt.Color.RED);
-        Hitbox hitbox = getHitBox();
-        int screenSX = game.translateToScreenX(hitbox.startX);
-        int screenSY = game.translateToScreenY(hitbox.startY);
-        int screenEX = game.translateToScreenX(hitbox.endX);
-        int screenEY = game.translateToScreenY(hitbox.endY);
-        g.drawRect(screenSX, screenSY, screenEX - screenSX, screenEY - screenSY);
+        if (Game.DEBUG) {
+            getHitBox().draw(g);
+        }
 
     }
 

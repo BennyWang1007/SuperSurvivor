@@ -29,9 +29,10 @@ public class StoneThrower extends Monster {
         super(game, "StoneThrower", x, y, defaultHp, defaultAttack, defaultSpeed, defaultExp, strength, player);
         stoneSpeed = speed / 12;
         dropItems = new DropItem[] {
-            (DropItem) new entity.ExpOrb(game, x, y, exp, player)
+            (DropItem) new entity.ExpOrb(game, x, y, exp, player),
+            (DropItem) new entity.HealBag(game, x, y, (int)(10 * strength), player)
         };
-        dropRates = new float[] {1.0f};
+        dropRates = new float[] {1.0f, 0.2f};
     }
 
     private static BufferedImage[][] loadAnimationImage() {
@@ -70,7 +71,9 @@ public class StoneThrower extends Monster {
         }
         shootCooldown = Game.FPS*3;
         float degree = (float)Math.toDegrees(Math.atan2(player.y - y, player.x - x));
-        game.addProjectile(new Stone(game, x, y, attack, stoneSpeed, degree, player));
+        Stone stone = new Stone(game, x, y, attack, stoneSpeed, degree);
+        game.addProjectile(stone);
+        game.addMonsterProjectile(stone);
     }
 
     public void draw(Graphics g) {
@@ -82,8 +85,6 @@ public class StoneThrower extends Monster {
         g.setColor(java.awt.Color.BLUE);
         g.setFont(g.getFont().deriveFont(12f));
         drawBody(g, cx, cy);
-        // use id instead of name
-        g.drawString(Integer.toString(id), cx, cy - 5);
 
         // draw health bar, red and green, above the monster
         int healthBarWidth = width;
@@ -97,9 +98,12 @@ public class StoneThrower extends Monster {
 
         drawDamageReceived(g);
 
-        // // draw hitbox
-        // g.setColor(java.awt.Color.RED);
-        // g.drawRect(cx, cy, width, height);
+        if (Game.DEBUG) {
+            // draw id
+            g.drawString(Integer.toString(id), cx, cy - 5);
+            // draw hitbox
+            getHitBox().draw(g);
+        }
     }
 
     private void drawBody(Graphics g, int cx, int cy) {

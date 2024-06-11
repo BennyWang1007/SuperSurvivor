@@ -26,9 +26,9 @@ public class GameMap {
         Scanner sc = new Scanner(new InputStreamReader(is));
         while (sc.hasNext()) {
             String fileName = sc.next();
-            String collsion = sc.next();
+            String collision = sc.next();
             fileNames.add(fileName);
-            collisionStatus.add(collsion);
+            collisionStatus.add(collision);
         }
         sc.close();
 
@@ -44,7 +44,6 @@ public class GameMap {
                 collisionstatus = true;
             }
             setup(i, fileName, collisionstatus);
-            // System.out.println("setup: " + i + " | " + fileName);
         }
     }
 

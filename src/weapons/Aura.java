@@ -7,7 +7,6 @@ import java.util.Set;
 import entity.Player;
 import entity.monster.Monster;
 import main.Game;
-import main.Sound;
 import main.SoundType;
 import utils.ImageTools;
 
@@ -17,7 +16,6 @@ public class Aura extends Weapon {
     private int animationIndex = 0;
     Set<Monster> monsters;
     private final float deltaRadius = 40;
-    // private float degreeOfTransparency = 0.0f; // cos(degree) = transparency
 
     public Aura(Game game, int width, int height, float attackMul, float radius, Player player) {
         super(game, width, height, attackMul, player);
@@ -98,5 +96,4 @@ public class Aura extends Weapon {
     protected BufferedImage loadIconImage() {
         return ImageTools.readImage("/weapons/Aura.png");
     }
-
 }

@@ -41,9 +41,9 @@ public class Roller extends Monster {
         height = 75;
         dropItems = new DropItem[] {
             (DropItem) new entity.ExpOrb(game, x, y, exp, player),
-            (DropItem) new entity.HealBag(game, x, y, 10, player)
+            (DropItem) new entity.HealBag(game, x, y, (int)(10 * strength), player)
         };
-        dropRates = new float[] {1.0f, 0.5f};
+        dropRates = new float[] {1.0f, 0.3f};
     }
 
 
@@ -128,7 +128,10 @@ public class Roller extends Monster {
         g.fillRect(healthBarX, healthBarY, healthBarWidth * hp / maxHp, healthBarHeight);
 
         drawDamageReceived(g);
-        
+
+        if (Game.DEBUG) {
+            getHitBox().draw(g);
+        }
     }
 
     private void drawBody(Graphics g, int cx, int cy) {
